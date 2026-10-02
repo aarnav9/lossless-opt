@@ -14,9 +14,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.colors import to_rgba
-from matplotlib.patches import FancyBboxPatch
 
 
 def render(data_path, output):
@@ -52,161 +50,136 @@ def render(data_path, output):
             "svg.hashsalt": "lossless-retention",
         }
     )
-    background, ink, muted, mint = "#0b1220", "#f0f5fc", "#a7b5cb", "#66e6cb"
-    fig = plt.figure(figsize=(13.6, 7.8), facecolor=background)
-    backdrop = fig.add_axes([0, 0, 1, 1], zorder=-2)
-    backdrop.set_axis_off()
-    yy, xx = np.mgrid[0:1:500j, 0:1:900j]
-    for color, center, opacity in [
-        (mint, (0.02, 0.65), 0.055),
-        ("#8e8cf7", (0.98, 0.95), 0.09),
-    ]:
-        layer = np.ones((*xx.shape, 4)) * np.array(to_rgba(color))
-        layer[:, :, 3] = opacity * np.exp(-((xx - center[0]) ** 2 + (yy - center[1]) ** 2) / 0.15)
-        backdrop.imshow(layer, extent=(0, 1, 0, 1), origin="lower", aspect="auto")
-
-    fig.text(0.06, 0.923, "LOSSLESS  /  INSTALLED ALPHA", color=mint, size=10, weight="bold")
-    fig.text(0.06, 0.846, "Same batch. Less waiting.", color=ink, size=29, weight="bold")
+    background, ink, muted = "#ffffff", "#303747", "#677388"
+    slate, teal, baseline = "#8297b5", "#3a9e89", "#9b96cf"
+    fig = plt.figure(figsize=(12.8, 7.6), facecolor=background)
     fig.text(
-        0.06,
-        0.787,
-        "SmolLM2-135M-Instruct · unchanged 8-bit weights · eight fixed-count requests",
-        color=muted,
-        size=11,
-    )
-    fig.text(0.06, 0.58, f"{speedup:.2f}×", color=mint, size=66, weight="bold")
-    fig.text(0.065, 0.525, "measured throughput", color=ink, size=17)
-
-    callout = FancyBboxPatch(
-        (0.06, 0.355),
-        0.343,
-        0.106,
-        transform=fig.transFigure,
-        boxstyle="round,pad=0.009,rounding_size=0.015",
-        facecolor=to_rgba(mint, 0.06),
-        edgecolor=to_rgba(mint, 0.18),
-        linewidth=1,
-    )
-    fig.add_artist(callout)
-    fig.text(
-        0.079,
-        0.416,
-        f"{reduction:.1f}% less batch time",
+        0.5,
+        0.93,
+        "Lossless: measured MLX inference performance",
+        ha="center",
         color=ink,
-        size=15,
-        weight="bold",
+        size=16,
+        weight="medium",
     )
     fig.text(
-        0.079,
-        0.38,
-        f"95% speedup interval: {low:.3f}–{high:.3f}×",
+        0.5,
+        0.876,
+        f"{data['model']}  |  {data['device']}  |  unchanged 8-bit weights",
+        ha="center",
         color=muted,
         size=10,
     )
 
-    ax = fig.add_axes([0.535, 0.355, 0.385, 0.36], facecolor="none")
-    ax.set_xlim(-0.6, 1.6)
+    ax = fig.add_axes([0.09, 0.325, 0.86, 0.49], facecolor=background)
+    ax.set_xlim(-0.7, 1.7)
     ax.set_ylim(0, 2.3)
     ax.set_axisbelow(True)
-    ax.set_yticks([0, 0.5, 1, 1.5, 2], ["0", "0.5×", "1×", "1.5×", "2×"])
-    ax.tick_params(axis="y", colors=muted, length=0, pad=8, labelsize=9)
-    ax.grid(axis="y", color="#d4e0f3", alpha=0.085, linewidth=0.8)
-    ax.set_ylabel("Throughput / stock serial", color=muted, size=10, labelpad=12)
-    ax.axhline(0, color="#d4e0f3", alpha=0.20, lw=1)
-    for x, height, color, top_alpha in [
-        (0, 1, "#9caccc", 0.40),
-        (1, speedup, mint, 0.65),
-    ]:
-        patch = FancyBboxPatch(
-            (x - 0.26, 0),
-            0.52,
+    ax.set_yticks([0, 0.5, 1, 1.5, 2], ["0", "0.5", "1.0", "1.5", "2.0"])
+    ax.tick_params(axis="y", colors=muted, length=3, width=0.6, pad=7, labelsize=9)
+    ax.grid(axis="y", color="#e9edf2", linewidth=0.7)
+    ax.set_ylabel("Throughput relative to stock serial MLX (×)", color=muted, size=10, labelpad=12)
+    for x, height, color in [(0, 1, slate), (1, speedup, teal)]:
+        ax.bar(
+            x,
             height,
-            boxstyle="round,pad=0,rounding_size=0.035",
-            facecolor=to_rgba(color, 0.045),
-            edgecolor=to_rgba(color, 0.60),
-            linewidth=1.1,
+            width=0.48,
+            facecolor=to_rgba(color, 0.18),
+            edgecolor=to_rgba(color, 0.85),
+            linewidth=1.0,
             zorder=3,
         )
-        ax.add_patch(patch)
-        gradient = np.ones((250, 1, 4)) * np.array(to_rgba(color))
-        gradient[:, :, 3] = np.linspace(0.06, top_alpha, 250)[:, None]
-        fill = ax.imshow(
-            gradient,
-            extent=(x - 0.26, x + 0.26, 0, height),
-            origin="lower",
-            aspect="auto",
-            zorder=2,
-        )
-        fill.set_clip_path(patch)
+    ax.axhline(1, color=baseline, lw=1, ls=(0, (5, 3)), zorder=4)
+    ax.text(
+        1.66,
+        1.045,
+        "Stock serial baseline",
+        ha="right",
+        va="bottom",
+        color=baseline,
+        size=8.5,
+    )
     ax.errorbar(
         1,
         speedup,
         yerr=[[speedup - low], [high - speedup]],
         fmt="none",
-        color=mint,
+        color=teal,
         capsize=5,
-        capthick=1.4,
-        elinewidth=1.4,
+        capthick=1.1,
+        elinewidth=1.1,
         zorder=5,
     )
-    ax.text(0, 1.12, "1.000×", ha="center", color=ink, size=14, weight="bold")
-    ax.text(
-        1,
-        high + 0.12,
-        f"{speedup:.3f}×",
-        ha="center",
-        color=mint,
-        size=14,
-        weight="bold",
-    )
+    ax.text(0, 1.09, "1.000×", ha="center", color=ink, size=12)
+    ax.text(1, high + 0.10, f"{speedup:.3f}×", ha="center", color=ink, size=12)
     ax.set_xticks(
         [0, 1],
         [
             f"Stock serial MLX\n{reference * 1000:.1f} ms / batch",
-            f"Lossless alpha\n{candidate * 1000:.1f} ms / batch",
+            f"Lossless alpha · retained recipe\n{candidate * 1000:.1f} ms / batch",
         ],
     )
     ax.tick_params(axis="x", colors=ink, length=0, pad=12, labelsize=10)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color("#dce2eb")
+        ax.spines[side].set_linewidth(0.7)
 
-    fig.add_artist(
-        plt.Line2D(
-            [0.06, 0.94],
-            [0.256, 0.256],
-            transform=fig.transFigure,
-            color="#cedbec",
-            alpha=0.13,
-        )
-    )
-    for x, title, detail in [
-        (0.085, "Tokens", "All eight requests match"),
-        (0.38, "Log probabilities", "Bitwise identical on tested cases"),
-        (0.705, "Active KV state", "Bitwise identical on tested cases"),
-    ]:
-        fig.text(x - 0.025, 0.206, "✓", color=mint, size=15, weight="bold")
-        fig.text(x, 0.209, title, color=ink, size=12, weight="bold")
-        fig.text(x, 0.176, detail, color=muted, size=9)
-    fig.text(
-        0.06,
-        0.115,
-        f"Apple M2 · MLX {data['runtime']['mlx']} / mlx-lm {data['runtime']['mlx-lm']} · {repeats} paired warm repeats · descriptive 95% interval",
+    ax.text(
+        0.025,
+        0.93,
+        f"{repeats} paired warm repeats\n"
+        f"Median batch time reduction: {reduction:.1f}%\n"
+        f"Speedup 95% interval: [{low:.3f}, {high:.3f}]×",
+        transform=ax.transAxes,
+        va="top",
         color=muted,
         size=9,
+        linespacing=1.7,
+        bbox={
+            "boxstyle": "round,pad=0.6,rounding_size=0.15",
+            "facecolor": "#f8fafc",
+            "edgecolor": "#e9edf2",
+            "linewidth": 0.7,
+        },
+    )
+
+    fig.text(
+        0.09,
+        0.206,
+        "Exact comparison: tokens, log-probability bits and active KV state match on all eight requests.",
+        color=ink,
+        size=9.5,
     )
     fig.text(
-        0.06,
-        0.081,
-        "33-token prefixes · 4–32 output tokens per request · Loading and first-use compilation excluded",
+        0.09,
+        0.161,
+        f"MLX {data['runtime']['mlx']} / mlx-lm {data['runtime']['mlx-lm']}"
+        "  ·  33-token prefixes  ·  4–32 output tokens per request  ·  evaluation split",
         color=muted,
-        size=9,
+        size=8.5,
     )
     fig.text(
-        0.06,
-        0.047,
-        "One recorded workload; finite validation. Batching may increase first-token latency. Retained recipe; no live LLM call.",
+        0.09,
+        0.127,
+        "Bars: ratio of median batch times. Whisker: descriptive paired bootstrap 95% interval, within-host timing only.",
         color=muted,
-        size=9,
+        size=8.5,
+    )
+    fig.text(
+        0.09,
+        0.093,
+        "Loading and first-use compilation excluded. Batching may increase first-token latency.",
+        color=muted,
+        size=8.5,
+    )
+    fig.text(
+        0.09,
+        0.059,
+        "One recorded workload; finite validation, not a universal proof. Retained recipe; no live LLM call.",
+        color=muted,
+        size=8.5,
     )
     for extension in ["png", "svg"]:
         destination = output / f"mlx-retention.{extension}"
