@@ -1,4 +1,4 @@
-# Lossless
+# Lossless Numerical Optimization
 
 > An optimizer that combines formal reasoning, hardware information, and measured experiments to accelerate computations while preserving an explicit correctness contract.
 
