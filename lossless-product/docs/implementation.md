@@ -1,8 +1,10 @@
 # Lossless implementation plan
 
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
 Build the product as an independently installable project inside `lossless-product`. Extract the research components behind explicit interfaces while retaining the chosen research gains. The first delivery needs a complete optimization workflow, bring-your-own LLM support, and deployment of the selected exact recipes with their checks and reference fallback.
 
-This is a proposed implementation sequence. Only design documentation, illustrative contract/job configurations, and repository hygiene files exist in this folder today.
+This is a proposed implementation sequence. The source alpha implements the core workflow and selected adapters; use the retention inventory for what has been extracted and tested.
 
 ## Preserve the gains before simplifying the architecture
 

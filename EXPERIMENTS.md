@@ -120,3 +120,8 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 Append an experiment/result pair under a stable new ID. State the hypothesis and workload in the experiment line; state the decision, comparator, correctness mode, principal result, and useful failure lesson in the result line. Record pending work as pending rather than inventing a result. Use a follow-up ID for new evidence that changes an earlier conclusion, and point back to the earlier entry.
 
 Keep large runs and scratch work under ignored `research/`. Any evidence required to reproduce a public product claim must be separately curated into public fixtures, source, or a versioned evidence bundle. A summary alone is insufficient to reproduce or certify a speedup.
+
+## Product extraction
+
+- **Alpha 0.1.0a1 — Experiment:** Extract the frozen native optimizer and retained 017–023 MLX recipe into an independent package; test wheel installation, provider boundaries, contracts, proofs, export/load, fallback, and the original shrinking-batch fixtures.
+- **Result — scoped retention:** Local CPU/Metal checks and seven Lean modules passed; installed MLX reached 1.945× stock serial on the evaluation fixture with exact sampled tokens/probabilities/KV, close to the prior 1.96× result. Full campaign replay, broader model/device qualification, and fresh multi-GiB proof setup remain separate work; see `lossless-product/docs/retention.md`.

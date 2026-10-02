@@ -1,0 +1,21 @@
+{
+  "mathlib_commit": "8f9d9cff6bd728b17a24e163c9402775d9e6a365",
+  "lean_toolchain": "leanprover/lean4:v4.28.0",
+  "checked_examples": [
+    "KernelTheorems.diagonal_action",
+    "KernelTheorems.diagonal_product",
+    "KernelTheorems.compose_action"
+  ],
+  "indexed_theorems": 14735,
+  "index_sha256": "fd28d7a9e767f414ce645a5c21ac94618d619ec8b6d1801de83d7d24dd4fe78c",
+  "project_sources": {
+    "lakefile.toml": "382660d20937ce1d03107aa0e97c22fef99a9b8421aebd42dac752a380451cc3",
+    "lake-manifest.json": "14b35ff6bdf77bd9cd73c125b0a3559c02c82bdd361895c2fc81bdbaf08dcae6",
+    "lean-toolchain": "db7bb24b756d745bbde83fe92718b51bd3625dae3701ba0f598d0eedcd3f3028",
+    "KernelTheorems.lean": "e12094d9105d1b8f5d849beae2933396e3213078c1c514aafbe6bd5d6ff703b9",
+    "Index.lean": "1dfa03a8512165b519518d2ed1656fb6b44e63277865a3998bcab4d6a5c04820",
+    "search.py": "51f6de37c761cb35892517d0133472bff06ce1f4cbe33dfb9d7c862686254036"
+  },
+  "numeric_scope": "matrix examples over rationals; retrieved identities are not certified machine-float rewrites",
+  "verification": "lake build KernelTheorems and lake env lean Index.lean completed; no sorry/custom axioms in checked examples"
+}

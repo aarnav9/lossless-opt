@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "name": "native-softmax",
+  "workload": {
+    "adapter": "native.softmax",
+    "cases": [
+      {
+        "id": "discovery_c",
+        "split": "discovery",
+        "rows": 64,
+        "columns": 257,
+        "layout": "c"
+      },
+      {
+        "id": "discovery_f",
+        "split": "discovery",
+        "rows": 65,
+        "columns": 128,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_c",
+        "split": "evaluation",
+        "rows": 73,
+        "columns": 259,
+        "layout": "c"
+      },
+      {
+        "id": "evaluation_f",
+        "split": "evaluation",
+        "rows": 67,
+        "columns": 132,
+        "layout": "f"
+      }
+    ]
+  },
+  "contract": {
+    "preset": "numerical",
+    "required_evidence": "validated"
+  },
+  "objective": {
+    "metric": "latency",
+    "min_speedup": 1.02
+  },
+  "budget": {
+    "wall_time_seconds": 60,
+    "max_candidates": 3,
+    "max_llm_calls": 1
+  },
+  "target": {
+    "device": "auto"
+  },
+  "output": {
+    "directory": "./lossless-runs"
+  }
+}

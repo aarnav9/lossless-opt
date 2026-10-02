@@ -1,8 +1,10 @@
 # Lossless distribution and first use plan
 
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
 Recommend a small Python distribution providing both the `lossless` CLI and `import lossless`. Install it into the user's computation environment. Keep backend dependencies optional, use GitHub for source and contributions, and add Homebrew only after the installation and worker-environment story is stable. The product targets ML and numerical computations; the first demo should work without model weights or an LLM key.
 
-This is a design proposal. No Lossless package, installer, CLI, or release has been published from this workspace. Commands below describe the intended experience after implementation. `lossless-opt` is the proposed distribution/repository name and `lossless` the proposed command/import name; ownership and availability still need verification.
+This is a design proposal. The CLI and installable source package now exist in the private development repository; no package registry release has been published. Commands below describe the intended experience after implementation. `lossless-opt` is the proposed distribution/repository name and `lossless` the proposed command/import name; ownership and availability still need verification.
 
 ## What the GitHub repository should look like
 
@@ -156,7 +158,7 @@ Measure each release in CI: wheel bytes, source archive bytes, unpacked core siz
 
 ## Git ignores and release contents
 
-Git ignore rules keep untracked local research and generated output out of normal staging. They do not erase tracked files or existing history. This workspace has not yet been initialized with Git, so the ignored research can stay outside the first public commit. See [Git ignore semantics](https://git-scm.com/docs/gitignore).
+Git ignore rules keep untracked local research and generated output out of normal staging. They do not erase tracked files or existing history. The private Git history excludes the ignored research workspace. See [Git ignore semantics](https://git-scm.com/docs/gitignore).
 
 Package contents need explicit build configuration and an inspected file list as well. Define core package resources deliberately; exclude research, model weights, local environments, credentials and generated runs from both the wheel and source distribution. Test an installed wheel outside the checkout and ensure required templates, recipes, proof receipts and notices are present. Building from the promoted product directory gives a second, physical boundary around the archive.
 

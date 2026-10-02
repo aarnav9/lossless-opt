@@ -1,8 +1,10 @@
 # Lossless job configuration
 
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
 Use one job entry point, with a choice between inline configuration and references to reusable files. JSON is sufficient for this interface; the existing YAML example is an equivalent authoring option. Keep the correctness contract logically separate from the workload, objective, LLM connection, resource budget, and optional hardware profile even when they share a file. A performance preference or hardware hint cannot relax correctness.
 
-This is a proposed interface. The [inline JSON example](../examples/lossless.json), [split JSON example](../examples/lossless-split.json), and [YAML example](../examples/lossless.yaml) are illustrative. Their workload, model, datasets, and LLM callback are supplied by the user rather than included in this design folder. There is no configuration loader or optimizer implementation here yet.
+This is a proposed interface. The [inline JSON example](../examples/lossless.json), [split JSON example](../examples/lossless-split.json), and [YAML example](../examples/lossless.yaml) are illustrative. Their workload, model, datasets, and LLM callback are supplied by the user rather than included in this design folder. The executable loader accepts schema version 1; these older draft examples are not executable inputs.
 
 The examples use the retained language-model workload. The same job structure is intended for vision and numerical computation: change the workload adapter/reference, input fixtures, and contract observers. A classifier might supply image tensors and observe logits; a matrix routine might supply matrices and observe its result plus declared mutations. Tokens, samplers, and KV caches are adapter-specific fields, not requirements of the shared configuration. The `llm` section connects the optimization assistant regardless of the target. Each new adapter must define executable checks before its configuration can be accepted.
 

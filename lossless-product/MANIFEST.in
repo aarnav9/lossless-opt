@@ -1,0 +1,9 @@
+include README.md NOTICE
+recursive-include src/lossless/resources *.c *.json *.lean *.toml *.gz *LICENSE lean-toolchain
+recursive-include src/lossless/adapters/mlx *.json *LICENSE
+recursive-include src/lossless/_native *.m
+recursive-include tests *.py
+recursive-include scripts *.py
+recursive-include examples *.json
+recursive-include docs *.md *.mmd *.dot *.png *.svg
+global-exclude *.pyc

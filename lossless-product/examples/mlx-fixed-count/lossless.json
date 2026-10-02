@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "workload": {
+    "adapter": "mlx.fixed_count",
+    "parameters": {
+      "model": "./model",
+      "fixed_count": true,
+      "repeats": 7
+    },
+    "inputs": "requests.json"
+  },
+  "contract": {
+    "preset": "exact"
+  },
+  "budget": {
+    "wall_time_seconds": 180,
+    "max_candidates": 1,
+    "max_llm_calls": 0
+  },
+  "proofs": {
+    "check": true
+  }
+}

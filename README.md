@@ -2,28 +2,34 @@
 
 > An optimizer that combines formal reasoning, hardware information, and measured experiments to accelerate computations while preserving an explicit correctness contract.
 
-Lossless is designed for GPU-focused optimization of ML and numerical computations, including language models, computer vision, and linear algebra. Supported CPU workloads also remain in scope. Broader domain support must be implemented and measured; existing research gains apply to their recorded workloads.
+**Installable source alpha (`0.1.0a1`), private development repository.** The product now includes a CLI, JSON contracts, bounded search, bring-your-own LLM callbacks/commands, hardware discovery, validation, reports, and guarded export/load. Supported adapters cover native tensor copy, softmax, RMSNorm plus residual, and the retained exact MLX inference recipe.
 
-**Status: product design and research extraction.** The public product is not yet installable. Proposed interfaces, examples, and diagrams describe the planned behavior; performance entries summarize scoped research, not released product guarantees.
-
-- [Product overview](lossless-product/README.md)
-- [Architecture and computation lifecycle](lossless-product/docs/architecture.md)
-- [Job configuration and contracts](lossless-product/docs/configuration.md)
-- [Experiment ledger](EXPERIMENTS.md): what was tried, what worked, and what failed
-- [Repository and release plan](lossless-product/docs/repository.md)
-- [Installation, first use and package size plan](lossless-product/docs/distribution.md)
-
-## Repository layout
-
-```text
-README.md               Project entry point
-EXPERIMENTS.md          Public experiment summaries
-lossless-product/      Product design, examples, and future implementation
-research/              Local research workspace; ignored by Git
+```sh
+git clone https://github.com/aarnav9/lossless-opt.git
+cd lossless-opt
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install ./lossless-product
+lossless doctor
+lossless demo --budget 60s --output ./lossless-runs/demo
 ```
 
-`lossless-product/` is the clean product boundary. `research/` contains the historical runners, experiments, plans, detailed reports, raw results, proofs, and downloaded artifacts. It is kept locally but excluded from the proposed public repository. Existing hidden virtual environments also remain local and ignored.
+Python 3.10+ and clang are required for the CPU demo. Python dependencies install automatically; Lean/mathlib, GPU frameworks and weights are optional separate installations. Private-repo access is required. Nothing has been published to PyPI or Homebrew.
 
-Contributors should read `EXPERIMENTS.md` before proposing a repeat investigation. A new experiment should state what changes relative to prior work and add an experiment/result pair, including a negative or inconclusive result when applicable. An accepted product optimization must bring its required code, tests, proof scope, notices, and reproducible evidence into the public product; it must not depend on the ignored workspace.
+The broader product targets GPU optimization for ML, vision, and linear algebra. Arbitrary model graphs, CUDA execution and a vision adapter remain to be implemented. Exact MLX admission currently preserves the researched Apple M2, runtime and model-identity guards. Scoped Lean checks and finite floating-point validation remain distinct evidence.
 
-For local research, start with `research/WORKSPACE.md` and run historical commands from `research/`. This is the initial development snapshot: design documents and illustrative configurations. The installable optimizer is still to be extracted and implemented. Repository name: **`lossless-opt`**; product name: **Lossless**.
+- [Product quickstart and supported adapters](lossless-product/README.md)
+- [Implemented configuration, providers and deployment](lossless-product/docs/alpha.md)
+- [Research retention and validation](lossless-product/docs/retention.md)
+- [Architecture diagrams and future design](lossless-product/docs/architecture.md)
+- [Experiment ledger](EXPERIMENTS.md)
+- [Contributing](CONTRIBUTING.md)
+
+```text
+lossless-product/      Installable package, adapters, proofs, tests and docs
+EXPERIMENTS.md         Concise experiment/result memory
+.github/workflows/    CPU checks and isolated package installation
+research/             Preserved local research archive; ignored by Git
+```
+
+The product runs independently of `research/`. Large experiments, results, model weights, virtual environments and generated optimization runs stay local. Original-code licensing and public distribution remain pending; retained third-party notices ship with the package.

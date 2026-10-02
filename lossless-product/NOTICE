@@ -1,0 +1,18 @@
+Lossless source alpha: original-code license has not yet been selected.
+The development repository is private; this is not an open-source release.
+
+Retained research code provenance is recorded in
+src/lossless/resources/PROVENANCE.json. Paths there identify the local research
+archive used for extraction, not runtime dependencies.
+
+MLX-LM-derived grouped-head execution retains its MIT notice in
+src/lossless/adapters/mlx/MLX_LM_LICENSE.
+
+The bundled mathematical statement index and pinned mathlib project retain
+the mathlib Apache 2.0 license in
+src/lossless/resources/theorems/MATHLIB_LICENSE.
+The extraction receipt, mathlib revision and Lake manifest accompany the index.
+
+NumPy, optional SciPy, MLX, MLX-LM, and externally installed Lean/Elan/mathlib
+retain their own licenses. Model weights are not bundled and remain subject
+to the model publisher's terms.

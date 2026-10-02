@@ -1,0 +1,313 @@
+[
+  {
+    "research_source": "kernel_lab/__init__.py",
+    "source_sha256": "d8a5c936aecb050a6011295b63accd295ab54032669509ad777b0ade1a63a428",
+    "product_file": "src/lossless/_native/__init__.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/common.py",
+    "source_sha256": "b3a8ea9c24e4ddd005511aa97edbd7b0b60ff74a19d240b9a5cf046665175ed1",
+    "product_file": "src/lossless/_native/common.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/engine.py",
+    "source_sha256": "95f39183365db8c0253a054d3b09587a12091cbcf11291390c3a034299035c3f",
+    "product_file": "src/lossless/_native/engine.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/worker.py",
+    "source_sha256": "237c3e70895ec50e1c723e166b9b402c703961b83d0a12511cb29f4b06c06876",
+    "product_file": "src/lossless/_native/worker.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/operators.py",
+    "source_sha256": "1f5b2ae56fcaaa3e4de12bd8f96c735b0fac1220dacf071a9362a3e1dbe1a823",
+    "product_file": "src/lossless/_native/operators.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/providers.py",
+    "source_sha256": "76c3ff2624b6077eaa0595ce759ab6e5575c98c130cb7edc4af1597463061bd2",
+    "product_file": "src/lossless/_native/providers.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/hardware.py",
+    "source_sha256": "0d67f61f0750a19690a929730d6f146abdba9cc1fc366b1b9a643256246506ff",
+    "product_file": "src/lossless/_native/hardware.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/cuda_info.py",
+    "source_sha256": "a2f513e774a2280ff5f4355312d911a82ef4f9cea69ccca9ee4ee68377641b28",
+    "product_file": "src/lossless/_native/cuda_info.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "kernel_lab/metal_info.m",
+    "source_sha256": "17fbd20be51d7c822f30f3d419e0bc630bd627ec309e25449c9e7408b4876cd0",
+    "product_file": "src/lossless/_native/metal_info.m",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theory_guided_017/schedule.py",
+    "source_sha256": "17eca89a1dab01c8d11ab0a100d46728436e4a2f985a31c8cda7d40f2238df40",
+    "product_file": "src/lossless/adapters/mlx/schedule.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/dead_projection_018/plan.py",
+    "source_sha256": "fd03c58aab0343e8d9e7a63e14ef6c755c992ddfbcff9f0cae46b3acf667bb8e",
+    "product_file": "src/lossless/adapters/mlx/liveness.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/frontier_016/recipes.py",
+    "source_sha256": "d4a4e8d56d2c78dc18d5f29ea455ddf5eeabda504affbc5d7cc6c858671c882d",
+    "product_file": "src/lossless/adapters/mlx/model.py",
+    "extracted_symbols": [
+      "GroupedHead"
+    ]
+  },
+  {
+    "research_source": "experiments/frontier_016/batching.py",
+    "source_sha256": "0633c74d49c34ce7a65a4a85b8750be856b92ff79c37cdb0ff130bf982232fc7",
+    "product_file": "src/lossless/adapters/mlx/batching.py",
+    "extracted_symbols": [
+      "output_counts",
+      "serial",
+      "native"
+    ]
+  },
+  {
+    "research_source": "experiments/dead_projection_018/runtime.py",
+    "source_sha256": "b7f58e75566a6e6a33d9620cff96660d2354ed003dc11178e06e97952de7dcd1",
+    "product_file": "src/lossless/adapters/mlx/execution.py",
+    "extracted_symbols": [
+      "DeadHead",
+      "scheduled",
+      "teacher_checks"
+    ]
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/runtime.py",
+    "source_sha256": "d4be2b035aacd5773b82a42ae81551d1d707ac3dc47d15af760e707f461ef5cd",
+    "product_file": "src/lossless/adapters/mlx/cache.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/copy_kernel.py",
+    "source_sha256": "261a30aea76ec3a2f2f2d8edfd945e7c3630aae4325d2b85f292c61609b3570a",
+    "product_file": "src/lossless/adapters/mlx/copy_kernel.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/indexing.py",
+    "source_sha256": "83e3c8bc687226f6a7b363c41618e744c80b9e90d6da3b48064eee6e8f0d7e40",
+    "product_file": "src/lossless/adapters/mlx/indexing.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/frontier_016/checks.py",
+    "source_sha256": "13808c15c18ac5001eb7bcd314418e28a4c6333adf510a974e36df68b82197f8",
+    "product_file": "src/lossless/adapters/mlx/checks.py",
+    "extracted_symbols": [
+      "arrays",
+      "diff",
+      "cache_diff"
+    ]
+  },
+  {
+    "research_source": "experiments/memory_bounds_020/validation.py",
+    "source_sha256": "5e951e4c82d0bce7430fc0cb638b2c29eca3e2d983344a7c0ab2254b783ee261",
+    "product_file": "src/lossless/adapters/mlx/validation.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/fast_model/core.py",
+    "source_sha256": "6f678953cd346c538902b4ff7d8aba649504c7787927ae81f64e35dbaea1b634",
+    "product_file": "src/lossless/adapters/mlx/identity.py",
+    "extracted_symbols": [
+      "sha",
+      "fingerprint"
+    ]
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/api.py",
+    "source_sha256": "f3634331c1f7e409f767548fed640220b8fa57997b445c1f121107e0ec2dde76",
+    "product_file": "src/lossless/adapters/mlx/text.py",
+    "extracted_symbols": [
+      "stopped_serial"
+    ]
+  },
+  {
+    "research_source": "experiments/theory_guided_017/Bounds.lean",
+    "source_sha256": "97045adae55fce33975ed1809aaa576c9c6164471993ae0055f2d10a97d56358",
+    "product_file": "src/lossless/resources/proofs/Bounds.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/dead_projection_018/Eliminate.lean",
+    "source_sha256": "dccdf78bb5b8f696b2c6e8ba6b0561a6281421b68b4660c80123494954e13726",
+    "product_file": "src/lossless/resources/proofs/Eliminate.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/Address.lean",
+    "source_sha256": "bbb14c3a3c46f529de4574395c5d945750b29308785650c8c451e196edbc595e",
+    "product_file": "src/lossless/resources/proofs/Address.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/Layout.lean",
+    "source_sha256": "b71cc3e7fb862a22b04b3b58a67472bb2edcc46a571df779ceb2efc2c6b2969a",
+    "product_file": "src/lossless/resources/proofs/Layout.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/Movement.lean",
+    "source_sha256": "a324e8d39de106df7f648adbe66cf941d12b2fbcb998d211eadac36fb54a5391",
+    "product_file": "src/lossless/resources/proofs/Movement.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/Fusion.lean",
+    "source_sha256": "5b71324be359287987b92b01bac60de8b0a1b6407ad4373858d0e5816a4839b7",
+    "product_file": "src/lossless/resources/proofs/Fusion.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/hardware_guided_022/ThreadMap.lean",
+    "source_sha256": "e3b924adb3040a8eed4659332442e01b63b283e5ddccb9be5ac2923ba8716e8b",
+    "product_file": "src/lossless/resources/proofs/ThreadMap.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theory_guided_017/lean-toolchain",
+    "source_sha256": "db7bb24b756d745bbde83fe92718b51bd3625dae3701ba0f598d0eedcd3f3028",
+    "product_file": "src/lossless/resources/proofs/lean-toolchain",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/KernelTheorems.lean",
+    "source_sha256": "e12094d9105d1b8f5d849beae2933396e3213078c1c514aafbe6bd5d6ff703b9",
+    "product_file": "src/lossless/resources/theorems/KernelTheorems.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/Index.lean",
+    "source_sha256": "1dfa03a8512165b519518d2ed1656fb6b44e63277865a3998bcab4d6a5c04820",
+    "product_file": "src/lossless/resources/theorems/Index.lean",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/lakefile.toml",
+    "source_sha256": "382660d20937ce1d03107aa0e97c22fef99a9b8421aebd42dac752a380451cc3",
+    "product_file": "src/lossless/resources/theorems/lakefile.toml",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/lake-manifest.json",
+    "source_sha256": "14b35ff6bdf77bd9cd73c125b0a3559c02c82bdd361895c2fc81bdbaf08dcae6",
+    "product_file": "src/lossless/resources/theorems/lake-manifest.json",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/lean-toolchain",
+    "source_sha256": "db7bb24b756d745bbde83fe92718b51bd3625dae3701ba0f598d0eedcd3f3028",
+    "product_file": "src/lossless/resources/theorems/lean-toolchain",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/receipt.json",
+    "source_sha256": "96f749a11ebb6d7ccde5bb29c3f89b742dd7e0a573d167a7eff8651640a4dc14",
+    "product_file": "src/lossless/resources/theorems/receipt.json",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/theorem_library/MATHLIB_LICENSE",
+    "source_sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "product_file": "src/lossless/resources/theorems/MATHLIB_LICENSE",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/profile_guided_023/MLX_LM_LICENSE",
+    "source_sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01",
+    "product_file": "src/lossless/adapters/mlx/MLX_LM_LICENSE",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/profile_guided_023/model_identity.json",
+    "source_sha256": "b64ec94747343cc84c990fde8a093e85129df53441acd7881c8f2918bb7eadb6",
+    "product_file": "src/lossless/adapters/mlx/model_identity.json",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/profile_guided_023/selected_policy.json",
+    "source_sha256": "2af111dd09712e190371910beb384c532777dd3bd2988f1e101118fef4fa28ff",
+    "product_file": "src/lossless/adapters/mlx/selected_policy.json",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "proposals/softmax_round1/softmax_row_16.c",
+    "source_sha256": "c2202d4b2c3f406cfa8f9f1867f723798bf59744fb512edc0ad41558d0b6b6ea",
+    "product_file": "src/lossless/resources/softmax_row_16.c",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "proposals/softmax_round1/softmax_column_4.c",
+    "source_sha256": "2c7e59f1998097cb66677b36cc3daa0dd6bbec6f458f058a11bd8852c32f2364",
+    "product_file": "src/lossless/resources/softmax_column_4.c",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "tests/test_kernel_lab.py",
+    "source_sha256": "1682cdc27b74ebfbefa8029e4a2e21d47025c3c5c0a4ce9c1b1d82d6230d3a06",
+    "product_file": "tests/test_kernel_lab.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "tests/test_hardware.py",
+    "source_sha256": "2ec3cc3b6a10f148e84bc847921d4ca568d34261f7724dc597c62b2a93ccb5e1",
+    "product_file": "tests/test_hardware.py",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "experiments/frontier_016/run.py",
+    "source_sha256": "b2889d7c0e35433dd2285edc2573a9dba52792b83c663eab5f658a85eb3c820e",
+    "product_file": "src/lossless/adapters/mlx/checks.py",
+    "extracted_symbols": [
+      "prepare_prefix"
+    ]
+  },
+  {
+    "research_source": "experiments/theorem_library/index.jsonl",
+    "source_sha256": "fd28d7a9e767f414ce645a5c21ac94618d619ec8b6d1801de83d7d24dd4fe78c",
+    "product_file": "src/lossless/resources/theorems/index.jsonl.gz",
+    "extracted_symbols": null
+  },
+  {
+    "research_source": "results/profile_guided_023_20261002T050900Z/rounds/07/fixtures.json",
+    "source_sha256": "0ed3b4c254b461324f07d8a04b244f258194224a6749143dfa92d4d1e164242c",
+    "product_file": "examples/mlx-fixed-count/requests.json",
+    "extracted_symbols": [
+      "requests.text",
+      "counts"
+    ],
+    "note": "Synthetic benchmark fixtures, combined into distinct discovery and evaluation splits"
+  },
+  {
+    "research_source": "results/profile_guided_023_20261002T050900Z/rounds/08/fixtures.json",
+    "source_sha256": "be74abe456e69e158e30979a46c467e87542383235807aa3ee4d9728dc8697a4",
+    "product_file": "examples/mlx-fixed-count/requests.json",
+    "extracted_symbols": [
+      "requests.text",
+      "counts"
+    ],
+    "note": "Synthetic benchmark fixtures, combined into distinct discovery and evaluation splits"
+  }
+]

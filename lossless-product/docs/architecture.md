@@ -1,6 +1,8 @@
 # Lossless architecture and computation lifecycle
 
-Lossless optimizes how a computation executes under a specified correctness contract. For model inference, it produces a reusable execution recipe and implementation for the same reference model, with measured evidence and compatibility guards. The product architecture below is proposed; the current research already supplies several scoped recipes, proofs, and measurements, while clean packaging and deployment integration remain to be built.
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
+Lossless optimizes how a computation executes under a specified correctness contract. For model inference, it produces a reusable execution recipe and implementation for the same reference model, with measured evidence and compatibility guards. The product architecture below is proposed; the current research already supplies several scoped recipes, proofs, and measurements, while the source alpha now packages a supported subset with guarded deployment.
 
 The target computation may be a vision model, language model, tensor subgraph, or numerical routine. The **user-connected reasoning LLM** proposes optimizations during tuning, including for computations that contain no language model. The shared core handles inputs, outputs, optional state, contracts, and evidence; domain adapters supply the meaning of those values. See the [scope and workload examples](design.md#product-scope-ml-and-numerical-computation).
 

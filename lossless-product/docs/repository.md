@@ -1,10 +1,12 @@
 # Repository organization and release plan
 
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
 Keep the public repository focused on the product, its supported behavior, and enough evidence for contributors to assess it. Preserve the local research separately instead of deleting history. The cleanup completed on 2 October 2026 moves the old workspace under ignored `research/` and keeps a concise public `EXPERIMENTS.md` at the outer repository root.
 
 ## Name recommendation
 
-Use **Lossless** as the product name and **`lossless-opt`** as the GitHub repository name. The suffix explains that this is an optimizer while leaving room for kernels, model execution, and numerical workloads. Keep the CLI name `lossless` as a proposal until packaging and executable-name checks are complete.
+Use **Lossless** as the product name and **`lossless-opt`** as the GitHub repository name. The suffix explains that this is an optimizer while leaving room for kernels, model execution, and numerical workloads. The source alpha now installs the `lossless` CLI.
 
 `lossless` is the shorter alternative but is less descriptive when encountered outside the project. `lossless-product` is useful as the current staging directory; it is an internal organizational name rather than the recommended public repository name. Avoid names tied exclusively to kernels or MLX when the product includes scheduling, memory handling, and other execution targets.
 

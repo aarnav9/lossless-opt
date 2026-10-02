@@ -1,0 +1,82 @@
+[
+  {
+    "text": "Field notebook 2495020: compare the observations and describe what remains uncertain.\nObservation 0: plot 31 contained 7",
+    "max_tokens": 4,
+    "split": "discovery"
+  },
+  {
+    "text": "Review this Python module for edge cases. Module number 2495021.\ndef adjust_0(values, limit=557):",
+    "max_tokens": 8,
+    "split": "discovery"
+  },
+  {
+    "text": "# Maintenance report 2495022\nIdentify dependencies and propose a practical order of work.\n## Task 0: cabinet 7\nThe",
+    "max_tokens": 12,
+    "split": "discovery"
+  },
+  {
+    "text": "Inspect the following purchase records for consistency. Batch 2495023.\n{\"record\": 2495023, \"",
+    "max_tokens": 16,
+    "split": "discovery"
+  },
+  {
+    "text": "Read the multilingual notes and summarize their common themes. Collection 2495024.\nNote 2495024: La port",
+    "max_tokens": 20,
+    "split": "discovery"
+  },
+  {
+    "text": "Check the dimensions and assumptions in these arithmetic exercises. Worksheet 2495025.\nExercise 0: a tank starts with 754",
+    "max_tokens": 24,
+    "split": "discovery"
+  },
+  {
+    "text": "Summarize the decisions and unresolved questions in this workshop transcript 2495026.\nMira (0): We can inspect shelf 2",
+    "max_tokens": 28,
+    "split": "discovery"
+  },
+  {
+    "text": "Analyze this event ledger for missing readings. Export 2495027.\nid,station,reading,status\n24950",
+    "max_tokens": 32,
+    "split": "discovery"
+  },
+  {
+    "text": "Field notebook 2493101: compare the observations and describe what remains uncertain.\nObservation 0: plot 4 contained 19",
+    "max_tokens": 4,
+    "split": "evaluation"
+  },
+  {
+    "text": "Review this Python module for edge cases. Module number 2493102.\ndef adjust_0(values, limit=341):",
+    "max_tokens": 8,
+    "split": "evaluation"
+  },
+  {
+    "text": "# Maintenance report 2493103\nIdentify dependencies and propose a practical order of work.\n## Task 0: cabinet 2\nThe",
+    "max_tokens": 12,
+    "split": "evaluation"
+  },
+  {
+    "text": "Inspect the following purchase records for consistency. Batch 2493104.\n{\"record\": 2493104, \"",
+    "max_tokens": 16,
+    "split": "evaluation"
+  },
+  {
+    "text": "Read the multilingual notes and summarize their common themes. Collection 2493105.\nNote 2493105: La port",
+    "max_tokens": 20,
+    "split": "evaluation"
+  },
+  {
+    "text": "Check the dimensions and assumptions in these arithmetic exercises. Worksheet 2493106.\nExercise 0: a tank starts with 538",
+    "max_tokens": 24,
+    "split": "evaluation"
+  },
+  {
+    "text": "Summarize the decisions and unresolved questions in this workshop transcript 2493107.\nMira (0): We can inspect shelf 2",
+    "max_tokens": 28,
+    "split": "evaluation"
+  },
+  {
+    "text": "Analyze this event ledger for missing readings. Export 2493108.\nid,station,reading,status\n24931",
+    "max_tokens": 32,
+    "split": "evaluation"
+  }
+]

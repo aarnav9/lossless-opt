@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "options": {
+    "allocator_cache_mib": 256
+  },
+  "status": "opt_in_research",
+  "reference": "campaign 019/020 exact recipe, unchanged checkpoint and numerical gates",
+  "scope": {
+    "device": "Apple M2",
+    "model": "SmolLM2-135M-Instruct existing 8-bit artifact",
+    "mlx": "0.32.3",
+    "mlx-lm": "0.32.0",
+    "concurrency": "one worker; context temporarily overrides process-global functions"
+  },
+  "memory": "256 MiB is a trim threshold at existing clear calls, not a hard allocator or resident RAM cap",
+  "evidence": "results/profile_guided_023_20261002T050900Z",
+  "audit_sha256": "23e7d6a0aa25cda765b48cb35b69996d67db7eb6016fb83c06822022260162e4",
+  "gates": {
+    "all_exact": true,
+    "fresh_and_replay_lower_gt_1_01": true,
+    "control_points_ge_0_98": true,
+    "memory": true
+  },
+  "preview_default_changed": false
+}

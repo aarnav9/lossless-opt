@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lossless-opt"
+version = "0.1.0a1"
+description = "Contract-driven optimization for ML and numerical computation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3"]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering"]
+
+[project.optional-dependencies]
+numerical = ["scipy>=1.10,<2"]
+mlx = ["mlx==0.32.3; platform_system == 'Darwin' and platform_machine == 'arm64'", "mlx-lm==0.32.0; platform_system == 'Darwin' and platform_machine == 'arm64'"]
+dev = ["build>=1", "scipy>=1.10,<2", "ruff>=0.16,<0.17"]
+
+[project.scripts]
+lossless = "lossless.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"lossless" = ["resources/*.c", "resources/*.json", "resources/proofs/*", "resources/theorems/*", "_native/*.m", "adapters/mlx/*.json", "adapters/mlx/*LICENSE"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["F"]

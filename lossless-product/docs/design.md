@@ -1,5 +1,7 @@
 # Lossless system design
 
+> Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
+
 This draft defines how Lossless becomes a general optimizer with a clear user workflow. The proposed architecture separates the optimization process from the code that runs afterward. Users supply a computation and an explicit contract; Lossless searches within that contract and produces a reusable implementation with evidence and a reference fallback.
 
 The general optimizer direction, bring-your-own LLM support, and retention of the valuable research gains are requirements. The remaining choices below are recommendations for discussion, not implemented capabilities or finalized scope.
