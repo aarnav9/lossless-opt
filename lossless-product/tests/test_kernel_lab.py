@@ -25,7 +25,8 @@ class KernelLabTests(unittest.TestCase):
             ],
             "budget_seconds": budget,
             "job_timeout_seconds": 2,
-            "compile_timeout_seconds": 3,
+            # Match the product limit: cold compiler startup can exceed 3s on CI.
+            "compile_timeout_seconds": 8,
             "target_ns": 100000,
             "screening_blocks": 3,
             "confirmation_blocks": 3,
