@@ -32,6 +32,36 @@ Result: [untested / failed / inconclusive / no win / accepted within scope]
 
 For measured results, include the configuration, inputs or generator, compiler/runtime versions, seeds, discovery/evaluation split, search budget, and timing method. Keep full-model measurements separate from isolated-kernel timings. Report changed precision or weights, failures, and cases where the reference wins. A new idea can start a discussion before this evidence exists.
 
+## LLM-proposed tests and new backends
+
+This is a proposed extension workflow. The alpha has fixed adapter contracts, seeded native input generation, regression tests, and discovery/evaluation separation; it does not currently accept LLM-generated test specifications or create new execution backends automatically.
+
+Use the LLM to turn an experiment hypothesis or failure into additional cases: awkward dimensions, supported strides, padding, repeated calls, aliasing, state resets, or exceptional values allowed by the input domain. It can draft input generators, minimal reproducers, environment probes, and backend setup code. An experiment summary is useful context, but its claims and copied constants are not an oracle for correct results.
+
+Keep the acceptance machinery independently defined:
+
+1. Maintain a versioned baseline suite and seedable generators, with required coverage derived from the contract. Check the suite against known-correct references and deliberately broken implementations, so a checker that always passes is detected.
+2. Treat generated case descriptions as proposals. A bounded JSON schema can constrain supported operations, shapes, dtypes, distributions, and resource limits. Cases that fit an already reviewed generator can be admitted automatically; executable generators, reference implementations, and runner changes need code review and validation before joining the trusted suite.
+3. Compute expected results from the frozen reference or an appropriate independent oracle. For exact CUDA jobs, compare against the declared CUDA reference on the pinned target/runtime. A CPU result is useful where its semantics match the contract; do not assume identical floating-point results across architectures.
+4. Freeze the contract, suite/generator version, target facts, and acceptance policy before candidate search. Keep evaluation inputs and results out of proposal context. A future generalized runner should choose additional evaluation seeds independently after selection is sealed and record them for replay. The current native alpha uses fixed seeded evaluation cases. Public regression tests remain public, and trusted local processes do not provide a security boundary against arbitrary code reading files.
+5. If an LLM suggests a new case after seeing evaluation results, retain it as a regression for a subsequent experiment. Use fresh evaluation for that experiment. Keep incorrect, failed, and skipped checks visible; missing hardware means untested, not passed.
+
+Determinism means that recorded inputs, generators, versions, and settings support replay in a qualified environment. It does not mean that a seed guarantees identical results across every framework release or device. PyTorch documents these limits in its [reproducibility guidance](https://docs.pytorch.org/docs/stable/notes/randomness.html).
+
+As the suite grows, the proposed organization is:
+
+```text
+lossless-product/tests/
+  fixtures/       Small JSON contracts, case descriptions and input fixtures
+  generators/     Reviewed, seeded generators shared where semantics allow
+  conformance/    Common contract checks, including known-bad controls
+  backends/       Runtime-specific setup, synchronization, state and export checks
+```
+
+These subdirectories are a plan, not a claim that a generic conformance suite or CUDA tests already exist. Keep existing tests working while extracting shared helpers. Large model weights and datasets use versioned manifests and hashes rather than entering Git. Runtime dependencies install from explicit, reviewed requirements; LLM-generated setup scripts remain proposals until reviewed and exercised.
+
+For the first CUDA test bundle, capture the actual GPU, driver and runtime, execute a small reference and deliberately incorrect candidate, run a bounded real optimization, and verify export/load in a fresh process. Check candidate timing with the required GPU synchronization; [CUDA operations can execute asynchronously](https://docs.pytorch.org/docs/stable/notes/cuda.html#asynchronous-execution). An LLM can help author this bundle, but only execution on the target device supplies hardware-validation evidence. Scope special-value, state, and race checks to the supported contract and backend. Independent tests and finite comparisons still do not establish universal correctness.
+
 ## Develop and validate
 
 From the repository root:

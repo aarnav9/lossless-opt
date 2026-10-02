@@ -90,6 +90,12 @@ python -u -m lossless setup --proofs mathlib
 
 Setup can download several GiB and take several minutes. The seven retained transformation proof modules require Lean/Std; mathlib supports the broader matrix and linear-algebra library. `"proofs": {"check": true}` requires successful scoped checks for the job. A numerical or exact contract still has **finite validation** evidence: Lean checks here do not prove generated C, floating-point GPU arithmetic, or end-to-end model equivalence. Unsupported `required_evidence: "proved"` requests are rejected.
 
+## Tests and proposed backend support
+
+The current test suite covers strict contracts, seeded workloads, compiler failures, invalid candidates, export/load, and reference fallback. Discovery and evaluation cases are separate. See the repository's [test and contribution workflow](https://github.com/aarnav9/lossless-opt/blob/main/CONTRIBUTING.md#llm-proposed-tests-and-new-backends) for the proposed combination of versioned regression cases, reviewed generators, and LLM-suggested tests.
+
+Automatic test generation and CUDA backend setup are planned extensions. Generated tests cannot change a running job's contract, independent reference, or acceptance criteria. Future hardware adapters need validation on their target device before support is claimed.
+
 ## Development
 
 From this folder:
