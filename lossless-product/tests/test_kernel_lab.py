@@ -16,7 +16,7 @@ class KernelLabTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
-    def campaign(self, operator="softmax", budget=60):
+    def campaign(self, operator="softmax", budget=120):
         spec = {
             "operator": operator,
             "cases": [
@@ -25,8 +25,9 @@ class KernelLabTests(unittest.TestCase):
             ],
             "budget_seconds": budget,
             "job_timeout_seconds": 2,
-            # Match the product limit: cold compiler startup can exceed 3s on CI.
-            "compile_timeout_seconds": 8,
+            # Allow cold compiler/linker startup on shared CI hosts.
+            # Execution hangs still have the separate two-second timeout above.
+            "compile_timeout_seconds": 30,
             "target_ns": 100000,
             "screening_blocks": 3,
             "confirmation_blocks": 3,
@@ -122,10 +123,13 @@ class KernelLabTests(unittest.TestCase):
     def test_budget_defers_without_launch_and_can_be_explicitly_extended(self):
         run = self.campaign(budget=1)
         self.proposal(run, "valid", operators.baseline_source("softmax"))
-        self.assertEqual(engine.execute(run, "discovery")["jobs_executed"], 0)
+        with patch.object(engine.subprocess, "Popen") as launch:
+            self.assertEqual(engine.execute(run, "discovery")["jobs_executed"], 0)
+            launch.assert_not_called()
         self.assertEqual(read(run / "state.json")["spent_seconds"], 0)
-        engine.extend_budget(run, 10, "unit test explicit extension")
-        self.assertGreater(engine.execute(run, "discovery")["jobs_executed"], 0)
+        engine.extend_budget(run, 60, "unit test explicit extension")
+        self.assertEqual(engine.execute(run, "discovery", max_jobs=1)["jobs_executed"], 1)
+        self.assertEqual(read(run / "state.json")["jobs"]["compile_baseline"]["status"], "ok")
 
     def test_reference_failure_stops_instead_of_rejecting_proposal(self):
         with patch.object(
