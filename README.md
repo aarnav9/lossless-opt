@@ -8,6 +8,10 @@ Bring a supported workload, a JSON contract, and your own LLM. Lossless searches
 
 **Status: installable source alpha (`0.1.0a1`), MIT-licensed original code, private development repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
 
+![Recorded installed-alpha MLX comparison: 1.945× throughput, with batch time falling from 574.8 to 295.4 ms and exact agreement on tested tokens, log probabilities and active KV state.](lossless-product/docs/assets/mlx-retention.png)
+
+One recorded evaluation batch on the pinned Apple M2 setup, using the retained recipe. Bars show throughput normalized to stock serial MLX; timing labels show **median batch completion time**. It does not measure live-LLM search gains or establish performance on other models/devices. [Measurements and reproduction scope](lossless-product/docs/retention.md#readme-performance-figure) · [Source data](lossless-product/docs/assets/mlx-retention-evaluation.json).
+
 ## Quickstart
 
 Requires **Python 3.10+ and clang** on macOS or Linux. On macOS, clang is provided by the Xcode Command Line Tools. Python dependencies install automatically; the CPU demo needs no model weights, GPU, LLM key, or proof toolchain.
@@ -74,15 +78,44 @@ Add an `llm` section to the generated job to use your model:
 
 ```json
 {
-  "callback": "my_llm.py:complete",
-  "provider": "your-provider",
-  "model": "your-model",
-  "credential_env": ["MY_MODEL_API_KEY"],
-  "timeout_seconds": 30
+  "llm": {
+    "callback": "my_llm.py:complete",
+    "provider": "your-provider",
+    "model": "your-model",
+    "credential_env": ["MY_MODEL_API_KEY"],
+    "timeout_seconds": 120
+  },
+  "budget": {
+    "wall_time_seconds": 180,
+    "max_candidates": 4,
+    "max_llm_calls": 1
+  }
 }
 ```
 
-Your callback calls the model you choose and returns structured proposals. A JSON stdin/stdout command is also supported. Keep API keys in environment variables. Capable reasoning models are a sensible starting point; measure their effect on gains and search cost. [Provider protocol and supported proposals](lossless-product/docs/alpha.md#provider-boundary).
+Merge those fields into the generated job, keeping its workload and contract. The total budget includes model calls, compilation, checks, and measurements; each call is also limited by the remaining budget. Built-in candidates count toward `max_candidates`.
+
+Your `complete(prompt: str)` callback returns a proposal JSON string or object. A command alternative reads one JSON request from stdin and writes one proposal batch to stdout. The request contains the contract, reference code or recipe scope, hardware context, and discovery feedback; evaluation inputs are withheld from the prompt. Lossless checks and measures every admitted proposal independently. Keep API keys in environment variables. The `provider` and `model` fields are labels; the callback or command makes the actual model connection.
+
+### Connect Claude or Codex
+
+| Connection | Setup |
+| --- | --- |
+| Claude API | Install `anthropic` in the same virtual environment, set `ANTHROPIC_API_KEY`, and supply a Python callback using your chosen model. [Minimal callback and job configuration](lossless-product/docs/alpha.md#connecting-claude-or-codex). |
+| Codex CLI | A user-supplied command wrapper invokes `codex exec` with a proposal JSON Schema and returns the final proposal object. It can reuse the CLI's saved authentication. [Official OpenAI documentation](https://learn.chatgpt.com/docs/non-interactive-mode). |
+| Claude Code | A user-supplied command wrapper invokes `claude -p` with a proposal JSON Schema and extracts `structured_output` from its JSON response. [Official Claude Code documentation](https://code.claude.com/docs/en/headless). |
+
+The callback/command interface is implemented. **Turnkey Claude/Codex connectors are not bundled, and a live-provider optimization run has not yet been validated.** A CLI wrapper must return proposal JSON rather than its tool's metadata or event stream. The [connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex) explains the boundary and current limitations.
+
+### What the LLM tests establish
+
+- The CPU suite uses a deterministic provider that returns the reference C implementation as a control candidate. It exercises prompt delivery, compilation, correctness checks, timing, separate evaluation, and export/load.
+- The fresh-environment MLX test uses a deterministic provider proposing the 64 MiB allocator policy. The real harness evaluates it; the retained 256 MiB recipe wins that run.
+- Regression tests cover malformed responses, timeouts, credential echoes, and withholding evaluation cases from proposal prompts.
+
+These are protocol and execution tests. They do not establish that Claude/Codex produces useful optimizations or that the measured retained-recipe speedup came from a live model call. [Validation record](lossless-product/docs/retention.md#local-verification-2-october-2026).
+
+Capable reasoning models are a sensible starting point; measure their effect on gains and search cost. [Provider protocol and supported proposals](lossless-product/docs/alpha.md#provider-boundary).
 
 ## Correctness and formal reasoning
 
@@ -93,6 +126,8 @@ Research contributions can target three explicit contracts:
 | Exact / lossless | Preserve the declared output bits, state, and behavior |
 | Numerical | Stay within declared error bounds and invariants |
 | Task quality | Meet a named metric and allowed change on a specified evaluation dataset |
+
+These categories specify acceptable behavior. Relaxing a contract can admit more candidates, but does not guarantee a larger speedup. Comparing search outcomes requires the same workload, device, reference, and stated search effort.
 
 The current runtime implements the exact and numerical contracts in the support table. Task quality is a research category pending an executable evaluator. A failed exact experiment can motivate a separate numerical or quality experiment; the existing job's contract never relaxes silently.
 

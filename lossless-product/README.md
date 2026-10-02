@@ -61,15 +61,34 @@ Add an `llm` object to the job:
 
 ```json
 {
-  "callback": "my_llm.py:complete",
-  "provider": "your-provider",
-  "model": "your-model",
-  "credential_env": ["MY_MODEL_API_KEY"],
-  "timeout_seconds": 30
+  "llm": {
+    "callback": "my_llm.py:complete",
+    "provider": "your-provider",
+    "model": "your-model",
+    "credential_env": ["MY_MODEL_API_KEY"],
+    "timeout_seconds": 120
+  },
+  "budget": {
+    "wall_time_seconds": 180,
+    "max_candidates": 4,
+    "max_llm_calls": 1
+  }
 }
 ```
 
+Merge those fields into the generated job while keeping its workload and contract. The total budget includes provider time and evaluation; built-in candidates count toward the candidate limit.
+
 Your `complete(prompt: str)` calls your preferred model and returns the JSON proposal string or object. The prompt contains the response schema, contract, permitted transformations, hardware context, and discovery feedback. A command alternative accepts one JSON request on stdin and emits one proposal batch on stdout. No model SDK or hosted Lossless service is required. Prefer a capable reasoning model for difficult searches; improved gains are a hypothesis to measure, not a guarantee. Native adapters accept C candidates; MLX currently lets the LLM choose among retained allocator policies rather than generating arbitrary GPU programs.
+
+The [Claude/Codex connection guide](docs/alpha.md#connecting-claude-or-codex) includes a minimal Claude API callback and explains command wrappers for Codex CLI and Claude Code. Provider/model labels alone do not connect a service; your callback or command performs the call. Turnkey vendor connectors are not bundled.
+
+**LLM validation so far uses deterministic local providers, not live Claude/OpenAI calls.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. These tests exercise the real harness, including failed responses and separate evaluation. They establish protocol behavior, not live-model optimization quality. See the [validation record](docs/retention.md).
+
+## Recorded product measurement
+
+![Installed exact MLX recipe: 1.945× throughput versus stock serial MLX on one recorded Apple M2 batch, with matching tested tokens, log-probability bits and active KV state.](docs/assets/mlx-retention.png)
+
+This is a warm batch measurement of the retained recipe on a pinned model/runtime/device. It does not measure live-LLM search gains. [Source data and reproduction scope](docs/retention.md#readme-performance-figure).
 
 ## Formal reasoning and dependencies
 

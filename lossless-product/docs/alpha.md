@@ -63,6 +63,103 @@ The native request includes `response_format`; return a batch such as:
 
 Usage is provider-reported, not a billing enforcement boundary. The controller limits time, model calls and candidate count. It compiles, checks, and measures each admitted source; the model's claimed correctness or speed never admits it. Provider failures are recorded by type without retaining exception text or provider stderr. Configured credential echoes are rejected. Wall-time limits include setup and model calls, with small controller/cleanup overhead possible; native jobs reserve their whole timeout before launching. If the budget cannot complete evaluation, the report says `incomplete` and export is refused.
 
+## Connecting Claude or Codex
+
+The current interface supports user-owned callbacks and commands. It does not include turnkey vendor connectors. The examples below explain the wiring; they have not been exercised against a live Claude/OpenAI service in the product validation runs.
+
+### Claude API callback
+
+Inside your activated virtual environment, install the optional provider SDK and create a CPU job:
+
+```sh
+python -m pip install anthropic
+lossless init --template copy --output ./my-job
+```
+
+Set `ANTHROPIC_API_KEY` in your shell environment. Save this as `my-job/provider.py` and replace `YOUR_CLAUDE_MODEL_ID` with a model available to your account:
+
+```python
+import json
+from anthropic import Anthropic
+
+
+def complete(prompt: str) -> dict:
+    response = Anthropic(timeout=100, max_retries=0).messages.create(
+        model="YOUR_CLAUDE_MODEL_ID",
+        max_tokens=8192,
+        system=(
+            "Return only JSON matching the response_format in the input. "
+            "Follow the frozen contract. Do not include Markdown fences."
+        ),
+        messages=[{"role": "user", "content": prompt}],
+    )
+    if response.stop_reason != "end_turn":
+        raise ValueError("Provider did not return a complete response")
+    proposal = json.loads(
+        "".join(block.text for block in response.content if block.type == "text")
+    )
+    proposal["usage"] = {
+        "input_tokens": response.usage.input_tokens,
+        "output_tokens": response.usage.output_tokens,
+        "cost_usd": None,
+    }
+    return proposal
+```
+
+This uses the [official Claude Python SDK](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python). It is a minimal text-to-JSON callback: malformed JSON, incomplete responses, and invalid proposal fields are rejected, rather than repaired automatically. A fuller connector can add provider-side schema-constrained output and bounded retries. Report unknown dollar cost as `null`; token usage is not a billing cap.
+
+Merge these fields into `my-job/lossless.json`, preserving its existing workload and contract:
+
+```json
+{
+  "llm": {
+    "callback": "provider.py:complete",
+    "provider": "anthropic",
+    "credential_env": ["ANTHROPIC_API_KEY"],
+    "timeout_seconds": 120
+  },
+  "budget": {
+    "wall_time_seconds": 180,
+    "max_candidates": 4,
+    "max_llm_calls": 1
+  }
+}
+```
+
+The callback path resolves relative to the job JSON. The callback selects the model; `llm.provider` and `llm.model` are labels, not built-in SDK routing. The whole-job budget includes setup, provider calls, compilation, checks, and timing. Each call receives at most its configured timeout and the remaining search budget. Built-in candidates also consume candidate slots. Slow responses can exhaust the budget; a completed search can legitimately retain the reference.
+
+```sh
+lossless inspect ./my-job/lossless.json
+lossless optimize ./my-job/lossless.json --output ./lossless-runs/claude-test
+lossless report ./lossless-runs/claude-test
+```
+
+### Codex CLI or Claude Code
+
+Both can be connected through a user-supplied command wrapper. The wrapper reads the Lossless request from stdin, asks the CLI for a proposal using an actual JSON Schema for the active adapter, and writes only the proposal batch to stdout. The request's `response_format` illustrates the expected object; it is not itself a JSON Schema.
+
+- **Codex CLI:** `codex exec` accepts stdin context, supports `--output-schema`, and reuses saved CLI authentication. Its ordinary stdout is the final message; `--json` produces a JSONL event stream that must be parsed before returning a proposal. [Official OpenAI documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
+- **Claude Code:** `claude -p` supports `--output-format json` with `--json-schema`. Extract the `structured_output` field; do not forward the enclosing session metadata as a Lossless proposal. [Official Claude Code documentation](https://code.claude.com/docs/en/headless).
+
+Once that wrapper exists, replace the callback `llm` object with a command object such as:
+
+```json
+{
+  "llm": {
+    "command": ["python", "provider_command.py"],
+    "timeout_seconds": 120
+  }
+}
+```
+
+`provider_command.py` is user-supplied; this filename is not a shipped executable. Preserve the configured job budget. Command arguments are an argv list, not a shell pipeline. Commands inherit the basic environment plus named `credential_env` entries; forward any required custom auth/configuration variables explicitly. Run proposal generation with only the inputs and permissions it needs. Lossless retains responsibility for executing and accepting candidates. Local callbacks and commands are trusted code, and withholding evaluation data from the prompt is not filesystem isolation.
+
+### What has been tested
+
+The CPU workflow regression sends a deterministic provider the real discovery context and receives the reference C implementation as a control candidate. It then exercises compilation, contract checks, timing, separate evaluation, and export/load. The installed MLX check sends a deterministic command the request and receives a 64 MiB allocator proposal; the retained 256 MiB recipe is selected. Malformed responses, timeout behavior, credential echoes, and evaluation-prompt separation have regression coverage.
+
+No live Claude/Codex run was part of those checks. The measured MLX retention gain comes from the retained recipe, and does not establish live-model proposal quality or search ROI. A bounded live-provider run remains a release-validation task. [Recorded validation](retention.md).
+
 ## Reports and deployment
 
 A run directory contains the resolved job, expanded contract, hardware evidence, immutable source/harness hashes, discovery feedback, a frozen selection, evaluation measurements, model-call receipts, `report.json`, `report.html`, and logs. CPU workers have individual logs in `jobs/`; MLX writes its worker progress to `run.log`.

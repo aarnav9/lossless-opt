@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-02",
+  "source": {
+    "research_path": "research/results/product_alpha_20261002/mlx-retention/evaluation_retained.json",
+    "sha256": "a497cb0f90379f915e4e8a033e22e679b99392d0d42bb9319dc9eec661275f78"
+  },
+  "device": "Apple M2",
+  "model": "SmolLM2-135M-Instruct",
+  "precision": "Existing 8-bit artifact; unchanged weights and precision",
+  "runtime": {
+    "mlx": "0.32.3",
+    "mlx-lm": "0.32.0"
+  },
+  "reference": "Stock serial MLX inference",
+  "candidate": "Installed Lossless alpha retained exact recipe",
+  "workload": {
+    "requests": 8,
+    "prefix_tokens": 33,
+    "output_tokens_per_request": [
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32
+    ],
+    "split": "evaluation"
+  },
+  "measurement": {
+    "estimator": "Ratio of median batch completion times",
+    "repeats": 7,
+    "temperature": "warm",
+    "interval": "Source-reported descriptive paired bootstrap 95% interval; within-host timing only"
+  },
+  "limits": [
+    "Finite bitwise validation; not a universal implementation proof.",
+    "One pinned model/runtime/device and fixed batch; not independent-machine validation.",
+    "Loading and initial compilation excluded; bulk throughput may worsen first-token latency.",
+    "Retained recipe; this measurement does not test a live LLM provider."
+  ],
+  "evaluation": {
+    "exact": true,
+    "checks": [
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      },
+      {
+        "tokens_equal": true,
+        "probabilities": {
+          "shape_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0,
+          "rms": 0.0
+        },
+        "kv": {
+          "offset_equal": true,
+          "dtype_equal": true,
+          "bitwise": true,
+          "finite": true,
+          "max_abs": 0.0
+        }
+      }
+    ],
+    "samples_seconds": {
+      "reference": [
+        0.5768403748515993,
+        0.5871581670362502,
+        0.5747694170568138,
+        0.5718037500046194,
+        0.585473082959652,
+        0.5742289591580629,
+        0.5727411250118166
+      ],
+      "candidate": [
+        0.2956644590012729,
+        0.28912162501364946,
+        0.2952693330589682,
+        0.2962457500398159,
+        0.29449720797128975,
+        0.2954449160024524,
+        0.3098954998422414
+      ]
+    },
+    "orders": [
+      [
+        "reference",
+        "candidate"
+      ],
+      [
+        "candidate",
+        "reference"
+      ],
+      [
+        "candidate",
+        "reference"
+      ],
+      [
+        "reference",
+        "candidate"
+      ],
+      [
+        "candidate",
+        "reference"
+      ],
+      [
+        "candidate",
+        "reference"
+      ],
+      [
+        "reference",
+        "candidate"
+      ]
+    ],
+    "speedup": 1.945436817237508,
+    "ci95": [
+      1.9333311108592757,
+      1.9880428985823497
+    ]
+  }
+}

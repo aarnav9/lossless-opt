@@ -41,3 +41,22 @@ lossless optimize lossless-product/examples/mlx-fixed-count/lossless.json --outp
 The initial built wheel was approximately 467 KiB; the source archive including design diagrams was approximately 937 KiB. Base package plus NumPy occupied about 38 MiB allocated, or 62 MiB including the new environment's pip/setuptools. With the MLX extra, that environment occupied about 455 MiB, excluding the Python installation, downloaded weights and proof tools. These are local measurements, not cross-platform bounds; rerun `scripts/check_dist.py` for exact archive sizes after documentation changes.
 
 The full first-time mathlib/Lean download was not repeated. Setup orchestration has a pinned-manifest regression test; scoped proof checks used the already installed Lean toolchain. GitHub's CPU matrix provides separate Linux/macOS installation checks; MLX still needs a qualified local Metal worker.
+
+## README performance figure
+
+The [README figure](assets/mlx-retention.png) compares the stock serial MLX reference with the installed alpha's retained exact recipe on the evaluation split described above. Both arms complete the same eight requests. The medians of seven paired warm repeats are **574.769 ms** for the reference and **295.445 ms** for the candidate. Their ratio is **1.945437× throughput**, equivalent to **48.598% less batch completion time**. The recorded descriptive 95% speedup interval is **[1.933331, 1.988043]**.
+
+[Checked-in source data](assets/mlx-retention-evaluation.json) includes all 14 timing samples, paired run orders, all eight exact-comparison records, workload/runtime metadata, and the original local research record's SHA-256. This small evidence file makes the figure reproducible from a clone without the ignored research archive. Regenerating the figure does not rerun or independently reproduce the GPU experiment.
+
+The vertical axis is throughput normalized to the same stock serial reference. The timing labels are medians of complete batch times. The candidate whisker is the source-reported descriptive speedup interval; the reference is normalized to 1×. This is one workload/device comparison, not a ranking of exact, numerical, and quality contracts. No live LLM call generated this measurement.
+
+Model loading and first-use compilation are excluded. Bulk throughput can trade off first-token latency, and matching these finite cases is not a universal correctness proof. Reproducing GPU execution still requires the pinned M2/runtime/model artifact described above; the figure supplies no CUDA, vision, or other-device result.
+
+To redraw the PNG and SVG from the repository root, install the optional plotting dependency in a development environment and run:
+
+```sh
+python -m pip install matplotlib
+python lossless-product/scripts/plot_retention.py
+```
+
+The [plotting script](../scripts/plot_retention.py) validates the exact-comparison flags, sample counts, and ratio of medians before rendering. Matplotlib is not a Lossless runtime dependency.
