@@ -1,0 +1,51 @@
+# Local credentials and provider configuration
+.env
+.env.*
+!.env.example
+adapter.json
+*.local.json
+.aws/
+
+# Python environments, caches, and packaging output
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local research workspace, including experiments, plans, reports, raw runs,
+# downloaded artifacts and compatibility links. Public summaries live in
+# EXPERIMENTS.md; reviewed product tests/evidence belong in lossless-product/.
+/research/
+
+# Protect against accidental output in the outer workspace too.
+/results/
+/artifacts/
+/runs/
+lossless-runs/
+/weights/
+/.lossless/
+*.safetensors
+*.gguf
+*.log
+*.ses
+*.dylib
+*.so
+*.o
+
+# Machine and editor state
+.DS_Store
+.idea/
+.vscode/
+
+# Pinned Lean dependency sources and compiled caches are reproducible downloads.
+**/.lake/
+*.olean
+*.ilean

@@ -1,0 +1,25 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.3", ranksep="0.45", dpi=140, fontname="Helvetica", fontsize=19, fontcolor="#0f172a", labelloc=t, label="Lossless | Application deployment"];
+node [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", fillcolor="#f8fafc", color="#64748b", fontcolor="#0f172a", margin="0.17,0.11", penwidth=1.2];
+edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#334155", arrowsize=0.7];
+M [label="Reference computation\nsame model weights where applicable", shape=box, fillcolor="#fef3c7"];
+L [label="Application startup\nload computation and Lossless bundle", shape=box, fillcolor="#f8fafc"];
+A [label="Deployment bundle", shape=box, fillcolor="#dcfce7"];
+V [label="Check reference, runtime and hardware identity\nretain original execution path", shape=box, fillcolor="#f8fafc"];
+G [label="Recipe admitted and\nrequest conditions supported?", shape=diamond, fillcolor="#f8fafc"];
+U [label="Application inputs or queued batch", shape=box, fillcolor="#f8fafc"];
+O [label="Selected execution recipe\nscheduling, graph, kernels and cache policy", shape=box, fillcolor="#dbeafe"];
+R [label="Original computation", shape=box, fillcolor="#f1f5f9"];
+Y [label="Return required outputs and state", shape=box, fillcolor="#dcfce7"];
+C [label="Application or end user", shape=box, fillcolor="#f8fafc"];
+M -> L;
+A -> L;
+L -> V;
+V -> G;
+U -> G;
+G -> O [label="Yes"];
+G -> R [label="No"];
+O -> Y;
+R -> Y;
+Y -> C;
+}

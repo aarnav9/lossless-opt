@@ -1,0 +1,25 @@
+{
+  "schema_version": "draft-1",
+  "reference": {
+    "entrypoint": "stock_mlx_fixed_count",
+    "identity_manifest": "reference.json"
+  },
+  "input_domain": {
+    "generation": "fixed_count",
+    "sampler": "greedy",
+    "stop_tokens": [],
+    "cancellation": false,
+    "weights": "immutable"
+  },
+  "observables": {
+    "token_ids": "equal",
+    "emitted_log_probabilities": "bitwise_equal",
+    "active_kv_state": "bitwise_equal",
+    "request_order": "equal"
+  },
+  "allow": {
+    "weight_changes": false,
+    "precision_changes": false
+  },
+  "required_evidence": "validated"
+}

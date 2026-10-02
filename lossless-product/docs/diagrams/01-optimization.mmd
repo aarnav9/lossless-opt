@@ -1,0 +1,18 @@
+flowchart TD
+    J["Job JSON<br/>contract, inputs, objective and budget"] --> S["Harness resolves and freezes setup"]
+    M["Target computation and reference implementation"] --> S
+    H["Actual worker hardware<br/>and runtime discovery"] --> S
+    S --> B["Validate reference and measure baseline"]
+    B --> P["Prepare allowed discovery context"]
+    R["Existing recipes and formal rules"] --> P
+    P --> L["User-connected reasoning LLM<br/>proposes a transformation"]
+    L --> C["Build candidate<br/>check required proofs and correctness"]
+    C -->|"Pass"| T["Measure complete execution<br/>time, startup and memory"]
+    C -->|"Reject"| F["Record discovery evidence and feedback"]
+    T --> F
+    F --> Q{"Continue within search budget?"}
+    Q -->|"Yes"| P
+    Q -->|"No"| V["Freeze finalist or reference<br/>run fresh final evaluation"]
+    V --> O["Export accepted implementation<br/>or retain the reference"]
+    O --> A["Deployment bundle"]
+    O --> E["Human report and reproducible evidence"]

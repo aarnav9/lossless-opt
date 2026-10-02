@@ -1,0 +1,37 @@
+# Proposed configuration, not runnable in this design-only folder.
+# The workload, model, inputs, and LLM callback are supplied by the user.
+schema_version: draft-1
+name: exact-bulk-inference
+
+workload:
+  adapter: mlx.fixed_count
+  reference: workload:reference
+  parameters:
+    model: ./model
+    sampler: greedy
+    max_new_tokens: 32
+  inputs: ./requests.jsonl
+
+contract:
+  preset: exact
+  observables: [token_ids, emitted_log_probabilities, active_kv_state, request_order]
+  weight_changes: false
+  precision_changes: false
+  required_evidence: validated
+
+objective:
+  metric: throughput
+
+llm:
+  callback: my_llm:complete
+
+budget:
+  wall_time_seconds: 600
+  max_llm_calls: 20
+  max_candidates: 40
+
+target:
+  device: auto
+
+output:
+  directory: ./lossless-runs

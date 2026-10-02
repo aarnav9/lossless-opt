@@ -1,0 +1,38 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.3", ranksep="0.45", dpi=140, fontname="Helvetica", fontsize=19, fontcolor="#0f172a", labelloc=t, label="Lossless | Optimization before deployment"];
+node [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", fillcolor="#f8fafc", color="#64748b", fontcolor="#0f172a", margin="0.17,0.11", penwidth=1.2];
+edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#334155", arrowsize=0.7];
+J [label="Job JSON\ncontract, inputs, objective and budget", shape=box, fillcolor="#f8fafc"];
+S [label="Harness resolves and freezes setup", shape=box, fillcolor="#dbeafe"];
+M [label="Target computation and reference implementation", shape=box, fillcolor="#f8fafc"];
+H [label="Actual worker hardware\nand runtime discovery", shape=box, fillcolor="#f8fafc"];
+B [label="Validate reference and measure baseline", shape=box, fillcolor="#f8fafc"];
+P [label="Prepare allowed discovery context", shape=box, fillcolor="#f8fafc"];
+R [label="Existing recipes and formal rules", shape=box, fillcolor="#f8fafc"];
+L [label="User-connected reasoning LLM\nproposes a transformation", shape=box, fillcolor="#ede9fe"];
+C [label="Build candidate\ncheck required proofs and correctness", shape=box, fillcolor="#dbeafe"];
+T [label="Measure complete execution\ntime, startup and memory", shape=box, fillcolor="#dbeafe"];
+F [label="Record discovery evidence and feedback", shape=box, fillcolor="#f8fafc"];
+Q [label="Continue within search budget?", shape=diamond, fillcolor="#f8fafc"];
+V [label="Freeze finalist or reference\nrun fresh final evaluation", shape=box, fillcolor="#dbeafe"];
+O [label="Export accepted implementation\nor retain the reference", shape=box, fillcolor="#f8fafc"];
+A [label="Deployment bundle", shape=box, fillcolor="#dcfce7"];
+E [label="Human report and reproducible evidence", shape=box, fillcolor="#dcfce7"];
+J -> S;
+M -> S;
+H -> S;
+S -> B;
+B -> P;
+R -> P;
+P -> L;
+L -> C;
+C -> T [label="Pass"];
+C -> F [label="Reject"];
+T -> F;
+F -> Q;
+Q -> P [label="Yes"];
+Q -> V [label="No"];
+V -> O;
+O -> A;
+O -> E;
+}

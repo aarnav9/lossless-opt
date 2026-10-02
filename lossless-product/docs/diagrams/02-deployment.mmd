@@ -1,0 +1,11 @@
+flowchart TD
+    M["Reference computation<br/>same model weights where applicable"] --> L["Application startup<br/>load computation and Lossless bundle"]
+    A["Deployment bundle"] --> L
+    L --> V["Check reference, runtime and hardware identity<br/>retain original execution path"]
+    V --> G{"Recipe admitted and<br/>request conditions supported?"}
+    U["Application inputs or queued batch"] --> G
+    G -->|"Yes"| O["Selected execution recipe<br/>scheduling, graph, kernels and cache policy"]
+    G -->|"No"| R["Original computation"]
+    O --> Y["Return required outputs and state"]
+    R --> Y
+    Y --> C["Application or end user"]

@@ -1,0 +1,34 @@
+{
+  "schema_version": "draft-1",
+  "name": "exact-bulk-inference",
+  "workload": {
+    "adapter": "mlx.fixed_count",
+    "reference": "workload:reference",
+    "parameters": {
+      "model": "./model",
+      "sampler": "greedy",
+      "max_new_tokens": 32
+    },
+    "inputs": "./requests.jsonl"
+  },
+  "contract": {
+    "file": "contracts/exact-policy.json"
+  },
+  "objective": {
+    "metric": "throughput"
+  },
+  "llm": {
+    "callback": "my_llm:complete"
+  },
+  "budget": {
+    "wall_time_seconds": 600,
+    "max_llm_calls": 20,
+    "max_candidates": 40
+  },
+  "target": {
+    "device": "auto"
+  },
+  "output": {
+    "directory": "./lossless-runs"
+  }
+}

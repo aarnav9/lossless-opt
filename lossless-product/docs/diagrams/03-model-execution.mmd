@@ -1,0 +1,17 @@
+flowchart TD
+    I["Prompt or queued prompts"] --> T["Tokenize and prepare requests"]
+    T --> S["Schedule compatible requests"]
+    S --> P["Prefill<br/>process prompt and initialize KV state"]
+    P --> N["Select and emit next token<br/>preserve required probabilities"]
+    N --> Q{"Request complete?"}
+    Q -->|"No"| D["Decode step<br/>run model using current history and KV state"]
+    D --> N
+    Q -->|"Yes"| F["Finalize required state<br/>decode text and return response"]
+    K["Per-request KV state<br/>ownership, layout and memory policy"] <--> P
+    K <--> D
+    K <--> F
+    style S fill:#dbeafe,stroke:#2563eb,color:#111827
+    style P fill:#f1f5f9,stroke:#64748b,color:#111827
+    style D fill:#dbeafe,stroke:#2563eb,color:#111827
+    style K fill:#dbeafe,stroke:#2563eb,color:#111827
+    style F fill:#dbeafe,stroke:#2563eb,color:#111827

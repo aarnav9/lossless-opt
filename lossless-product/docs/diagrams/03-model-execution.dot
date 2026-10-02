@@ -1,0 +1,25 @@
+digraph G {
+graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.3", ranksep="0.45", dpi=140, fontname="Helvetica", fontsize=19, fontcolor="#0f172a", labelloc=t, label="Lossless | Inside model inference"];
+node [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", fillcolor="#f8fafc", color="#64748b", fontcolor="#0f172a", margin="0.17,0.11", penwidth=1.2];
+edge [fontname="Helvetica", fontsize=10, color="#64748b", fontcolor="#334155", arrowsize=0.7];
+I [label="Prompt or queued prompts", shape=box, fillcolor="#f8fafc"];
+T [label="Tokenize and prepare requests", shape=box, fillcolor="#f8fafc"];
+S [label="Schedule compatible requests", shape=box, fillcolor="#dbeafe"];
+P [label="Prefill\nprocess prompt and initialize KV state", shape=box, fillcolor="#f8fafc"];
+N [label="Select and emit next token\npreserve required probabilities", shape=box, fillcolor="#f8fafc"];
+Q [label="Request complete?", shape=diamond, fillcolor="#f8fafc"];
+D [label="Decode step\nrun model using current history and KV state", shape=box, fillcolor="#dbeafe"];
+F [label="Finalize required state\ndecode text and return response", shape=box, fillcolor="#dbeafe"];
+K [label="Per-request KV state\nownership, layout and memory policy", shape=box, fillcolor="#dbeafe"];
+I -> T;
+T -> S;
+S -> P;
+P -> N;
+N -> Q;
+Q -> D [label="No"];
+D -> N;
+Q -> F [label="Yes"];
+K -> P [dir=both];
+K -> D [dir=both];
+K -> F [dir=both];
+}

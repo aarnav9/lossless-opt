@@ -1,0 +1,42 @@
+# Python environments and generated files
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local jobs, generated artifacts, weights, and provider configuration
+/runs/
+lossless-runs/
+/artifacts/
+/weights/
+/.lossless/
+.env
+.env.*
+!.env.example
+*.local.json
+*.log
+*.safetensors
+*.gguf
+
+# Reproducible native and Lean build output
+*.so
+*.dylib
+*.dll
+*.o
+*.obj
+**/.lake/
+*.olean
+*.ilean
+
+# Machine and editor state
+.DS_Store
+.idea/
+.vscode/
