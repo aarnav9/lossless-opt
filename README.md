@@ -32,4 +32,4 @@ EXPERIMENTS.md         Concise experiment/result memory
 research/             Preserved local research archive; ignored by Git
 ```
 
-The product runs independently of `research/`. Large experiments, results, model weights, virtual environments and generated optimization runs stay local. Original-code licensing and public distribution remain pending; retained third-party notices ship with the package.
+The product runs independently of `research/`. Large experiments, results, model weights, virtual environments and generated optimization runs stay local. Original code is [MIT licensed](LICENSE); retained [third-party notices](lossless-product/NOTICE) ship with the package. Public distribution remains pending.

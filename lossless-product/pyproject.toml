@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,6 +7,9 @@ name = "lossless-opt"
 version = "0.1.0a1"
 description = "Contract-driven optimization for ML and numerical computation"
 readme = "README.md"
+# Original code is MIT; the distribution also contains Apache-2.0 mathlib resources.
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "src/lossless/adapters/mlx/MLX_LM_LICENSE", "src/lossless/resources/theorems/MATHLIB_LICENSE"]
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24,<3"]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering"]

@@ -1,4 +1,4 @@
-include README.md NOTICE
+include README.md LICENSE NOTICE
 recursive-include src/lossless/resources *.c *.json *.lean *.toml *.gz *LICENSE lean-toolchain
 recursive-include src/lossless/adapters/mlx *.json *LICENSE
 recursive-include src/lossless/_native *.m

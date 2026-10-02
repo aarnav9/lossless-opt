@@ -1,5 +1,9 @@
-Lossless source alpha: original-code license has not yet been selected.
-The development repository is private; this is not an open-source release.
+Lossless original code is licensed under the MIT License; see LICENSE.
+Copyright (c) 2026 aarnav9 and Lossless contributors.
+
+Third-party components retain the licenses and notices listed below.
+The distribution metadata uses MIT AND Apache-2.0 to account for the
+bundled mathlib resources; the original Lossless code remains MIT.
 
 Retained research code provenance is recorded in
 src/lossless/resources/PROVENANCE.json. Paths there identify the local research

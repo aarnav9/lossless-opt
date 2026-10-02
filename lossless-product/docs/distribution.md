@@ -14,7 +14,7 @@ Keep the product in `lossless-product/` during extraction. Promote its contents 
 lossless-opt/
   README.md                 Purpose, working quickstart, supported targets
   pyproject.toml            Package metadata, CLI, dependencies and extras
-  LICENSE                   Original-code license selected by the owner
+  LICENSE                   MIT license for original code
   NOTICE                    Notices for reused materials
   CONTRIBUTING.md           Setup, tests, adding adapters and recipes
   EXPERIMENTS.md            Concise findings, including negative results

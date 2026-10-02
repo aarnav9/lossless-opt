@@ -4,6 +4,8 @@ Concise research memory for contributors. Read this before repeating an approach
 
 All results are scoped to the recorded hardware, runtime, model, and workload. **Exact** below means bitwise agreement on tested outputs/state, unless a specific proof is stated; Lean results have narrower declared scopes. Numerical tolerance, certified error, and measured task quality are different contracts. Speedups use the named comparator and cannot be added or multiplied across campaigns. Research qualification does not mean a product default was shipped.
 
+New entries should name their requested category: exact/lossless, numerical, or task quality. Record untested, failed, and inconclusive outcomes explicitly. Categories describe the correctness contract; proof scope and validation coverage are separate evidence. See [contribution guidance](CONTRIBUTING.md) for a short submission format.
+
 Detailed local evidence lives in the ignored `research/` workspace. Numbered reports are `research/results/reports/RESULTS_NNN.md` (`RESULTS.md` for 001); legacy entry paths also exist inside that workspace. Supplemental source locations appear below as plain paths because a public checkout does not contain those files. This ledger is contributor memory, not a replacement for reproducible evidence supporting a published performance claim.
 
 ## Numbered campaigns

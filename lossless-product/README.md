@@ -102,4 +102,4 @@ python -m build
 
 Candidate execution and provider callbacks use trusted local processes with timeouts, not an OS security sandbox. Run with representative inputs you are allowed to send to your configured provider. Evaluation data is withheld from proposal prompts; candidates do not decide acceptance.
 
-See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. The original-code license and public release remain pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
+See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. Public release remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.

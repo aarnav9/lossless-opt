@@ -36,6 +36,7 @@ def main(directory):
             "lossless/resources/theorems/index.jsonl.gz",
             "lossless/resources/theorems/MATHLIB_LICENSE",
             "lossless/adapters/mlx/MLX_LM_LICENSE",
+            "/LICENSE",
             "NOTICE",
         ]:
             if not any(n.endswith(suffix) for n in names):
