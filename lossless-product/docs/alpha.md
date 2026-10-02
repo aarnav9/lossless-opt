@@ -4,7 +4,7 @@ This is the implemented interface for version `0.1.0a1`. Files labeled `draft-1`
 
 ## A job is deterministic setup
 
-`lossless init --template copy --output my-job` writes an executable JSON configuration. The required sections are `schema_version: 1`, `workload`, `contract`, and `budget`. Unknown keys, duplicate JSON keys, nonfinite numbers, overlapping discovery/evaluation shapes, and unsupported contract changes are rejected before search.
+Configuration files use JSON exclusively. `lossless init --template copy --output my-job` writes an executable JSON configuration. The required sections are `schema_version: 1`, `workload`, `contract`, and `budget`. Unknown keys, duplicate JSON keys, nonfinite numbers, overlapping discovery/evaluation shapes, and unsupported contract changes are rejected before search.
 
 ```json
 {

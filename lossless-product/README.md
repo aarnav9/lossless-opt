@@ -55,7 +55,7 @@ lossless inspect ./my-job/lossless.json
 lossless optimize ./my-job/lossless.json --output ./lossless-runs/softmax
 ```
 
-Templates are `copy`, `softmax`, `rmsnorm`, and `mlx-fixed-count`. JSON schema version `1` is executable; the earlier `draft-1` examples are design proposals. [The alpha guide](docs/alpha.md) covers contracts, hardware inputs, providers, reports, and MLX deployment.
+Templates are `copy`, `softmax`, `rmsnorm`, and `mlx-fixed-count`. Configuration files accept JSON only. JSON schema version `1` is executable; the earlier `draft-1` examples are design proposals. [The alpha guide](docs/alpha.md) covers contracts, hardware inputs, providers, reports, and MLX deployment.
 
 Add an `llm` object to the job:
 

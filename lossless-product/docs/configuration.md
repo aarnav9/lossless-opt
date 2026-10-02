@@ -2,9 +2,9 @@
 
 > Implementation status: the source alpha is now installable. See [the alpha guide](alpha.md) for supported behavior and [retention status](retention.md). This document describes the broader target design; its draft interfaces and release plans are not all implemented.
 
-Use one job entry point, with a choice between inline configuration and references to reusable files. JSON is sufficient for this interface; the existing YAML example is an equivalent authoring option. Keep the correctness contract logically separate from the workload, objective, LLM connection, resource budget, and optional hardware profile even when they share a file. A performance preference or hardware hint cannot relax correctness.
+Use one job entry point, with a choice between inline configuration and references to reusable files. JSON is the only configuration format, including reusable contract and hardware files. Keep the correctness contract logically separate from the workload, objective, LLM connection, resource budget, and optional hardware profile even when they share a file. A performance preference or hardware hint cannot relax correctness.
 
-This is a proposed interface. The [inline JSON example](../examples/lossless.json), [split JSON example](../examples/lossless-split.json), and [YAML example](../examples/lossless.yaml) are illustrative. Their workload, model, datasets, and LLM callback are supplied by the user rather than included in this design folder. The executable loader accepts schema version 1; these older draft examples are not executable inputs.
+This is a proposed interface. The [inline JSON example](../examples/lossless.json) and [split JSON example](../examples/lossless-split.json) are illustrative. Their workload, model, datasets, and LLM callback are supplied by the user rather than included in this design folder. The executable loader accepts schema version 1; these older draft examples are not executable inputs.
 
 The examples use the retained language-model workload. The same job structure is intended for vision and numerical computation: change the workload adapter/reference, input fixtures, and contract observers. A classifier might supply image tensors and observe logits; a matrix routine might supply matrices and observe its result plus declared mutations. Tokens, samplers, and KV caches are adapter-specific fields, not requirements of the shared configuration. The `llm` section connects the optimization assistant regardless of the target. Each new adapter must define executable checks before its configuration can be accepted.
 
@@ -73,63 +73,65 @@ The model proposes transformations, parameters, or proof text within the allowed
 
 "Deterministic setup" means schema validation, contract expansion, admissibility checks, budgets, and acceptance rules are controlled by explicit code and frozen inputs. It does not mean LLM outputs or hardware timings are identical across runs. Record proposal outputs, seeds, tool versions, and raw measurements to make the process auditable. A malformed configuration or unsupported contract fails with a field-specific explanation; no hidden LLM is needed to guess its intended meaning.
 
-## Format recommendation
+## JSON configuration
 
-| Format | Proposed role | Reason |
-| --- | --- | --- |
-| JSON | Initial job input, reusable contract/profile files, and resolved run records | Simple structured interchange with a versioned schema |
-| YAML | Optional equivalent authoring format | Nested settings and comments; the same semantics as JSON |
-| CSV | Optional tabular workload fixtures and metric exports | Useful for rows of cases; a poor primary representation for nested policies and state contracts |
+Job inputs, reusable contract/profile files, provider protocol messages, and resolved run records use JSON. One parser and a versioned schema define the configuration format. Reject duplicate keys, nonfinite numbers, and unknown fields rather than introducing implicit behavior. Keep units in field names and resolve relative paths from the file containing them. The executable loader bounds JSON files to 4 MB and validates adapter-specific requirements after parsing.
 
-YAML supports mappings, sequences, and comments; JSON supports objects and arrays; CSV describes records of fields. JSON is sufficient for the first parser; adding YAML is an authoring choice rather than a change to the architecture. Sources: [YAML specification](https://yaml.org/spec/1.2.2/), [JSON standard](https://www.rfc-editor.org/info/rfc8259/), and [CSV format](https://datatracker.ietf.org/doc/rfc4180/).
+CSV may be useful for future tabular workload fixtures or metric exports; it is not a configuration format. Tensor payloads remain separate from configuration and are loaded by their workload adapter.
 
-Both accepted configuration formats should parse to the same restricted data model and pass the same versioned schema. Use a YAML 1.2 parser configured for ordinary data, with string keys, bounded document size/depth, and no custom object construction. Initially reject aliases/merge keys, duplicate keys, nonfinite numbers, and unknown fields rather than introducing implicit behavior. Keep units in field names. Relative paths resolve from the configuration file's directory.
-
-JSON Schema can validate the parsed configuration, including required types and rejection of unexpected properties. It does not by itself establish that an adapter exists or that a contract is executable; perform those semantic checks separately. See [JSON Schema object validation](https://json-schema.org/understanding-json-schema/reference/object).
+Schema validation alone cannot establish that an adapter exists or that a contract is executable. The harness checks both before search. See [the alpha guide](alpha.md) for the implemented schema and supported adapters.
 
 ## Example job
 
-```yaml
-schema_version: draft-1
-name: exact-bulk-inference
-
-workload:
-  adapter: mlx.fixed_count
-  reference: workload:reference
-  parameters:
-    model: ./model
-    sampler: greedy
-    max_new_tokens: 32
-  inputs: ./requests.jsonl
-
-contract:
-  preset: exact
-  observables: [token_ids, emitted_log_probabilities, active_kv_state, request_order]
-  weight_changes: false
-  precision_changes: false
-  required_evidence: validated
-
-objective:
-  metric: throughput
-
-llm:
-  callback: my_llm:complete
-
-budget:
-  wall_time_seconds: 600
-  max_llm_calls: 20
-  max_candidates: 40
-
-target:
-  device: auto
-
-output:
-  directory: ./lossless-runs
+```json
+{
+  "schema_version": "draft-1",
+  "name": "exact-bulk-inference",
+  "workload": {
+    "adapter": "mlx.fixed_count",
+    "reference": "workload:reference",
+    "parameters": {
+      "model": "./model",
+      "sampler": "greedy",
+      "max_new_tokens": 32
+    },
+    "inputs": "./requests.jsonl"
+  },
+  "contract": {
+    "preset": "exact",
+    "observables": [
+      "token_ids",
+      "emitted_log_probabilities",
+      "active_kv_state",
+      "request_order"
+    ],
+    "weight_changes": false,
+    "precision_changes": false,
+    "required_evidence": "validated"
+  },
+  "objective": {
+    "metric": "throughput"
+  },
+  "llm": {
+    "callback": "my_llm:complete"
+  },
+  "budget": {
+    "wall_time_seconds": 600,
+    "max_llm_calls": 20,
+    "max_candidates": 40
+  },
+  "target": {
+    "device": "auto"
+  },
+  "output": {
+    "directory": "./lossless-runs"
+  }
+}
 ```
 
 The example selects a fixed-count adapter; it does not imply support for EOS stopping, cancellation, or arbitrary MLX programs. The adapter must expand the exact preset into concrete input-domain, state, observer, exceptional-value, and comparison definitions. The reference callable supplies the executable computation, and its code/model/tokenizer identities are frozen before search. `validated` allows finite tests as evidence; it does not claim universal equivalence.
 
-`my_llm:complete` names a user-supplied callable taking prompt text and returning response text. A built-in transport configuration can instead specify a provider, model, endpoint, and credential environment-variable name. Treat these as alternative connection modes, with one active mode per job. API keys never belong in the YAML or generated run records. Loading explicitly configured user code is a deliberate application action, not a YAML parser feature. Syntactic config validation should not import it.
+`my_llm:complete` names a user-supplied callable taking prompt text and returning response text. A built-in transport configuration can instead specify a provider, model, endpoint, and credential environment-variable name. Treat these as alternative connection modes, with one active mode per job. API keys never belong in configuration files or generated run records. Loading explicitly configured user code is a deliberate application action, not a configuration parser feature. Syntactic config validation should not import it.
 
 The 600-second budget is illustrative, not a recommended demo duration. A substantial run should be estimated before launch and performed under the user's foreground-run preferences. Total job wall time includes model calls, builds, proof checks, validation, and measurement; individual stages also have timeouts. Reserve enough budget for final confirmation. If it cannot finish, keep the reference and label the search incomplete.
 
