@@ -42,6 +42,7 @@ def context_data(run, state):
         "schema_version": 1,
         "operator": spec["operator"],
         "contract": read(run / "contract.json"),
+        "deployment_comparator": spec["comparator"],
         "c_abi": ABI,
         "baseline_source": (run / "baseline.c").read_text(),
         "platform": {

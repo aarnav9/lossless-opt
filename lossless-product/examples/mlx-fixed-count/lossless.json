@@ -19,5 +19,9 @@
   },
   "proofs": {
     "check": true
+  },
+  "objective": {
+    "metric": "throughput",
+    "comparator": "stock_serial"
   }
 }

@@ -13,6 +13,11 @@ import tempfile
 import time
 
 
+def bounded_timeout(connection, remaining_seconds):
+    """Same configured timeout and remaining-budget rule for every adapter."""
+    return min((connection or {}).get("timeout_seconds", 30), max(0, remaining_seconds))
+
+
 def _callback_child(connection, callback, prompt, base):
     os.setsid()
     try:

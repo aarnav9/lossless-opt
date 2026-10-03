@@ -40,7 +40,8 @@
   },
   "objective": {
     "metric": "latency",
-    "min_speedup": 1.02
+    "min_speedup": 1.02,
+    "comparator": "numpy_copy"
   },
   "budget": {
     "wall_time_seconds": 60,

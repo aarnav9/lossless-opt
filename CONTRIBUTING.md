@@ -92,4 +92,4 @@ The intended sequence is:
 
 ## License
 
-Original code and original contributions use the [MIT License](LICENSE). Retain the [third-party notices](lossless-product/NOTICE) for imported material. The repository remains a private development alpha until public release; applying MIT does not publish it. A fresh full proof-toolchain installation check remains outstanding alongside broader backend validation.
+Original code and original contributions use the [MIT License](LICENSE). Retain the [third-party notices](lossless-product/NOTICE) for imported material. The source repository is public. Tagged GitHub releases and package-registry distribution remain pending. A fresh full proof-toolchain installation check remains outstanding alongside broader backend validation.

@@ -143,7 +143,7 @@ def main(run):
             and config["budget"]["max_candidates"] > 1
             and time.monotonic() + reserve < deadline
         ):
-            from ...providers import call
+            from ...providers import call, bounded_timeout
             from ...proofs import search
 
             context = {
@@ -174,7 +174,7 @@ def main(run):
                     context,
                     config["llm"],
                     base=Path(read_json(run / "controller.json")["base"]),
-                    timeout=min(30, max(0, deadline - reserve - time.monotonic())),
+                    timeout=bounded_timeout(config["llm"], deadline - reserve - time.monotonic()),
                 )
                 if (
                     not isinstance(response, dict)

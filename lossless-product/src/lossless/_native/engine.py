@@ -21,12 +21,15 @@ TERMINAL = {"ok", "incorrect", "compile_failed", "crashed", "timed_out", "refere
 
 
 def initialize(spec_path, run, *, hardware_report=None, hardware_notes=None):
-    from .operators import CONTRACTS, baseline_source
+    from .operators import CONTRACTS, baseline_source, validate_comparator
     from . import hardware
 
     spec = read(spec_path)
     if spec.get("operator") not in CONTRACTS:
         raise ValueError("operator adapter is not registered")
+    spec["comparator"] = validate_comparator(
+        spec["operator"], spec.get("comparator", "native_baseline")
+    )
     cases = spec["cases"]
     ids = [c["id"] for c in cases]
     if len(ids) != len(set(ids)) or not cases:
@@ -205,7 +208,11 @@ def submit(run, proposal_path):
         name = proposal.get("id", "")
         if state["sealed"]:
             raise ValueError("candidate pool is sealed")
-        if proposal.get("schema_version") != 1 or not ID.fullmatch(name) or name == "baseline":
+        if (
+            proposal.get("schema_version") != 1
+            or not ID.fullmatch(name)
+            or name in {"baseline", "native_baseline", "deployment_reference"}
+        ):
             raise ValueError("invalid proposal schema/id")
         if proposal.get("operator") != spec["operator"] or not proposal.get("hypothesis"):
             raise ValueError("proposal needs matching operator and hypothesis")
@@ -283,6 +290,7 @@ def job_specs(run, state, stage):
             {
                 "kind": "benchmark",
                 "operator": spec["operator"],
+                "comparator": spec["comparator"],
                 "case": case,
                 "baseline": baseline,
                 "candidate": str(run / "build" / (name + suffix)),
@@ -463,6 +471,9 @@ def feedback_data(run, state):
             "complete": complete,
             "rejected": proposal["rejected"],
             "completed_cases": len(records),
+            "geomean_speedup_vs_comparator": geomean([r["speedup_vs_comparator"] for r in records])
+            if complete
+            else None,
             "geomean_speedup_vs_native": geomean([r["speedup_vs_native"] for r in records])
             if complete
             else None,
@@ -471,7 +482,15 @@ def feedback_data(run, state):
             "cases": [
                 {
                     k: r[k]
-                    for k in ("case", "speedup_vs_native", "speedup_vs_library", "ci95_vs_native")
+                    for k in (
+                        "case",
+                        "speedup_vs_native",
+                        "speedup_vs_library",
+                        "ci95_vs_native",
+                        "comparator",
+                        "speedup_vs_comparator",
+                        "ci95_vs_comparator",
+                    )
                 }
                 for r in records
             ],
@@ -514,12 +533,18 @@ def seal(run):
         valid = sorted(n for n, v in data["candidates"].items() if v["complete"])
         if not valid:
             raise ValueError("no validated proposals")
-        winner = max(valid, key=lambda n: (data["candidates"][n]["geomean_speedup_vs_native"], n))
+        winner = max(
+            valid, key=lambda n: (data["candidates"][n]["geomean_speedup_vs_comparator"], n)
+        )
         # A frozen global choice is an evaluation target, not a learned runtime selector.
-        if data["candidates"][winner]["geomean_speedup_vs_native"] <= read(run / "spec.json").get(
-            "min_speedup", 1.02
-        ):
-            winner = "native_baseline"
+        if data["candidates"][winner]["geomean_speedup_vs_comparator"] <= read(
+            run / "spec.json"
+        ).get("min_speedup", 1.02):
+            winner = (
+                "native_baseline"
+                if read(run / "spec.json")["comparator"] == "native_baseline"
+                else "deployment_reference"
+            )
         state["sealed"] = {
             "utc": now(),
             "valid_candidates": valid,
@@ -527,7 +552,8 @@ def seal(run):
             "proposal_fingerprints": {
                 n: state["proposals"][n]["fingerprint"] for n in sorted(state["proposals"])
             },
-            "selection_rule": f"best discovery confirmation geometric mean; retain native baseline unless >{read(run / 'spec.json').get('min_speedup', 1.02)}x",
+            "comparator": read(run / "spec.json")["comparator"],
+            "selection_rule": f"best discovery confirmation geometric mean against frozen comparator; retain reference unless >{read(run / 'spec.json').get('min_speedup', 1.02)}x",
         }
         write(run / "seal.json", state["sealed"])
         event(run, state, "pool_sealed", global_choice=winner)
@@ -579,6 +605,9 @@ def report(run):
                     **{
                         k: r[k]
                         for k in (
+                            "comparator",
+                            "speedup_vs_comparator",
+                            "ci95_vs_comparator",
                             "speedup_vs_native",
                             "speedup_vs_library",
                             "screening",
@@ -602,6 +631,9 @@ def report(run):
             by_candidate[name] = {
                 "complete": complete,
                 "cases": len(records),
+                "geomean_vs_comparator": geomean([r["speedup_vs_comparator"] for r in records])
+                if complete
+                else None,
                 "geomean_vs_native": geomean([r["speedup_vs_native"] for r in records])
                 if complete
                 else None,
@@ -612,7 +644,7 @@ def report(run):
                 "confirmed_regressions": sum(r["confirmed_regression"] for r in records),
             }
         choice = state["sealed"]["global_choice"]
-        if choice == "native_baseline":
+        if choice in {"native_baseline", "deployment_reference"}:
             native_records = []
             for case in evaluation:
                 matches = [
@@ -630,11 +662,20 @@ def report(run):
             chosen = {
                 "complete": complete,
                 "cases": len(native_records),
-                "geomean_vs_native": 1.0 if complete else None,
+                "geomean_vs_comparator": 1.0 if complete else None,
+                "geomean_vs_native": geomean(
+                    [
+                        r["confirmation"]["median_us"]["native_baseline"]
+                        / r["confirmation"]["median_us"][spec["comparator"]]
+                        for r in native_records
+                    ]
+                )
+                if complete
+                else None,
                 "geomean_vs_library": geomean(
                     [
                         r["confirmation"]["median_us"][r["library_choice"]]
-                        / r["confirmation"]["median_us"]["native_baseline"]
+                        / r["confirmation"]["median_us"][spec["comparator"]]
                         for r in native_records
                     ]
                 )
@@ -650,6 +691,7 @@ def report(run):
             "evaluation_cases": len(evaluation),
             "proposals": len(state["proposals"]),
             "validated_before_evaluation": len(valid),
+            "comparator": spec["comparator"],
             "frozen_global_choice": choice,
             "frozen_choice_evaluation": chosen,
             "evaluation_by_candidate": by_candidate,
@@ -670,13 +712,14 @@ def report(run):
             "",
             f"Operator: **{spec['operator']}**. Workloads: {len(spec['cases'])}; sealed evaluation: {len(evaluation)}.",
             f"Frozen global choice: `{choice}`. Candidate pool and choice were frozen before evaluation measurements.",
+            f"Frozen deployment comparator: `{spec['comparator']}`. Acceptance is measured against this implementation.",
             "",
-            "| Candidate | Evaluation/native | Evaluation/library envelope | Confirmed wins | Confirmed regressions |",
-            "|---|---:|---:|---:|---:|",
+            "| Candidate | Evaluation/comparator | Evaluation/native | Evaluation/library envelope | Confirmed wins | Confirmed regressions |",
+            "|---|---:|---:|---:|---:|---:|",
         ]
         for name, item in by_candidate.items():
             lines.append(
-                f"| {name} | {item['geomean_vs_native'] if item['complete'] else 'incomplete'} | {item['geomean_vs_library'] if item['complete'] else 'incomplete'} | {item['confirmed_wins']} | {item['confirmed_regressions']} |"
+                f"| {name} | {item['geomean_vs_comparator'] if item['complete'] else 'incomplete'} | {item['geomean_vs_native'] if item['complete'] else 'incomplete'} | {item['geomean_vs_library'] if item['complete'] else 'incomplete'} | {item['confirmed_wins']} | {item['confirmed_regressions']} |"
             )
         lines += [
             "",

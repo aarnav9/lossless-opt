@@ -28,7 +28,7 @@ lossless demo --budget 60s --output ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-From a standalone copy of this folder, use `python -m pip install .`. This private development package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
+From a standalone copy of this folder, use `python -m pip install .`. This source alpha is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
 
 Use the exported operation without an LLM:
 
@@ -127,4 +127,4 @@ python -m build
 
 Candidate execution and provider callbacks use trusted local processes with timeouts, not an OS security sandbox. Run with representative inputs you are allowed to send to your configured provider. Evaluation data is withheld from proposal prompts; candidates do not decide acceptance.
 
-See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. Public release remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
+See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. Tagged releases and package-registry distribution remain pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.

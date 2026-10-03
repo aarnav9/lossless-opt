@@ -178,7 +178,17 @@ class Workload:
                 else "latency"
             },
         )
-        fields(objective, {"metric", "min_speedup"}, "objective", {"metric"})
+        fields(objective, {"metric", "min_speedup", "comparator"}, "objective", {"metric"})
+        if work["adapter"] == "mlx.fixed_count":
+            if objective.setdefault("comparator", "stock_serial") != "stock_serial":
+                raise ValueError("MLX comparator must be stock_serial")
+        else:
+            from ._native.operators import COMPARATORS, validate_comparator
+
+            operator = ADAPTERS[work["adapter"]]
+            validate_comparator(
+                operator, objective.setdefault("comparator", COMPARATORS[operator][0])
+            )
         if objective["metric"] != (
             "throughput" if work["adapter"] == "mlx.fixed_count" else "latency"
         ):
@@ -314,7 +324,11 @@ def template(adapter="native.copy", seconds=60):
             "preset": "exact" if adapter == "native.copy" else "numerical",
             "required_evidence": "validated",
         },
-        "objective": {"metric": "latency", "min_speedup": 1.02},
+        "objective": {
+            "metric": "latency",
+            "min_speedup": 1.02,
+            "comparator": "numpy_copy" if adapter == "native.copy" else "numpy_buffered",
+        },
         "budget": {"wall_time_seconds": seconds, "max_candidates": 3, "max_llm_calls": 1},
         "target": {"device": "auto"},
         "output": {"directory": "./lossless-runs"},

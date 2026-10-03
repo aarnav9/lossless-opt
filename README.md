@@ -6,7 +6,7 @@
 
 Bring a supported workload, a JSON contract, and your own LLM. Lossless searches for faster implementations, checks them independently, and exports a guarded implementation with performance and correctness records. Built-in candidates let you try the workflow without an API key.
 
-**Status: installable source alpha (`0.1.0a1`), MIT-licensed original code, private development repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
+**Status: installable source alpha (`0.1.0a1`), MIT-licensed original code, public source repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
 
 ![Recorded installed-alpha MLX comparison: 1.945× throughput, with batch time falling from 574.8 to 295.4 ms and exact agreement on tested tokens, log probabilities and active KV state.](lossless-product/docs/assets/mlx-retention.png)
 
@@ -29,7 +29,7 @@ lossless report ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-Private-repository access is currently required. The package has not been published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
+The source repository is public. The package has not been published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
 
 The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report.json` and `report.html` in the run directory. Completed runs export the accepted implementation or the reference; incomplete runs cannot be exported. A measured speedup is not guaranteed.
 
@@ -159,6 +159,6 @@ CONTRIBUTING.md        Experiment categories, test workflow and development setu
 research/             Local research archive; ignored by Git
 ```
 
-The product runs independently of `research/`. Original code is [MIT licensed](LICENSE); imported components retain their [third-party notices](lossless-product/NOTICE). Public distribution remains pending.
+The product runs independently of `research/`. Original code is [MIT licensed](LICENSE); imported components retain their [third-party notices](lossless-product/NOTICE). Package-registry distribution remains pending.
 
 [Architecture and future design](lossless-product/docs/architecture.md) · [Implemented API and configuration](lossless-product/docs/alpha.md) · [Product installation and deployment](lossless-product/README.md)

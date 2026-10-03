@@ -47,6 +47,7 @@ def export(run, destination):
         "schema_version": 1,
         "adapter": summary["adapter"],
         "selected": chosen,
+        "comparator": summary.get("comparator", "native_baseline"),
         "platform": sys.platform,
         "machine": platform.machine(),
         "python_abi": list(sys.version_info[:2]),
@@ -194,9 +195,18 @@ class NativeOperation:
                 )
 
             return reference
-        funcs, guards, _ = operators.executors(
-            self.operator, case, arrays, self.library, self.library
-        )
+        if self.manifest["selected"] == "reference":
+            funcs, _, _ = operators.executors(
+                self.operator, case, arrays, self.library, self.library
+            )
+            comparator = self.manifest.get("comparator", "native_baseline")
+            if comparator not in funcs:
+                self.fallback_reason = "declared comparator unavailable; independent reference used"
+                return lambda: np.asarray(
+                    operators.reference(self.operator, arrays), dtype=np.float32, order="C"
+                )
+            return funcs[comparator]
+        funcs, _, _ = operators.executors(self.operator, case, arrays, self.library, self.library)
         return funcs["proposal"]
 
     def __call__(self, x, residual=None, weight=None):

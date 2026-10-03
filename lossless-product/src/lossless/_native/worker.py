@@ -38,6 +38,7 @@ def benchmark_job(job):
 
     operator = job["operator"]
     case = job["case"]
+    comparator = operators.validate_comparator(operator, job.get("comparator", "native_baseline"))
     contract = operators.CONTRACTS[operator]
     baseline = operators.load_library(job["baseline"])
     candidate = operators.load_library(job["candidate"])
@@ -96,6 +97,9 @@ def benchmark_job(job):
         "validation": validation,
         **phases,
         "library_choice": library,
+        "comparator": comparator,
+        "speedup_vs_comparator": med[comparator] / med["proposal"],
+        "ci95_vs_comparator": interval(samples[comparator], samples["proposal"], seed + 30000),
         "speedup_vs_native": med["native_baseline"] / med["proposal"],
         "speedup_vs_library": med[library] / med["proposal"],
         "ci95_vs_native": ci,

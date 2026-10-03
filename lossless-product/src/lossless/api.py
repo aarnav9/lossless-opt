@@ -95,6 +95,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
             "confirmation_blocks": 9,
             "max_proposals": resolved["budget"]["max_candidates"],
             "min_speedup": resolved["objective"]["min_speedup"],
+            "comparator": resolved["objective"]["comparator"],
         }
         import tempfile
 
@@ -209,9 +210,8 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
                     resolved.get("llm"),
                     callback=llm,
                     base=workload.base,
-                    timeout=min(
-                        (resolved.get("llm") or {}).get("timeout_seconds", 30),
-                        max(0, deadline - reserve - time.monotonic()),
+                    timeout=providers.bounded_timeout(
+                        resolved.get("llm"), deadline - reserve - time.monotonic()
                     ),
                 )
                 proposals, usage = protocol.validate_response(
@@ -256,7 +256,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
     if detail:
         choice = detail["frozen_global_choice"]
         chosen = detail["frozen_choice_evaluation"]
-        if choice != "native_baseline" and chosen["complete"]:
+        if choice not in {"native_baseline", "deployment_reference"} and chosen["complete"]:
             entries = [
                 read_json(run / j["result"])
                 for j in engine.verify(run)["jobs"].values()
@@ -266,9 +266,9 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
                 and j["status"] == "ok"
             ]
             if (
-                chosen["geomean_vs_native"] >= resolved["objective"]["min_speedup"]
+                chosen["geomean_vs_comparator"] >= resolved["objective"]["min_speedup"]
                 and entries
-                and all(r["ci95_vs_native"][0] > 1 for r in entries)
+                and all(r["ci95_vs_comparator"][0] > 1 for r in entries)
             ):
                 selected = choice
     checkpoint()
@@ -280,6 +280,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
         "adapter": resolved["workload"]["adapter"],
         "status": status,
         "selected": selected,
+        "comparator": resolved["objective"]["comparator"],
         "contract": read_json(run / "contract.json"),
         "required_evidence": "validated",
         "job_identity": identity(resolved),

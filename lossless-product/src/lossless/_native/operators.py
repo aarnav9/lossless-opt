@@ -11,6 +11,21 @@ except ImportError:
     scipy_softmax = None
 
 GUARD = np.float32(-12345.5)
+COMPARATORS = {
+    "copy": ("numpy_copy", "native_baseline"),
+    "softmax": ("numpy_buffered", "scipy_softmax_float64", "native_baseline"),
+    "rmsnorm_residual": ("numpy_buffered", "native_baseline"),
+}
+
+
+def validate_comparator(operator, name):
+    if name not in COMPARATORS[operator]:
+        raise ValueError(f"unsupported deployment comparator {name!r} for {operator}")
+    if name == "scipy_softmax_float64" and scipy_softmax is None:
+        raise ValueError("scipy_softmax_float64 comparator requires the numerical extra")
+    return name
+
+
 ABI = "const float *restrict x, const float *restrict r, const float *restrict w, float *restrict out, float *restrict inv, float *restrict px, float *restrict pr, size_t rows, size_t cols, size_t rs, size_t cs"
 CONTRACTS = {
     "copy": {
