@@ -34,7 +34,7 @@ def main(run):
             if supplied.get("host", {}).get(key, actual) != actual:
                 raise ValueError(f"supplied hardware profile mismatches worker {key}")
     write(run / "hardware.json", hardware)
-    allowed, reason = admission(model_path, hardware["device_name"])
+    allowed, reason = admission(model_path, hardware["device_name"], model_identity=model_identity)
     model, tokenizer = load(model_path)
     mx.eval(model.parameters())
     grouped = GroupedHead(model, 4) if allowed else None
@@ -50,8 +50,16 @@ def main(run):
         proof = check(timeout=max(0, deadline - time.monotonic()))
         write(run / "proofs.json", proof)
     evaluations = {}
+    graphs = {}
 
     def execute(rows, options, capture=False):
+        recipe = (options or {}).get("execution_recipe", "retained")
+        if recipe != "retained" and recipe not in graphs:
+            from .graph import GraphRecipe
+
+            graphs[recipe] = GraphRecipe(
+                model, recipe, (options or {}).get("graph_cache_entries", 64)
+            )
         return generate(
             model,
             grouped,
@@ -61,12 +69,17 @@ def main(run):
             optimized=options is not None,
             options=options,
             capture=capture,
+            graph=graphs.get(recipe),
         )
 
     def evaluate(name, options, split):
         rows = splits[split]
         reference = execute(rows, None, True)
         candidate = execute(rows, options, True)
+        startup = {
+            "reference_seconds": reference[0]["seconds"],
+            "candidate_seconds": candidate[0]["seconds"],
+        }
         checks = []
         for i in range(len(rows)):
             checks.append(
@@ -85,16 +98,26 @@ def main(run):
             for c in checks
         )
         del reference, candidate
+        is_graph = (options or {}).get("execution_recipe", "retained") != "retained"
         samples = {"reference": [], "candidate": []}
+        if is_graph:
+            samples["retained"] = []
         orders = []
         if exact:
             for repeat in range(config["workload"]["parameters"]["repeats"]):
-                order = ["reference", "candidate"]
+                order = list(samples)
                 random.Random(4100 + repeat).shuffle(order)
                 orders.append(order)
                 token_ids = {}
                 for key in order:
-                    row, _, _ = execute(rows, None if key == "reference" else options)
+                    opts = (
+                        None
+                        if key == "reference"
+                        else {"allocator_cache_mib": 256}
+                        if key == "retained"
+                        else options
+                    )
+                    row, _, _ = execute(rows, opts)
                     samples[key].append(row["seconds"])
                     token_ids[key] = row["output_ids"]
                 if token_ids["reference"] != token_ids["candidate"]:
@@ -111,12 +134,20 @@ def main(run):
             else None
         )
         result = {
+            "first_validation_call": startup,
+            "graph": {
+                k: {**v.stats, "entries": len(v.functions), "capacity": v.capacity}
+                for k, v in graphs.items()
+            },
             "exact": exact,
             "checks": checks,
             "samples_seconds": samples,
             "orders": orders,
             "speedup": speedup,
             "ci95": interval(samples["reference"], samples["candidate"], 2026) if speedup else None,
+            "incremental_ci95": interval(samples["retained"], samples["candidate"], 2026)
+            if speedup and is_graph
+            else None,
         }
         write(run / (split + "_" + name + ".json"), result)
         return result
@@ -136,11 +167,21 @@ def main(run):
         candidates = [("retained", {"allocator_cache_mib": 256})]
         discovery = evaluate("retained", candidates[0][1], "discovery")
         evaluations["retained"] = discovery
+        for recipe in config["workload"]["parameters"].get("graph_recipes", []):
+            if len(candidates) >= config["budget"]["max_candidates"]:
+                break
+            opts = {
+                "allocator_cache_mib": 256,
+                "execution_recipe": recipe,
+                "graph_cache_entries": 64,
+            }
+            candidates.append((recipe, opts))
+            evaluations[recipe] = evaluate(recipe, opts, "discovery")
         reserve = (time.monotonic() - started) * 1.3
         if (
             config.get("llm")
             and config["budget"]["max_llm_calls"]
-            and config["budget"]["max_candidates"] > 1
+            and config["budget"]["max_candidates"] > len(candidates)
             and time.monotonic() + reserve < deadline
         ):
             from ...providers import call, bounded_timeout
@@ -183,10 +224,9 @@ def main(run):
                 ):
                     raise ValueError("provider response needs schema_version=1")
                 proposed = response.get("proposals", [])
-                if (
-                    not isinstance(proposed, list)
-                    or not 1 <= len(proposed) <= config["budget"]["max_candidates"] - 1
-                ):
+                if not isinstance(proposed, list) or not 1 <= len(proposed) <= config["budget"][
+                    "max_candidates"
+                ] - len(candidates):
                     raise ValueError("invalid proposal count")
                 write(run / "llm_response.json", response)
                 for proposal in proposed:
@@ -209,6 +249,10 @@ def main(run):
                     ):
                         raise ValueError("invalid/duplicate candidate identifier")
                     validate_options(proposal["options"])
+                    if set(proposal["options"]) - {"allocator_cache_mib"}:
+                        raise ValueError(
+                            "LLM proposals may only select allocator policy; graph recipes require explicit workload opt-in"
+                        )
                     if time.monotonic() + reserve >= deadline:
                         break
                     candidates.append((name, proposal["options"]))
@@ -224,6 +268,10 @@ def main(run):
             for name, opts in candidates
             if evaluations[name]["exact"]
             and evaluations[name]["speedup"] >= config["objective"]["min_speedup"]
+            and (
+                evaluations[name]["incremental_ci95"] is None
+                or evaluations[name]["incremental_ci95"][0] > 1.01
+            )
         ]
         if eligible:
             finalist, chosen = max(eligible, key=lambda p: evaluations[p[0]]["speedup"])
@@ -240,6 +288,10 @@ def main(run):
                 confirmation["exact"]
                 and confirmation["speedup"] >= config["objective"]["min_speedup"]
                 and confirmation["ci95"][0] > 1
+                and (
+                    confirmation["incremental_ci95"] is None
+                    or confirmation["incremental_ci95"][0] > 1.01
+                )
             ):
                 selected, options = finalist, chosen
         else:
@@ -265,6 +317,20 @@ def main(run):
         "evaluation": confirmation,
         "scope": "Fixed-count greedy bulk inference, exclusive process, pinned model/runtime/device. Finite token/probability/active-KV checks. Timings include recipe setup, tokenization, execution and required state materialization; model loading is separate. Throughput gains do not imply faster first-token latency.",
     }
+    if selected != "reference":
+        from ...economics import payback
+        import statistics
+
+        cold = evaluations[selected]["first_validation_call"]
+        summary["payback"] = payback(
+            summary["wall_time_seconds"],
+            statistics.median(confirmation["samples_seconds"]["reference"]),
+            statistics.median(confirmation["samples_seconds"]["candidate"]),
+            max(0, cold["candidate_seconds"] - cold["reference_seconds"]),
+        )
+        summary["payback"]["setup_scope"] = (
+            "extra first validation-call time after model load; includes capture"
+        )
     save_report(run, summary)
     write(
         run / "sealed.json",

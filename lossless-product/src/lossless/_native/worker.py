@@ -20,7 +20,7 @@ COMPILE_FLAGS = [
 ]
 
 
-def compile_job(job):
+def _compile_job(job):
     command = ["clang", *COMPILE_FLAGS, job["source"], "-o", job["binary"], "-lm"]
     result = subprocess.run(command, capture_output=True, text=True)
     return {
@@ -31,6 +31,30 @@ def compile_job(job):
         "source_sha256": sha(job["source"]),
         "binary_sha256": sha(job["binary"]) if result.returncode == 0 else None,
     }
+
+
+def compile_job(job):
+    from . import cache
+    import shutil
+
+    identity = {
+        "source": sha(job["source"]),
+        "flags": COMPILE_FLAGS,
+        "context": job.get("cache_context"),
+    }
+    with cache.entry(job.get("cache", {}).get("directory"), "compiled", identity) as folder:
+        record = cache.load(folder)
+        if record and record["status"] == "ok":
+            shutil.copy2(folder / "binary", job["binary"])
+            return {
+                **record,
+                "cache_hit": True,
+                "command": ["clang", *COMPILE_FLAGS, job["source"], "-o", job["binary"], "-lm"],
+            }
+        record = _compile_job(job)
+        if record["status"] == "ok":
+            cache.save(folder, record, job["binary"])
+        return {**record, "cache_hit": False}
 
 
 def benchmark_job(job):
@@ -44,30 +68,50 @@ def benchmark_job(job):
     candidate = operators.load_library(job["candidate"])
     validation = {}
     seed = job["seed"]
-    for index, distribution in enumerate(contract["distributions"]):
-        arrays = operators.input_arrays(operator, case, seed + index, distribution)
-        before = operators.digest(arrays)
-        expected = operators.reference(operator, arrays)
-        funcs, guards, poison = operators.executors(operator, case, arrays, baseline, candidate)
-        # Validate trusted implementations before the proposal; a baseline defect stops the campaign.
-        for name in [n for n in funcs if n != "proposal"] + ["proposal"]:
-            poison()
-            actual = funcs[name]()
-            value = operators.check(operator, actual, expected)
-            value["guards_intact"] = guards()
-            value["inputs_unchanged"] = operators.digest(arrays) == before
-            value["passed"] = (
-                value["passed"] and value["guards_intact"] and value["inputs_unchanged"]
-            )
-            validation.setdefault(name, {})[distribution] = value
-            if not value["passed"]:
-                return {
-                    "status": "incorrect" if name == "proposal" else "reference_failure",
-                    "validation": validation,
-                    "failed_implementation": name,
-                    "failed_distribution": distribution,
-                    "case": case,
-                }
+    from . import cache
+
+    validation_key = {
+        "context": job.get("cache_context"),
+        "case": case,
+        "seed": seed,
+        "baseline": sha(job["baseline"]),
+        "candidate": sha(job["candidate"]),
+    }
+    directory = job.get("cache", {}).get("directory") if job.get("reuse_validation") else None
+    validation_hit = False
+    with cache.entry(directory, "validation", validation_key) as folder:
+        cached = cache.load(folder)
+        if cached:
+            validation = cached["validation"]
+            validation_hit = True
+        else:
+            for index, distribution in enumerate(contract["distributions"]):
+                arrays = operators.input_arrays(operator, case, seed + index, distribution)
+                before = operators.digest(arrays)
+                expected = operators.reference(operator, arrays)
+                funcs, guards, poison = operators.executors(
+                    operator, case, arrays, baseline, candidate
+                )
+                # Validate trusted implementations before the proposal; a baseline defect stops the campaign.
+                for name in [n for n in funcs if n != "proposal"] + ["proposal"]:
+                    poison()
+                    actual = funcs[name]()
+                    value = operators.check(operator, actual, expected)
+                    value["guards_intact"] = guards()
+                    value["inputs_unchanged"] = operators.digest(arrays) == before
+                    value["passed"] = (
+                        value["passed"] and value["guards_intact"] and value["inputs_unchanged"]
+                    )
+                    validation.setdefault(name, {})[distribution] = value
+                    if not value["passed"]:
+                        return {
+                            "status": "incorrect" if name == "proposal" else "reference_failure",
+                            "validation": validation,
+                            "failed_implementation": name,
+                            "failed_distribution": distribution,
+                            "case": case,
+                        }
+            cache.save(folder, {"validation": validation})
     phases = {}
     for phase, offset, blocks in [
         ("screening", 10000, job["screening_blocks"]),
@@ -97,6 +141,7 @@ def benchmark_job(job):
         "validation": validation,
         **phases,
         "library_choice": library,
+        "validation_cache_hit": validation_hit,
         "comparator": comparator,
         "speedup_vs_comparator": med[comparator] / med["proposal"],
         "ci95_vs_comparator": interval(samples[comparator], samples["proposal"], seed + 30000),

@@ -232,11 +232,17 @@ def submit(run, proposal_path):
         shutil.copy2(source, folder / "kernel.c")
         write(folder / "proposal.json", proposal)
         names = [str(p.relative_to(run)) for p in folder.iterdir()]
+        source_hash = sha(source)
+        duplicate = next(
+            (n for n, v in state["proposals"].items() if v.get("source_sha256") == source_hash),
+            None,
+        )
         state["proposals"][name] = {
+            "source_sha256": source_hash,
             "fingerprint": fingerprint,
             "submitted_utc": now(),
             "hashes": {p: sha(run / p) for p in names},
-            "rejected": None,
+            "rejected": {"reason": "duplicate_source", "of": duplicate} if duplicate else None,
         }
         event(run, state, "proposal_submitted", candidate=name, fingerprint=fingerprint)
 
@@ -341,6 +347,24 @@ def execute(run, stage, max_jobs=None, deadline=None):
             attempts = previous.get("attempts", 0) + 1
             job_path = folder / f"job_{attempts}.json"
             result_path = folder / f"result_{attempts}.json"
+            spec = read(run / "spec.json")
+            manifest = read(run / "manifest.json")
+            job["cache"] = spec.get("cache", {})
+            job["reuse_validation"] = stage == "discovery" and job["cache"].get(
+                "reuse_validation", False
+            )
+            job["cache_context"] = {
+                "environment": {
+                    k: manifest.get(k)
+                    for k in ("python", "platform", "machine", "numpy", "scipy", "compiler_version")
+                },
+                "hardware": read(run / "hardware_profile.json")["host"],
+                "harness": {
+                    k: v for k, v in manifest["hashes"].items() if k.startswith("harness/")
+                },
+                "contract": manifest["hashes"]["contract.json"],
+                "comparator": spec["comparator"],
+            }
             write(job_path, job)
             entry = {
                 "status": "running",

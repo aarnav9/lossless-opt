@@ -18,11 +18,18 @@ def resolve_workload(work, base):
         raise ValueError("MLX takes a request input file, not native tensor cases")
     fields(
         work.get("parameters"),
-        {"model", "sampler", "fixed_count", "repeats"},
+        {"model", "sampler", "fixed_count", "repeats", "graph_recipes"},
         "MLX parameters",
         {"model", "fixed_count"},
     )
     params = work["parameters"]
+    graphs = params.setdefault("graph_recipes", [])
+    if (
+        not isinstance(graphs, list)
+        or any(g not in {"decoder_026", "fullhead_027"} for g in graphs)
+        or len(set(graphs)) != len(graphs)
+    ):
+        raise ValueError("graph_recipes must be unique supported recipe names")
     if params["fixed_count"] is not True or params.get("sampler", "greedy") != "greedy":
         raise ValueError("MLX optimization currently requires fixed_count=true and greedy sampling")
     params.setdefault("sampler", "greedy")
@@ -232,8 +239,11 @@ class MLXOperation:
             raise ValueError(
                 "local model directory missing; call operation.open(model=...) with the relocated weights"
             )
-        allowed, reason = admission(source, mx.device_info()["device_name"])
-        if fingerprint(source) != self.manifest["model_identity"]:
+        model_identity = fingerprint(source)
+        allowed, reason = admission(
+            source, mx.device_info()["device_name"], model_identity=model_identity
+        )
+        if model_identity != self.manifest["model_identity"]:
             allowed = False
             reason = "model identity differs from deployment artifact"
         if runtime_identity() != self.manifest["runtime_identity"]:
@@ -243,6 +253,14 @@ class MLXOperation:
         mx.eval(self._model.parameters())
         self._grouped = GroupedHead(self._model, 4) if allowed else None
         self._allowed = allowed and self.manifest["selected"] != "reference"
+        self._graph = None
+        recipe = self.manifest.get("options", {}).get("execution_recipe", "retained")
+        if self._allowed and recipe != "retained":
+            from .graph import GraphRecipe
+
+            self._graph = GraphRecipe(
+                self._model, recipe, self.manifest["options"].get("graph_cache_entries", 64)
+            )
         self.fallback_reason = reason
         return self
 
@@ -263,4 +281,5 @@ class MLXOperation:
             stop_ids=stop_ids,
             cancel_after=cancel_after,
             fallback_reason=self.fallback_reason,
+            graph=self._graph,
         )

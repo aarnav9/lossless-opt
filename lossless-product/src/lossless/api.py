@@ -96,6 +96,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
             "max_proposals": resolved["budget"]["max_candidates"],
             "min_speedup": resolved["objective"]["min_speedup"],
             "comparator": resolved["objective"]["comparator"],
+            "cache": resolved["cache"],
         }
         import tempfile
 
@@ -291,6 +292,22 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
         "measurements": detail,
         "scope": "Finite validation on generated cases; exact copy or explicit numerical contract. Native timings include ctypes dispatch with preallocated buffers; Python deployment allocation cost is separate. POSIX trusted-local execution, not a security sandbox.",
     }
+    from .economics import payback
+
+    summary["payback_by_evaluation_case"] = []
+    if selected != "reference":
+        for record in entries:
+            timings = record["confirmation"]["median_us"]
+            summary["payback_by_evaluation_case"].append(
+                {
+                    "case": record["case"],
+                    **payback(
+                        summary["wall_time_seconds"],
+                        timings[summary["comparator"]] / 1e6,
+                        timings["proposal"] / 1e6,
+                    ),
+                }
+            )
     save_report(run, summary)
     from ._native.common import sha
 

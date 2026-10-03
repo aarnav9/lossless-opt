@@ -204,3 +204,13 @@ python -u -m lossless setup --proofs mathlib 2>&1 | tee lossless-mathlib-setup.l
 ```
 
 Setup prints timestamped progress and result/log locations. Proof checks are scoped statements and cannot authorize numerical relaxation. The theorem index is proposal context, not checked evidence for a generated candidate.
+
+## Search reuse, deployment overhead and payback
+
+Native jobs default to a trusted local cache at `./.lossless/cache`, relative to the job. Configure `"cache": {"directory": null, "reuse_validation": false}` to disable it. Cache identities bind source, compiler flags/version, runtime packages, hardware inventory, harness, contract, comparator and (for validation) case/seed and binary identities. Exact duplicate proposal sources are recorded and rejected before compilation/measurement. This does not establish semantic equivalence of different source strings.
+
+Only compilation and successful discovery correctness evidence are reused. Evaluation correctness and every timing remain fresh. Hashes detect accidental corruption, not a malicious cache owner. Native reports contain per-case search-only break-even call counts; total payback stays unknown when deployment setup has not been measured. The bound-buffer API avoids benchmark-only initialization while preserving the complete scratch-buffer ABI.
+
+MLX jobs may opt into `"graph_recipes": ["decoder_026", "fullhead_027"]` inside `workload.parameters`, with `max_candidates` at least three to compare both with the retained recipe. These are alternatives, not additive gains. Each model handle holds at most 64 explicit shape/dtype/index specializations by default; unseen keys after the limit use the retained eager path. The hard maximum is 128 entries. This bounds entry count, not an absolute driver-memory limit. The model is immutable for the lifetime of the handle.
+
+Graph promotion additionally requires a fresh paired interval more than 1% above the retained recipe. Both first validation-call cost and warmed measurements are recorded. MLX reports estimate payback from measured extra first-call cost after model loading. Graphs remain opt-in and require the same exact model/runtime/device admission. Stopping/cancellation uses serial fallback. Provider timeouts honor `llm.timeout_seconds` and the remaining total budget in both backends.

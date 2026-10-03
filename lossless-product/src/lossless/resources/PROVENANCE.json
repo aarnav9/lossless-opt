@@ -309,5 +309,19 @@
       "counts"
     ],
     "note": "Synthetic benchmark fixtures, combined into distinct discovery and evaluation splits"
+  },
+  {
+    "research_source": "experiments/execution_reuse_026/candidates.py",
+    "source_sha256": "5b69c00dc1174aa44130c41c51e6438c9ee824c580f752e36fb1c04da86acb6d",
+    "product_file": "src/lossless/adapters/mlx/graph.py",
+    "extracted_symbols": null,
+    "note": "Adapted decoder/full-head explicit-state capture; bounded specialization keys and fallback added in campaign 032. Alternatives, not cumulative transformations."
+  },
+  {
+    "research_source": "experiments/execution_reuse_027/candidates.py",
+    "source_sha256": "6f3ccb6795916b213fddbb149edf775d0b55735b57da92b7af8f0209ff1ddc86",
+    "product_file": "src/lossless/adapters/mlx/graph.py",
+    "extracted_symbols": null,
+    "note": "Adapted decoder/full-head explicit-state capture; bounded specialization keys and fallback added in campaign 032. Alternatives, not cumulative transformations."
   }
 ]

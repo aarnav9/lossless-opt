@@ -1,6 +1,6 @@
 """The retained exact recipe in an explicitly exclusive MLX execution scope."""
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import importlib.metadata
 import json
 from pathlib import Path
@@ -24,7 +24,7 @@ def runtime_identity():
     return {p.name: sha(p) for p in sorted(Path(__file__).parent.glob("*.py"))}
 
 
-def admission(model_path, device_name, versions=None):
+def admission(model_path, device_name, versions=None, *, model_identity=None):
     from .identity import fingerprint
 
     versions = versions or {n: importlib.metadata.version(n) for n in ["mlx", "mlx-lm"]}
@@ -33,14 +33,27 @@ def admission(model_path, device_name, versions=None):
     if device_name != "Apple M2":
         return False, "hardware outside validated Apple M2"
     expected = json.loads(Path(__file__).with_name("model_identity.json").read_text())
-    if fingerprint(model_path) != expected:
+    if (fingerprint(model_path) if model_identity is None else model_identity) != expected:
         return False, "model identity outside the validated 8-bit SmolLM2 artifact"
     return True, None
 
 
 def validate_options(options):
-    if not isinstance(options, dict) or set(options) - {"allocator_cache_mib"}:
-        raise ValueError("MLX candidates may only select allocator_cache_mib in this alpha")
+    if not isinstance(options, dict) or set(options) - {
+        "allocator_cache_mib",
+        "execution_recipe",
+        "graph_cache_entries",
+    }:
+        raise ValueError("unsupported MLX recipe options")
+    if options.get("execution_recipe", "retained") not in {
+        "retained",
+        "decoder_026",
+        "fullhead_027",
+    }:
+        raise ValueError("unsupported execution recipe")
+    capacity = options.get("graph_cache_entries", 64)
+    if type(capacity) is not int or not 1 <= capacity <= 128:
+        raise ValueError("graph_cache_entries must be in 1..128")
     if "allocator_cache_mib" in options and (
         type(options["allocator_cache_mib"]) is not int
         or options["allocator_cache_mib"] not in {0, 64, 256}
@@ -81,6 +94,7 @@ def generate(
     stop_ids=None,
     cancel_after=None,
     fallback_reason=None,
+    graph=None,
 ):
     import mlx.core as mx
     from mlx_lm.generate import generation_stream
@@ -118,7 +132,21 @@ def generate(
             fallback_reason = "stop/cancellation uses stock serial"
         elif optimized and grouped is not None:
             with allocator(options or {"allocator_cache_mib": 256}):
-                value = run(grouped, prompts, counts, CACHE_RECIPE, capture)
+                recipe = CACHE_RECIPE
+                if (options or {}).get("execution_recipe", "retained") != "retained":
+                    if graph is None:
+                        from .graph import GraphRecipe
+
+                        graph = GraphRecipe(
+                            stock,
+                            options["execution_recipe"],
+                            options.get("graph_cache_entries", 64),
+                        )
+                    if graph.model is not stock or graph.recipe != options["execution_recipe"]:
+                        raise ValueError("graph belongs to a different model/recipe")
+                    recipe = {**CACHE_RECIPE, "append_metal": False, "append_concat": True}
+                with graph.installed() if graph is not None else nullcontext():
+                    value = run(grouped, prompts, counts, recipe, capture)
         else:
             value = serial(stock, prompts, counts, capture)
         row, caches, probs = value
@@ -143,6 +171,11 @@ def generate(
         row["tokens_per_second"] = sum(map(len, row["output_ids"])) / row["seconds"]
         row["fallback_reason"] = fallback_reason
         row["prompt_lengths"] = list(map(len, prompts))
+        row["graph"] = (
+            {**graph.stats, "entries": len(graph.functions), "capacity": graph.capacity}
+            if graph is not None
+            else None
+        )
         return row, caches, probs
     finally:
         LOCK.release()

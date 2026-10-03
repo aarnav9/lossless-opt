@@ -206,8 +206,7 @@ class NativeOperation:
                     operators.reference(self.operator, arrays), dtype=np.float32, order="C"
                 )
             return funcs[comparator]
-        funcs, _, _ = operators.executors(self.operator, case, arrays, self.library, self.library)
-        return funcs["proposal"]
+        return operators.bind_native(arrays, self.library)
 
     def __call__(self, x, residual=None, weight=None):
         return self.bind(x, residual, weight)()

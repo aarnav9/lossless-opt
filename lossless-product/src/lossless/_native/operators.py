@@ -196,6 +196,27 @@ def executors(operator, case, arrays, baseline, candidate):
     return funcs, guards, poison
 
 
+def bind_native(arrays, library):
+    """Deployment buffers without benchmark baselines, red zones or initialization.
+
+    Keep the complete public scratch ABI: generated candidates may use all three
+    matrix buffers. Allocation remains outside the measured bound call.
+    """
+    x, r, w = arrays
+    rows, cols = x.shape
+    out, px, pr = [np.empty((rows, cols), dtype=np.float32) for _ in range(3)]
+    inv = np.empty(rows, dtype=np.float32)
+    owners = (x, r, w, out, inv, px, pr)
+    pointers = [a.ctypes.data_as(ctypes.POINTER(ctypes.c_float)) for a in owners]
+    rs, cs = (s // 4 for s in x.strides)
+
+    def call():
+        library.kernel(*pointers, rows, cols, rs, cs)
+        return owners[3]
+
+    return call
+
+
 def check(operator, actual, expected):
     if operator == "copy":
         return {

@@ -98,6 +98,7 @@ class Workload:
                 "target",
                 "output",
                 "proofs",
+                "cache",
             },
             "job",
             {"schema_version", "workload", "contract", "budget"},
@@ -189,6 +190,14 @@ class Workload:
             validate_comparator(
                 operator, objective.setdefault("comparator", COMPARATORS[operator][0])
             )
+        cache = value.setdefault(
+            "cache", {"directory": "./.lossless/cache", "reuse_validation": True}
+        )
+        fields(cache, {"directory", "reuse_validation"}, "cache", {"directory"})
+        if cache["directory"] is not None:
+            cache["directory"] = str((self.base / cache["directory"]).resolve())
+        if type(cache.setdefault("reuse_validation", True)) is not bool:
+            raise ValueError("cache.reuse_validation must be boolean")
         if objective["metric"] != (
             "throughput" if work["adapter"] == "mlx.fixed_count" else "latency"
         ):

@@ -107,9 +107,10 @@ def scheduled(model, prompts, counts, capture=False, enabled=True, trace=False):
     )
 
 
-def teacher_checks(model, prompts, counts):
+def teacher_checks(model, prompts, counts, candidate_context=None):
     """Identical forced histories through every stop, including mixed head groups."""
     import mlx.core as mx
+    from contextlib import nullcontext
     from mlx_lm.models.cache import BatchKVCache
     from lossless.adapters.mlx.checks import prepare_prefix
     from lossless.adapters.mlx.checks import diff, cache_diff
@@ -128,7 +129,9 @@ def teacher_checks(model, prompts, counts):
         tokens = [prompts[i][-1] for i in active]
         for t in range(max(ds) + 1):
             inp = mx.array(tokens)[:, None]
-            la, lb = model(inp, cache=a), candidate(inp, cache=b)
+            la = model(inp, cache=a)
+            with candidate_context() if candidate_context else nullcontext():
+                lb = candidate(inp, cache=b)
             mx.eval(la, lb, [c.state for c in a], [c.state for c in b])
             for j, request in enumerate(active):
                 kv = cache_diff([c.extract(j) for c in a], [c.extract(j) for c in b])
