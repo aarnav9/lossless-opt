@@ -79,6 +79,20 @@ Keep the kernels experimental. The study covers one machine, one numerical opera
 
 [Public search evidence](assets/search-043.json) retains prompts, controls, all nine model-authored sources, token/time receipts, every search job result, sealed selections, paired samples and the pilot. A payback-reporting lookup initially used `candidate` instead of the worker's `proposal` timing key. The correction reused the nine already completed paired records after checking job identities; it did not rerun measurements, change choices or tune from evaluation. The prior script and bookkeeping amendment are retained. The pilot also needed explicit bookkeeping for zero-proposal arms; it was never used to tune the follow-up from final evaluation data.
 
+## README search-time figure
+
+The [PNG](assets/search-time-043.png) and [SVG](assets/search-time-043.svg) use the slate, teal and lavender palette of the earlier MLX retention figure. They are rendered from the [public campaign 043 evidence](assets/search-043.json), not manually entered timing values. The script validates timeout/completion receipts, all 810 LLM candidate/distribution checks, each selected kernel's paired correctness and timing records, and geometric means before drawing.
+
+Top cards compare author completion under the two caps. Five-minute kernel performance is **unmeasured**, so the figure does not assign it zero speed or a baseline speed. These were separate independent authoring sessions, not interrupted/continued versions of the same run. The 30-minute cap is per author, and no successful author used the full allowance.
+
+Each small point is the ratio of retained/candidate median latency for one held-out shape/layout, measured in 15 paired confirmation blocks. Vertical offsets only separate overlapping points. Diamonds are geometric means across each selected kernel's nine cases; neither the point spread nor the diamonds are confidence intervals. The lavender line marks retained performance at 1.00×. This numerical CPU softmax figure is separate from the exact MLX inference result.
+
+The cost band totals authoring, discovery and evaluation for the three LLM arms, excluding the earlier pilot and study overhead. Payback is search-only, per case, against retained; deployment setup is unmeasured. Regenerating the figure does not rerun the experiment or establish a time/speedup scaling relationship. With the optional plotting dependency installed, render from the repository root:
+
+```sh
+python lossless-product/scripts/plot_search_time.py
+```
+
 ## Reproduction
 
 Run from the repository root with the source package installed, the numerical dependencies for native search, and the pinned MLX extra for GPU work. Set `MODEL` to the previously qualified local SmolLM2 artifact; generic model downloads do not automatically pass admission. Use new output directories for every freeze. Full source, fixtures and rules are in [041](../experiments/mlx_041/suite.py), [042](../experiments/constraints_042/run.py), [043](../experiments/search_043/study.py) and [paired comparison](../experiments/search_043/compare.py).
