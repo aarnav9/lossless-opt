@@ -8,6 +8,7 @@ import time
 from ...jobs import read_json, identity
 from ..._native.common import write, sha, stamp, interval
 from ...api import save_report
+from ...constraints import measurements, assess
 from .runtime import admission, generate, validate_options, runtime_identity
 
 
@@ -51,6 +52,7 @@ def main(run):
         write(run / "proofs.json", proof)
     evaluations = {}
     graphs = {}
+    limits = config["objective"].get("constraints", {})
 
     def execute(rows, options, capture=False):
         recipe = (options or {}).get("execution_recipe", "retained")
@@ -103,6 +105,8 @@ def main(run):
         if is_graph:
             samples["retained"] = []
         orders = []
+        metric_rows = {key: [] for key in samples}
+        peaks = {key: [] for key in samples}
         if exact:
             for repeat in range(config["workload"]["parameters"]["repeats"]):
                 order = list(samples)
@@ -117,7 +121,17 @@ def main(run):
                         if key == "retained"
                         else options
                     )
-                    row, _, _ = execute(rows, opts)
+                    mx.reset_peak_memory()
+                    value = execute(rows, opts)
+                    row = value[0]
+                    peaks[key].append(mx.get_peak_memory())
+                    metric_rows[key].append(
+                        {
+                            field: row[field]
+                            for field in ["tokens_per_second", "ttft_seconds", "completion_seconds"]
+                        }
+                    )
+                    del value
                     samples[key].append(row["seconds"])
                     token_ids[key] = row["output_ids"]
                 if token_ids["reference"] != token_ids["candidate"]:
@@ -148,7 +162,26 @@ def main(run):
             "incremental_ci95": interval(samples["retained"], samples["candidate"], 2026)
             if speedup and is_graph
             else None,
+            "deployment_samples": metric_rows,
+            "deployment_metrics": {
+                key: measurements(metric_rows[key], peaks[key]) for key in samples
+            },
+            "peak_mlx_samples_bytes": peaks,
         }
+        if speedup:
+            extra = max(
+                0,
+                (startup["candidate_seconds"] - statistics.median(samples["candidate"]))
+                - (startup["reference_seconds"] - statistics.median(samples["reference"])),
+            )
+            result["constraints"] = assess(
+                limits,
+                result["deployment_metrics"]["candidate"],
+                search_seconds=time.monotonic() - started,
+                reference_seconds=statistics.median(samples["reference"]),
+                candidate_seconds=statistics.median(samples["candidate"]),
+                extra_setup_seconds=extra,
+            )
         write(run / (split + "_" + name + ".json"), result)
         return result
 
@@ -267,6 +300,7 @@ def main(run):
             (name, opts)
             for name, opts in candidates
             if evaluations[name]["exact"]
+            and evaluations[name].get("constraints", {}).get("passed", False)
             and evaluations[name]["speedup"] >= config["objective"]["min_speedup"]
             and (
                 evaluations[name]["incremental_ci95"] is None
@@ -286,6 +320,7 @@ def main(run):
             confirmation = evaluate(finalist, chosen, "evaluation")
             if (
                 confirmation["exact"]
+                and confirmation.get("constraints", {}).get("passed", False)
                 and confirmation["speedup"] >= config["objective"]["min_speedup"]
                 and confirmation["ci95"][0] > 1
                 and (
@@ -308,6 +343,7 @@ def main(run):
         "admitted": allowed,
         "admission_reason": reason,
         "contract": config["contract"],
+        "objective": config["objective"],
         "job_identity": identity(config),
         "wall_time_seconds": time.monotonic() - started,
         "model_loading_seconds": loading_seconds,
@@ -322,15 +358,42 @@ def main(run):
         import statistics
 
         cold = evaluations[selected]["first_validation_call"]
+        extra = max(
+            0,
+            (
+                cold["candidate_seconds"]
+                - statistics.median(evaluations[selected]["samples_seconds"]["candidate"])
+            )
+            - (
+                cold["reference_seconds"]
+                - statistics.median(evaluations[selected]["samples_seconds"]["reference"])
+            ),
+        )
         summary["payback"] = payback(
             summary["wall_time_seconds"],
             statistics.median(confirmation["samples_seconds"]["reference"]),
             statistics.median(confirmation["samples_seconds"]["candidate"]),
-            max(0, cold["candidate_seconds"] - cold["reference_seconds"]),
+            extra,
         )
         summary["payback"]["setup_scope"] = (
-            "extra first validation-call time after model load; includes capture"
+            "relative first-call excess over warm after shared model load; cold calls include capture"
         )
+        summary["deployment_constraints"] = assess(
+            limits,
+            confirmation["deployment_metrics"]["candidate"],
+            search_seconds=summary["wall_time_seconds"],
+            reference_seconds=statistics.median(confirmation["samples_seconds"]["reference"]),
+            candidate_seconds=statistics.median(confirmation["samples_seconds"]["candidate"]),
+            extra_setup_seconds=extra,
+        )
+        summary["deployment_constraints"]["assessed_candidate"] = selected
+        if not summary["deployment_constraints"]["passed"]:
+            summary.update(status="reference_retained", selected="reference", options={})
+    else:
+        summary["deployment_constraints"] = {
+            "passed": False if limits else None,
+            "reason": "No candidate passed all correctness, speed and deployment gates; retaining reference does not certify that the reference meets deployment limits.",
+        }
     save_report(run, summary)
     write(
         run / "sealed.json",

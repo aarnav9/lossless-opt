@@ -33,6 +33,7 @@ def main(directory):
         for suffix in [
             "lossless/cli.py",
             "lossless/profiling.py",
+            "lossless/constraints.py",
             "lossless/_profile_worker.py",
             "lossless/resources/proofs/Bounds.lean",
             "lossless/resources/theorems/index.jsonl.gz",

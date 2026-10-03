@@ -83,6 +83,23 @@ class Workload:
     def from_dict(cls, value, *, base="."):
         return cls(copy.deepcopy(value), Path(base).resolve())
 
+    def with_time_limits(self, *, seconds=None, llm_timeout_seconds=None):
+        """Copy a job with explicit search/authoring limits; correctness stays fixed."""
+        value = copy.deepcopy(self.config)
+        if seconds is not None:
+            positive(seconds, "budget.wall_time_seconds")
+            if not isinstance(value.get("budget"), dict):
+                raise ValueError("time override requires a budget object")
+            value["budget"]["wall_time_seconds"] = seconds
+        if llm_timeout_seconds is not None:
+            positive(llm_timeout_seconds, "llm.timeout_seconds")
+            if not isinstance(value.get("llm"), dict) or not (
+                "callback" in value["llm"] or "command" in value["llm"]
+            ):
+                raise ValueError("LLM time override requires a configured callback or command")
+            value["llm"]["timeout_seconds"] = llm_timeout_seconds
+        return Workload.from_dict(value, base=self.base)
+
     def resolve(self, budget=None):
         value = copy.deepcopy(self.config)
         fields(
@@ -179,7 +196,15 @@ class Workload:
                 else "latency"
             },
         )
-        fields(objective, {"metric", "min_speedup", "comparator"}, "objective", {"metric"})
+        fields(
+            objective,
+            {"metric", "min_speedup", "comparator", "constraints"},
+            "objective",
+            {"metric"},
+        )
+        from .constraints import validate as validate_constraints
+
+        validate_constraints(objective.get("constraints", {}), work["adapter"])
         if work["adapter"] == "mlx.fixed_count":
             if objective.setdefault("comparator", "stock_serial") != "stock_serial":
                 raise ValueError("MLX comparator must be stock_serial")
@@ -250,6 +275,11 @@ class Workload:
             from .adapters.mlx.job import resolve_workload
 
             resolve_workload(work, self.base)
+            if (
+                any(name.startswith("max_p95_") for name in objective.get("constraints", {}))
+                and work["parameters"]["repeats"] < 20
+            ):
+                raise ValueError("p95 deployment limits require workload.parameters.repeats >= 20")
         else:
             if "parameters" in work or "inputs" in work:
                 raise ValueError(
