@@ -11,7 +11,7 @@ The source alpha copies reviewed runtime pieces into the product. It never impor
 | 021–022 abstract transformations | Scoped fusion/thread-map proof sources and the pinned cache runtime |
 | 023 allocator policy | Retained 256 MiB policy; optional LLM comparison against 0/64 MiB |
 | Theorem library | Compressed statement index, source project, extraction receipt, Lean/mathlib pins and notices |
-| 027 reusable graph schedule | Not yet extracted; incremental gains need separate deployment and resource-lifetime checks |
+| 026/027 reusable graphs | Opt-in decoder/full-head alternatives with bounded specialization counts, fresh incremental gates, startup accounting and deployment checks; see campaigns 032–038 |
 | Earlier MPS kernels and certified CPU solves | Not yet exposed as product adapters; retain their research findings in the ledger |
 
 Historical 023 throughput gains around 1.96×/2.38× were scoped to its recorded batches and reference. They are not product-wide guarantees. No CUDA or computer-vision performance gain is claimed. The alpha MLX adapter deliberately preserves its model/runtime/device guards. Broadening them needs fresh evidence.
@@ -60,3 +60,9 @@ python lossless-product/scripts/plot_retention.py
 ```
 
 The [plotting script](../scripts/plot_retention.py) validates the exact-comparison flags, sample counts, and ratio of medians before rendering. Matplotlib is not a Lossless runtime dependency.
+
+## Follow-up product checks: campaigns 032–038
+
+The current working tree passed 48 CPU/policy tests with one optional Metal test skipped (49 total). Separate M2 runs passed full token/probability/KV comparison, graph-capacity fallback, patch restoration, 24 graph forced-history checks, artifact export/load, eight continuations and cancellation fallback. This extends the earlier installed-alpha evidence above; the 026/027 options remain opt-in. See the [full follow-up report](frontier-032-038.md) and [curated measurements](assets/frontier-032-038.json) for the native search controls, failures, payback and reproducible commands.
+
+The follow-up wheel and source archive also passed content inspection. A fresh temporary environment installed the wheel with NumPy 2.4.6 outside the checkout and passed the native demo, exact export/load and theorem-resource retrieval. Using the built wheel package with the existing pinned MLX dependencies passed a second graph optimization/export/load run, eight continuation checks and cancellation fallback. The main tests used 17.2 seconds; isolated build requirements were installed because the older research environment setuptools cannot parse current package metadata.

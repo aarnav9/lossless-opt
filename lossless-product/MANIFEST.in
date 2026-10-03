@@ -4,6 +4,7 @@ recursive-include src/lossless/adapters/mlx *.json *LICENSE
 recursive-include src/lossless/_native *.m
 recursive-include tests *.py
 recursive-include scripts *.py
+recursive-include experiments *.py *.c *.json
 recursive-include examples *.json
 recursive-include docs *.md *.mmd *.dot *.png *.svg *.json
 global-exclude *.pyc

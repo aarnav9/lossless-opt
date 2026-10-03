@@ -10,6 +10,27 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Numbered campaigns
 
+- **038 — Experiment (numerical):** Verify 15 rank-seven tensor-decomposition variants symbolically, then benchmark real 576-wide projection shapes including packing and cancellation controls.
+- **Result — rejected:** Best fresh speed was 0.302× NumPy BLAS for 8 rows and 0.556× for 33 rows despite all numerical gates passing. Reduced multiplication count did not repay additions and memory movement; no new tensor rank or bitwise model claim.
+
+- **037 — Experiment (search efficiency):** Compare fixed sampling with a bounded-score sequential race on real native timings, including an intentionally slow correct control and separate confirmation.
+- **Result — scoped pilot:** Live search took 3.003 s fixed versus 1.086 s racing and chose the same manual winner. Savings came from rejecting the 8×-work control after 34 samples; close contenders were not rejected early and device noise assumptions remain unverified.
+
+- **036 — Experiment (separate token-only contract):** Test suffix-bound vocabulary-head avoidance on eight real hidden states plus zero/tiny/large controls against a named scalar FP32 normalized-score reference.
+- **Result — rejected:** All 11 decisions matched, but real cases still computed 94.6–99.9% of products and ran at 0.373–0.393× reference speed. Bounds are not mechanically certified and do not establish MLX quantized-head equivalence or preserve full probability arrays.
+
+- **035 — Experiment (exact/lossless pilot):** Calibrate 14 MLX cohorts for six irregular requests and enumerate joint scheduling/lifetime choices under a declared exported-storage budget.
+- **Result — inconclusive:** The solver searched 81 states and kept the same cohorts, omitting a final materialization proxy. Five-repeat makespan medians were 169.3 versus 161.7 ms with 12 exact checks, insufficient for promotion; model storage/proxy costs are not a production allocator or device-memory proof.
+
+- **034 — Experiment (exact/lossless, bounded proof):** Use a shared integer index IR to prove finite-shape copy mappings with Z3, emit C, and compare verified filtering with ordinary validation on six candidate transformations.
+- **Result — no kernel promotion:** Three legal traversals passed and three defective mappings produced counterexamples before compilation; both searches retained NumPy. Filtering reduced measured search work, while a separate FP32 counterexample rejects reassociation. No general-shape theorem, verified compiler or GPU proof.
+
+- **033 — Experiment (numerical):** Compare retained, enumerated and manually authored Codex softmax candidates with three proposals per arm, frozen holdouts and three workload replications.
+- **Result — promising candidate:** Manual dispatch passed 3/3 replications versus retained 3/3 and enumeration 2/3; separate paired replay gained 4.3%, 16.0% and 5.6% over retained across C/F/slice layouts. One shared authoring session cannot establish independent-run model superiority or improvements per dollar; no default promotion.
+
+- **032 — Experiment (exact/lossless MLX; native overhead):** Extract bounded opt-in 026/027 alternatives, compare complete requests, validate export/load and continuation, and measure binding plus compilation/evidence reuse.
+- **Result — scoped product option:** Product-selected 027 reached 1.998× stock serial with incremental interval [1.026, 1.045] over retained; ragged gains were inconclusive. Fresh graph replay passed 24 forced-history checks; bounded-cache fallback and eight deployment continuations passed. Native binding fell 15.81→8.61 µs; one repeated search fell 5.90→4.48 s. Frozen comparator, configured timeout and public-release messaging fixes shipped in the working tree. [Evidence, limitations and commands for 032–038](lossless-product/docs/frontier-032-038.md).
+
 - **031 — Experiment:** Deblur a real sample photograph with one fixed periodic quadratic model, comparing spatial CG, complex FFT, a strong real-FFT control, and buffer reuse across three sizes, two noise seeds, fresh/cached filters, and an independent process replay.
 - **Result — scoped vision/numerical demonstration:** At 512², replay reached about 159× CG including setup or 264–276× cached; those large gains exploit established Fourier structure. Buffer reuse added only a few noisy percent over the strong real-FFT control, preserving tested bytes; all 96 method/case numerical gates passed. No generic vision-model or new Lean-proof claim, and no default promotion.
 

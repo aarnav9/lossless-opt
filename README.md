@@ -113,6 +113,8 @@ The callback/command interface is implemented. **Turnkey Claude/Codex connectors
 - The fresh-environment MLX test uses a deterministic provider proposing the 64 MiB allocator policy. The real harness evaluates it; the retained 256 MiB recipe wins that run.
 - Regression tests cover malformed responses, timeouts, credential echoes, and withholding evaluation cases from proposal prompts.
 
+A separate manual Codex-guided native study now compares authored candidates against retained recipes and enumeration; it is not a hosted-provider integration test. See the latest experiment ledger.
+
 These are protocol and execution tests. They do not establish that Claude/Codex produces useful optimizations or that the measured retained-recipe speedup came from a live model call. [Validation record](lossless-product/docs/retention.md#local-verification-2-october-2026).
 
 Capable reasoning models are a sensible starting point; measure their effect on gains and search cost. [Provider protocol and supported proposals](lossless-product/docs/alpha.md#provider-boundary).
@@ -162,3 +164,5 @@ research/             Local research archive; ignored by Git
 The product runs independently of `research/`. Original code is [MIT licensed](LICENSE); imported components retain their [third-party notices](lossless-product/NOTICE). Package-registry distribution remains pending.
 
 [Architecture and future design](lossless-product/docs/architecture.md) · [Implemented API and configuration](lossless-product/docs/alpha.md) · [Product installation and deployment](lossless-product/README.md)
+
+The [032–038 follow-up report](lossless-product/docs/frontier-032-038.md) records the explicit acceptance comparator, bounded optional graph recipes, manual Codex search, all six frontier pilots, and measured payback.

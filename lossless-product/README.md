@@ -82,7 +82,7 @@ Your `complete(prompt: str)` calls your preferred model and returns the JSON pro
 
 The [Claude/Codex connection guide](docs/alpha.md#connecting-claude-or-codex) includes a minimal Claude API callback and explains command wrappers for Codex CLI and Claude Code. Provider/model labels alone do not connect a service; your callback or command performs the call. Turnkey vendor connectors are not bundled.
 
-**LLM validation so far uses deterministic local providers, not live Claude/OpenAI calls.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. These tests exercise the real harness, including failed responses and separate evaluation. They establish protocol behavior, not live-model optimization quality. See the [validation record](docs/retention.md).
+**Provider integration tests use deterministic local providers; a separate manual Codex-guided native search study is recorded in the experiment ledger. Hosted Claude/OpenAI integration remains unvalidated.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. These tests exercise the real harness, including failed responses and separate evaluation. They establish protocol behavior, not live-model optimization quality. See the [validation record](docs/retention.md).
 
 ## Recorded product measurement
 
