@@ -95,6 +95,7 @@ def generate(
     cancel_after=None,
     fallback_reason=None,
     graph=None,
+    profile=False,
 ):
     import mlx.core as mx
     from mlx_lm.generate import generation_stream
@@ -149,10 +150,12 @@ def generate(
                     value = run(grouped, prompts, counts, recipe, capture)
         else:
             value = serial(stock, prompts, counts, capture)
+        executed = time.perf_counter() if profile else 0
         row, caches, probs = value
         mx.eval([c.state for cs in caches for c in cs])
         mx.synchronize(generation_stream)
         mx.synchronize()
+        materialized = time.perf_counter() if profile else 0
         row["output_texts"] = [tokenizer.decode(ids) for ids in row["output_ids"]]
         row["finish_reasons"] = row.get("finish_reasons", ["length"] * len(texts))
         row["response_bytes"] = len(
@@ -168,6 +171,13 @@ def generate(
         row["ttft_seconds"] = [v + encoded for v in row["ttft_seconds"]]
         row["completion_seconds"] = [v + encoded for v in row["completion_seconds"]]
         row["seconds"] = time.perf_counter() - started
+        if profile:
+            row["profile_stages_seconds"] = {
+                "input_validation_and_tokenization": encoded,
+                "execution": executed - started - encoded,
+                "state_materialization": materialized - executed,
+                "decode_and_response": row["seconds"] - (materialized - started),
+            }
         row["tokens_per_second"] = sum(map(len, row["output_ids"])) / row["seconds"]
         row["fallback_reason"] = fallback_reason
         row["prompt_lengths"] = list(map(len, prompts))

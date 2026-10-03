@@ -27,6 +27,30 @@ def main(directory):
         run(["-I", "-m", "lossless", "doctor"])
         run(["-I", "-m", "lossless", "demo", "--budget", "45s", "--output", "run"])
         run(["-I", "-m", "lossless", "export", "run", "--output", "artifact"])
+        run(
+            [
+                "-I",
+                "-m",
+                "lossless",
+                "profile",
+                "run/resolved.json",
+                "--artifact",
+                "artifact",
+                "--repeats",
+                "3",
+                "--budget",
+                "30s",
+                "--output",
+                "profile",
+            ]
+        )
+        run(
+            [
+                "-I",
+                "-c",
+                "import json; from pathlib import Path; r=json.loads(Path('profile/report.json').read_text()); assert r['status']=='profiled' and r['llm_calls']==0 and all(c['case']['split']=='discovery' for c in r['cases']); print('Installed profile passed')",
+            ]
+        )
         run(["-I", "-m", "lossless", "proofs", "search", "matrix transpose", "--limit", "1"])
         run(
             [

@@ -214,3 +214,7 @@ Only compilation and successful discovery correctness evidence are reused. Evalu
 MLX jobs may opt into `"graph_recipes": ["decoder_026", "fullhead_027"]` inside `workload.parameters`, with `max_candidates` at least three to compare both with the retained recipe. These are alternatives, not additive gains. Each model handle holds at most 64 explicit shape/dtype/index specializations by default; unseen keys after the limit use the retained eager path. The hard maximum is 128 entries. This bounds entry count, not an absolute driver-memory limit. The model is immutable for the lifetime of the handle.
 
 Graph promotion additionally requires a fresh paired interval more than 1% above the retained recipe. Both first validation-call cost and warmed measurements are recorded. MLX reports estimate payback from measured extra first-call cost after model loading. Graphs remain opt-in and require the same exact model/runtime/device admission. Stopping/cancellation uses serial fallback. Provider timeouts honor `llm.timeout_seconds` and the remaining total budget in both backends.
+
+## Workload profiling
+
+`lossless profile JOB --repeats 7 --budget 30s --output DIRECTORY` profiles discovery inputs without invoking providers or proof setup. Pass `--artifact PATH` to compare an exported implementation. Native ordinary and bound calls are separate; MLX records complete requests with probabilities, state, TTFT, memory and coarse phase accounting. See the [profiling guide](profiling.md) for setup costs, p95 interpretation, host attribution and fallback scope.

@@ -156,6 +156,18 @@ def main(argv=None):
     initialize.add_argument("--output", type=Path, required=True)
     inspect = commands.add_parser("inspect")
     inspect.add_argument("config", type=Path)
+    profile = commands.add_parser(
+        "profile", help="Profile discovery inputs without searching or calling an LLM"
+    )
+    profile.add_argument("config", type=Path)
+    profile.add_argument(
+        "--artifact",
+        type=Path,
+        help="Compare an exported implementation with the declared reference",
+    )
+    profile.add_argument("--repeats", type=int, default=7)
+    profile.add_argument("--budget", type=duration)
+    profile.add_argument("--output", type=Path)
     for name in ["optimize", "demo"]:
         command = commands.add_parser(name)
         if name == "optimize":
@@ -192,6 +204,21 @@ def main(argv=None):
             result = init(args.output, args.template)
         elif args.command == "inspect":
             result = Workload.from_config(args.config).resolve()
+        elif args.command == "profile":
+            from .profiling import profile
+
+            outcome = profile(
+                args.config,
+                artifact=args.artifact,
+                repeats=args.repeats,
+                budget=args.budget,
+                output=args.output,
+            )
+            result = {
+                "run": str(outcome.directory),
+                "status": outcome.summary["status"],
+                "report": str(outcome.directory / "report.html"),
+            }
         elif args.command in {"optimize", "demo"}:
             from .api import optimize
 

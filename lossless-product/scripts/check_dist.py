@@ -32,6 +32,8 @@ def main(directory):
                 raise ValueError(f"unexpected artifact content: {name}")
         for suffix in [
             "lossless/cli.py",
+            "lossless/profiling.py",
+            "lossless/_profile_worker.py",
             "lossless/resources/proofs/Bounds.lean",
             "lossless/resources/theorems/index.jsonl.gz",
             "lossless/resources/theorems/MATHLIB_LICENSE",

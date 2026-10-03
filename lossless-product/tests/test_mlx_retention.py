@@ -70,9 +70,14 @@ class MetalRetentionTests(unittest.TestCase):
             counts,
             capture=True,
             optimized=True,
+            profile=True,
             options={"allocator_cache_mib": 256},
         )
         self.assertEqual(reference[0]["output_ids"], candidate[0]["output_ids"])
+        self.assertNotIn("profile_stages_seconds", reference[0])
+        stages = candidate[0]["profile_stages_seconds"]
+        self.assertTrue(all(v >= 0 for v in stages.values()))
+        self.assertAlmostEqual(sum(stages.values()), candidate[0]["seconds"], places=8)
         for i in range(len(texts)):
             self.assertTrue(diff(reference[2][i], candidate[2][i])["bitwise"])
             self.assertTrue(cache_diff(reference[1][i], candidate[1][i])["bitwise"])
