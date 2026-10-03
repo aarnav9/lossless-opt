@@ -1,6 +1,6 @@
 # Using the source alpha
 
-This is the implemented interface for version `0.1.0a1`. Files labeled `draft-1` and the broader design documents remain proposals.
+This describes the source interface. The `v0.1.0a1` tag preserves the first published alpha; additions explicitly marked unreleased require installation from the current source. Files labeled `draft-1` and the broader design documents remain proposals.
 
 ## A job is deterministic setup
 
@@ -34,6 +34,56 @@ The registered adapter defines the reference, input generator, accepted observab
 To split the files, replace the contract object with `{"file": "contract.json"}`. Relative paths resolve against the job file. For optional hardware context, add `"target": {"device": "auto", "profile_file": "hardware.json"}`. Generate that file with `lossless hardware --output hardware.json`. The actual worker still detects its environment; supplied data is context, not permission to ignore device guards. Hardware inventory does not make a CUDA execution backend available.
 
 The harness resolves and freezes these inputs first. It then builds a discovery-only prompt for the user-connected LLM. There is no internal proprietary LLM. Evaluation cases stay out of that prompt and cannot be revised after observing discovery results within the same run.
+
+## Search time and performance (unreleased CLI overrides)
+
+**Treat optimization time as a performance tuning input: more time is likely to help when useful proposals or evaluations are being cut short.** It increases opportunity, not guaranteed speed. Search can reach a plateau or retain the same implementation. The 043 follow-up found useful kernels after raising a five-minute authoring cap to 30 minutes; it did not establish that 30 minutes beats every shorter completed run, or that eight hours beats 30 minutes. [Measured results and cost](qualification-041-043.md#043-independent-model-authoring).
+
+Time limits belong to the frozen search budget/LLM configuration. The correctness contract defines which outputs are acceptable and remains unchanged. Configure these existing JSON fields, retaining the workload and contract from your job:
+
+```json
+{
+  "budget": {
+    "wall_time_seconds": 28800,
+    "max_candidates": 24,
+    "max_llm_calls": 12
+  },
+  "llm": {
+    "callback": "provider.py:complete",
+    "timeout_seconds": 1800
+  }
+}
+```
+
+| Input | Meaning |
+| --- | --- |
+| `budget.wall_time_seconds` / `--budget 8h` | Maximum total search allowance, including setup, model calls, compilation and evaluation |
+| `llm.timeout_seconds` / `--llm-timeout 30m` | Maximum time for one author response; clipped to remaining time after the controller reserves evaluation time |
+| `budget.max_candidates` | Candidate cap, including retained recipes; at most 100 in this alpha |
+| `budget.max_llm_calls` | Upper bound on author calls, not a promise to use them all |
+
+The default per-response timeout remains 30 seconds for compatibility. Increase it explicitly for slow reasoning models; raising `--budget` alone does not change it. Configure any shorter SDK/CLI-wrapper timeout separately. These allowances are maximums, so a search can stop early. Native search can use feedback across multiple calls within its limits; MLX currently makes at most one allocator-policy proposal call and does not become an autonomous GPU-kernel search when given more time.
+
+Preview CLI overrides without running a provider or changing the source JSON, then use the same overrides to execute:
+
+```sh
+lossless inspect my-job/lossless.json --budget 8h --llm-timeout 30m
+set -o pipefail
+python -u -m lossless optimize my-job/lossless.json --budget 8h --llm-timeout 30m --output lossless-runs/overnight 2>&1 | tee lossless-overnight.log
+```
+
+The source CLI prints flushed, timestamped progress every 30 seconds during quiet waits, including LLM authoring. The command saves console output to `lossless-overnight.log`; reports are written under the selected output directory. An LLM callback or command must be configured to use `--llm-timeout`. The source Python API supports the same copy-on-change operation:
+
+```python
+import lossless
+
+job = lossless.Workload.from_config("my-job/lossless.json").with_time_limits(
+    seconds=8 * 3600, llm_timeout_seconds=30 * 60
+)
+result = lossless.optimize(job, output="lossless-runs/overnight-python")
+```
+
+The original `Workload` and source JSON are unchanged. The resolved JSON records the chosen limits, which participate in job identity and artifact provenance. Resuming requires the same frozen limits; use a new run for a different budget. Budget changes never relax correctness or final evaluation. Report search cost and break-even calls alongside any speed improvement; long searches for tiny kernels can require millions of calls to repay.
 
 ## Provider boundary
 
@@ -158,7 +208,7 @@ Once that wrapper exists, replace the callback `llm` object with a command objec
 
 The CPU workflow regression sends a deterministic provider the real discovery context and receives the reference C implementation as a control candidate. It then exercises compilation, contract checks, timing, separate evaluation, and export/load. The installed MLX check sends a deterministic command the request and receives a 64 MiB allocator proposal; the retained 256 MiB recipe is selected. Malformed responses, timeout behavior, credential echoes, and evaluation-prompt separation have regression coverage.
 
-No live Claude/Codex run was part of those checks. The measured MLX retention gain comes from the retained recipe, and does not establish live-model proposal quality or search ROI. A bounded live-provider run remains a release-validation task. [Recorded validation](retention.md).
+No live Claude/Codex run was part of those checks. The measured MLX retention gain comes from the retained recipe, and does not establish live-model proposal quality or search ROI. [Campaign 043](qualification-041-043.md#043-independent-model-authoring) separately exercises real Codex CLI authoring through the native experiment harness. It does not validate the packaged callback/command examples against a hosted service. [Recorded validation](retention.md).
 
 ## Reports and deployment
 
@@ -218,3 +268,32 @@ Graph promotion additionally requires a fresh paired interval more than 1% above
 ## Workload profiling
 
 `lossless profile JOB --repeats 7 --budget 30s --output DIRECTORY` profiles discovery inputs without invoking providers or proof setup. Pass `--artifact PATH` to compare an exported implementation. Native ordinary and bound calls are separate; MLX records complete requests with probabilities, state, TTFT, memory and coarse phase accounting. See the [profiling guide](profiling.md) for setup costs, p95 interpretation, host attribution and fallback scope.
+
+## MLX deployment limits (unreleased)
+
+Optional `objective.constraints` are frozen before search and checked in discovery, evaluation, and the final decision. They supplement all existing correctness, comparator and graph-incremental gates. For example, merge this objective into an MLX job and set `workload.parameters.repeats` to at least 20:
+
+```json
+{
+  "metric": "throughput",
+  "comparator": "stock_serial",
+  "min_speedup": 1.02,
+  "constraints": {
+    "max_p95_ttft_seconds": 0.15,
+    "max_p95_completion_seconds": 1.0,
+    "max_peak_mlx_bytes": 536870912,
+    "max_break_even_calls": 1000,
+    "min_tokens_per_second": 100
+  }
+}
+```
+
+Choose limits for your application; these illustrative values are not universal defaults. Every field is optional. Byte and call limits are positive integers. Unsupported or unavailable measurements fail the gate. These fields currently require `mlx.fixed_count`; native request-tail latency and per-call memory constraints are not implemented.
+
+Latency p95 is computed across warm repeats separately for each request position; the worst position must meet the limit. At least 20 repeats are required for latency gates. This remains a descriptive sampled percentile, not a statistical guarantee about production tails or future arrivals. The profiler's default seven-repeat p95 is insufficient for this acceptance gate.
+
+Memory is the largest MLX-tracked active allocation during warm calls, including the model and returned KV state, with probability capture disabled as in the default deployed interface. Allocator-cache memory, driver allocations and process RSS are excluded; this is not a total system-memory cap. Exact validation separately captures and compares every probability and active KV value.
+
+Payback uses the entire measured search cost plus relative first-call excess over warm, divided by measured per-batch savings. Shared model loading is excluded from deployment setup but included when it occurred during the search. The final check accounts for the completed search rather than only the cost seen at discovery. No positive saving means no finite payback. Unmeasured human/provider billing cost is not invented.
+
+`deployment_metrics`, raw samples and per-limit pass/fail records appear in the report. If no candidate satisfies all gates, Lossless retains the reference; that outcome does **not** certify that the reference meets the requested limits. These are offline acceptance checks for the declared workload, not an online latency/memory enforcement mechanism for arbitrary later requests.

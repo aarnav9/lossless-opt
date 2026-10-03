@@ -40,6 +40,24 @@ lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-r
 
 The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a1.md).
 
+Unreleased source adds frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. The published `v0.1.0a1` assets are unchanged.
+
+## Search time is a performance tuning input
+
+**More optimization time is likely to help find faster valid implementations when reasoning or evaluation is the bottleneck.** It gives authors time to finish and allows more experiments within the configured candidate/call caps. Gains can plateau; a larger allowance does not guarantee a faster result or weaken the correctness contract.
+
+Our independent search study illustrates the effect of an overly short limit: all three five-minute authoring attempts timed out. With a 30-minute allowance, fresh authors finished in **6:50, 10:08 and 7:21**, and their selected numerical softmax kernels measured **20.6–21.0% faster than retained** on held-out cases. This is evidence that the short cap excluded useful work, not a measured rule that performance increases with every extra hour. [Full results and search payback](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring).
+
+Set both limits in the job: `budget.wall_time_seconds` controls the whole search; `llm.timeout_seconds` controls each LLM response (default 30 seconds). The source CLI also supports explicit overrides once a provider is configured:
+
+```sh
+lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m
+set -o pipefail
+python -u -m lossless optimize ./my-job/lossless.json --budget 8h --llm-timeout 30m --output ./lossless-runs/overnight 2>&1 | tee lossless-overnight.log
+```
+
+These are maximum allowances. Runs can finish early, and increasing total time alone does not increase candidate/call caps or the per-response limit. Leave time for compilation and final evaluation. The source CLI prints timestamped progress every 30 seconds during quiet waits. The resolved limits are frozen with the job before search. [JSON/Python configuration and current search limits](lossless-product/docs/alpha.md#search-time-and-performance-unreleased-cli-overrides).
+
 ## How it works
 
 ```mermaid
@@ -112,7 +130,7 @@ Your `complete(prompt: str)` callback returns a proposal JSON string or object. 
 | Codex CLI | A user-supplied command wrapper invokes `codex exec` with a proposal JSON Schema and returns the final proposal object. It can reuse the CLI's saved authentication. [Official OpenAI documentation](https://learn.chatgpt.com/docs/non-interactive-mode). |
 | Claude Code | A user-supplied command wrapper invokes `claude -p` with a proposal JSON Schema and extracts `structured_output` from its JSON response. [Official Claude Code documentation](https://code.claude.com/docs/en/headless). |
 
-The callback/command interface is implemented. **Turnkey Claude/Codex connectors are not bundled, and a live-provider optimization run has not yet been validated.** A CLI wrapper must return proposal JSON rather than its tool's metadata or event stream. The [connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex) explains the boundary and current limitations.
+The callback/command interface is implemented. **Turnkey Claude/Codex connectors are not bundled; packaged provider tests use local fixtures.** Campaign 043 separately exercises real Codex CLI authoring. A CLI wrapper must return proposal JSON rather than its tool's metadata or event stream. The [connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex) explains the boundary and current limitations.
 
 ### What the LLM tests establish
 
@@ -120,9 +138,9 @@ The callback/command interface is implemented. **Turnkey Claude/Codex connectors
 - The fresh-environment MLX test uses a deterministic provider proposing the 64 MiB allocator policy. The real harness evaluates it; the retained 256 MiB recipe wins that run.
 - Regression tests cover malformed responses, timeouts, credential echoes, and withholding evaluation cases from proposal prompts.
 
-A separate manual Codex-guided native study now compares authored candidates against retained recipes and enumeration; it is not a hosted-provider integration test. See the latest experiment ledger.
+A separate manual Codex-guided native study compared authored candidates against retained recipes and enumeration. [Campaign 043](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring) adds independent live Codex CLI sessions; it tests model proposals through the native experiment harness, not a shipped vendor connector.
 
-These are protocol and execution tests. They do not establish that Claude/Codex produces useful optimizations or that the measured retained-recipe speedup came from a live model call. [Validation record](lossless-product/docs/retention.md#local-verification-2-october-2026).
+The fixture tests establish protocol and execution behavior, not live-model proposal quality. The measured MLX retained-recipe speedup did not come from a live model call. [Validation record](lossless-product/docs/retention.md#local-verification-2-october-2026).
 
 Capable reasoning models are a sensible starting point; measure their effect on gains and search cost. [Provider protocol and supported proposals](lossless-product/docs/alpha.md#provider-boundary).
 

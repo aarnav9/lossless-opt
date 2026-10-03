@@ -10,6 +10,15 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Numbered campaigns
 
+- **043 — Experiment (numerical, independent model search):** Compare three fresh Codex CLI authors against retained and enumerated softmax candidates with three proposal slots per arm, sealed holdouts, separate total-cost reporting and paired frozen-winner replay.
+- **Result — promising, experimental:** With a 30-minute cap, all three authors completed in 6:50–10:08; all nine proposals passed numerical validation. Frozen LLM winners gained 20.6–21.0% over retained in fresh paired replay, while enumeration lost. Authoring plus evaluation took 25.0 minutes across three runs; search-only payback was 6.8 million–1.19 billion calls. The earlier five-minute timeout pilot is separate. No default promotion. [Study design and full evidence](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring).
+
+- **042 — Experiment (product acceptance):** Freeze MLX limits for request latency, active allocation, throughput and payback; exercise real accepted/rejected workers and export/load.
+- **Result — implemented, unreleased:** The permissive job accepted at 145 calls to repay measured search; four deliberately impossible policies rejected correct candidates despite approximately 1.96× discovery speed. Exact export/load passed; native constraints remain unsupported. [Measurement scope and records](lossless-product/docs/qualification-041-043.md#042-deployment-constraints-control-acceptance).
+
+- **041 — Experiment (exact/lossless qualification):** Compare serial, unmodified stock batching, retained and 026/027 recipes over 32 frozen synthetic/natural workload profiles with separate discovery/evaluation processes.
+- **Result — workload-dependent:** All 360 product request checks passed; ten of sixteen choices confirmed on holdouts. Structured multirequest wins ranged 1.376–2.187× eligible stock serial, while natural two/four-request wins were 1.059×/1.055×. Stock batching violated the full bitwise contract in all 24 multirequest profiles. No default or device/model admission expansion. [Evidence and reproduction](lossless-product/docs/qualification-041-043.md#041-broader-mlx-workloads-and-a-stronger-library-control).
+
 - **040 — Experiment (product profiling):** Expose bounded CLI/Python profiling for supported native and MLX workloads, separate setup, allocating/bound calls, request latency/memory and instrumented host attribution, then validate against exported artifacts.
 - **Result — product feature:** Profiling uses discovery inputs without providers or proof setup; native correctness, artifact integrity and budget regressions pass. Local Metal checks preserve sampled tokens/probabilities/KV and phase accounting. GPU kernel-level attribution remains outside scope. [Usage and limits](lossless-product/docs/profiling.md).
 

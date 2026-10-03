@@ -78,11 +78,15 @@ Add an `llm` object to the job:
 
 Merge those fields into the generated job while keeping its workload and contract. The total budget includes provider time and evaluation; built-in candidates count toward the candidate limit.
 
+**Search time is a performance tuning input. More time is likely to help when reasoning or evaluation is the bottleneck, but faster results are not guaranteed.** In campaign 043, five-minute authors timed out; a 30-minute cap allowed fresh authors to finish in roughly 7–10 minutes and produce kernels 20.6–21.0% faster than retained on held-out numerical softmax cases. This does not establish a continuous time/speedup relationship or an end-to-end model gain.
+
+The unreleased source exposes both limits directly: `lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m` previews the frozen job; use the same options with `lossless optimize` to run it. Total search time and per-response time are distinct, and candidate/call caps still apply. Runs can finish early. [JSON/Python configuration](docs/alpha.md#search-time-and-performance-unreleased-cli-overrides) · [Study and payback](docs/qualification-041-043.md#043-independent-model-authoring).
+
 Your `complete(prompt: str)` calls your preferred model and returns the JSON proposal string or object. The prompt contains the response schema, contract, permitted transformations, hardware context, and discovery feedback. A command alternative accepts one JSON request on stdin and emits one proposal batch on stdout. No model SDK or hosted Lossless service is required. Prefer a capable reasoning model for difficult searches; improved gains are a hypothesis to measure, not a guarantee. Native adapters accept C candidates; MLX currently lets the LLM choose among retained allocator policies rather than generating arbitrary GPU programs.
 
 The [Claude/Codex connection guide](docs/alpha.md#connecting-claude-or-codex) includes a minimal Claude API callback and explains command wrappers for Codex CLI and Claude Code. Provider/model labels alone do not connect a service; your callback or command performs the call. Turnkey vendor connectors are not bundled.
 
-**Provider integration tests use deterministic local providers; a separate manual Codex-guided native search study is recorded in the experiment ledger. Hosted Claude/OpenAI integration remains unvalidated.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. These tests exercise the real harness, including failed responses and separate evaluation. They establish protocol behavior, not live-model optimization quality. See the [validation record](docs/retention.md).
+**Packaged provider integration tests use deterministic local providers.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. These tests exercise the real harness, including failed responses and separate evaluation. Independent live Codex CLI authoring is measured separately in [campaign 043](docs/qualification-041-043.md#043-independent-model-authoring); it does not validate a shipped vendor connector. See the [validation record](docs/retention.md).
 
 ## Recorded product measurement
 
@@ -130,3 +134,5 @@ Candidate execution and provider callbacks use trusted local processes with time
 See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. The [GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1) includes wheels, source and checksums; package-registry distribution remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
 
 Use `lossless profile JOB --output DIRECTORY` to measure discovery inputs without searching or calling a provider. Add `--artifact PATH` to compare a guarded deployment. [Profiling guide](docs/profiling.md) · [Release installation and support matrix](docs/release-0.1.0a1.md) · [Expanded softmax qualification](docs/softmax-039.md).
+
+The unreleased source also supports frozen [MLX deployment limits](docs/alpha.md#mlx-deployment-limits-unreleased) for latency, active allocation, throughput and payback. [Broader workload qualification](docs/qualification-041-043.md) records where batching gains repeat and where they do not; these additions are not in the immutable `v0.1.0a1` release assets.
