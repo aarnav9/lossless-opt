@@ -10,6 +10,12 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Numbered campaigns
 
+- **040 — Experiment (product profiling):** Expose bounded CLI/Python profiling for supported native and MLX workloads, separate setup, allocating/bound calls, request latency/memory and instrumented host attribution, then validate against exported artifacts.
+- **Result — product feature:** Profiling uses discovery inputs without providers or proof setup; native correctness, artifact integrity and budget regressions pass. Local Metal checks preserve sampled tokens/probabilities/KV and phase accounting. GPU kernel-level attribution remains outside scope. [Usage and limits](lossless-product/docs/profiling.md).
+
+- **039 — Experiment (numerical qualification):** Freeze the manually proposed softmax dispatch and test 75 shape/layout combinations, 11 distributions and three fresh worker processes against a separately screened retained winner plus NumPy/SciPy.
+- **Result — retain as experimental:** All 14,850 checks passed; process geomeans were 1.024×/1.041×/1.044× retained, but seven cases repeatedly failed the predeclared regression limit. The 7×255 Fortran case took about 27% more time. Built-in recipes remain unchanged. [Evidence and reproduction](lossless-product/docs/softmax-039.md).
+
 - **038 — Experiment (numerical):** Verify 15 rank-seven tensor-decomposition variants symbolically, then benchmark real 576-wide projection shapes including packing and cancellation controls.
 - **Result — rejected:** Best fresh speed was 0.302× NumPy BLAS for 8 rows and 0.556× for 33 rows despite all numerical gates passing. Reduced multiplication count did not repay additions and memory movement; no new tensor rank or bitwise model claim.
 
