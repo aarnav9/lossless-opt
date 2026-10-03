@@ -6,7 +6,7 @@
 
 Bring a supported workload, a JSON contract, and your own LLM. Lossless searches for faster implementations, checks them independently, and exports a guarded implementation with performance and correctness records. Built-in candidates let you try the workflow without an API key.
 
-**Status: installable source alpha (`0.1.0a1`), MIT-licensed original code, public source repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
+**Status: GitHub prerelease (`0.1.0a1`), MIT-licensed original code, public source repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
 
 ![Recorded installed-alpha MLX comparison: 1.945× throughput, with batch time falling from 574.8 to 295.4 ms and exact agreement on tested tokens, log probabilities and active KV state.](lossless-product/docs/assets/mlx-retention.png)
 
@@ -17,11 +17,9 @@ One recorded evaluation batch on the pinned Apple M2 setup, using the retained r
 Requires **Python 3.10+ and clang** on macOS or Linux. On macOS, clang is provided by the Xcode Command Line Tools. Python dependencies install automatically; the CPU demo needs no model weights, GPU, LLM key, or proof toolchain.
 
 ```sh
-git clone https://github.com/aarnav9/lossless-opt.git
-cd lossless-opt
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install ./lossless-product
+python -m pip install https://github.com/aarnav9/lossless-opt/releases/download/v0.1.0a1/lossless_opt-0.1.0a1-py3-none-any.whl
 
 lossless doctor
 lossless demo --budget 60s --output ./lossless-runs/demo
@@ -29,9 +27,18 @@ lossless report ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-The source repository is public. The package has not been published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
+The [first GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1) provides a wheel, source archive and checksums. For source development, clone this repository and install `./lossless-product`. The package has not been published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
 
 The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report.json` and `report.html` in the run directory. Completed runs export the accepted implementation or the reference; incomplete runs cannot be exported. A measured speedup is not guaranteed.
+
+## Profile before searching
+
+```sh
+lossless init --template softmax --output ./softmax-demo
+lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-runs/profile
+```
+
+The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a1.md).
 
 ## How it works
 

@@ -92,6 +92,6 @@ The intended sequence is:
 
 ## License
 
-Original code and original contributions use the [MIT License](LICENSE). Retain the [third-party notices](lossless-product/NOTICE) for imported material. The source repository is public. Tagged GitHub releases and package-registry distribution remain pending. A fresh full proof-toolchain installation check remains outstanding alongside broader backend validation.
+Original code and original contributions use the [MIT License](LICENSE). Retain the [third-party notices](lossless-product/NOTICE) for imported material. The source repository is public. The first GitHub prerelease packages the tested alpha; package-registry distribution remains pending. A fresh full proof-toolchain installation check remains outstanding alongside broader backend validation.
 
 The [032–038 follow-up report](lossless-product/docs/frontier-032-038.md) contains foreground reproduction commands for the manual proposal replay, Z3 search, graph extraction, scheduling, head bounds, racing and tensor decomposition. Its optional Z3/SymPy dependencies are research tools, not base package dependencies. Replaying preserved manual proposals does not count as a new live model call.

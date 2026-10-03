@@ -2,7 +2,7 @@
 
 > An optimizer that combines formal reasoning, hardware information, and measured experiments to accelerate computations while preserving an explicit correctness contract.
 
-**Installable source alpha, `0.1.0a1`.** Lossless searches offline, checks candidates against a frozen contract, measures them on separate discovery and evaluation cases, and exports a guarded implementation. If no candidate qualifies, it retains the reference. Connect your own reasoning LLM through a Python callback or JSON command; retained candidates also work without an API key.
+**GitHub prerelease, `0.1.0a1`.** Lossless searches offline, checks candidates against a frozen contract, measures them on separate discovery and evaluation cases, and exports a guarded implementation. If no candidate qualifies, it retains the reference. Connect your own reasoning LLM through a Python callback or JSON command; retained candidates also work without an API key.
 
 The product direction covers ML, vision, and linear algebra. This alpha implements the adapters below. It does not yet optimize arbitrary model graphs or CUDA workloads.
 
@@ -127,4 +127,6 @@ python -m build
 
 Candidate execution and provider callbacks use trusted local processes with timeouts, not an OS security sandbox. Run with representative inputs you are allowed to send to your configured provider. Evaluation data is withheld from proposal prompts; candidates do not decide acceptance.
 
-See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. Tagged releases and package-registry distribution remain pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
+See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. The [GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1) includes wheels, source and checksums; package-registry distribution remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
+
+Use `lossless profile JOB --output DIRECTORY` to measure discovery inputs without searching or calling a provider. Add `--artifact PATH` to compare a guarded deployment. [Profiling guide](docs/profiling.md) · [Release installation and support matrix](docs/release-0.1.0a1.md) · [Expanded softmax qualification](docs/softmax-039.md).
