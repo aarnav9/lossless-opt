@@ -53,6 +53,11 @@ MLX artifact admission includes adapter source identity. Updating to this worker
 
 ## 043: independent model authoring
 
+**Follow-up:** [Campaign 044](timers-044.md) compares announced 5-, 30- and
+60-minute allowances with an unannounced control. It confirms the short-cap
+completion problem but finds no consistent advantage for one hour over 30 minutes.
+The earlier 043 prompts below did not tell authors their deadline.
+
 The five-minute pilot returned no complete proposals in three sessions. Simple connectivity and structured-output diagnostics succeeded, but that does not establish why the authoring sessions timed out or how good their unfinished kernels would have been. The pilot remains recorded separately; its final evaluation cases were never opened.
 
 The follow-up freezes a **30-minute cap per author** before three fresh independent `gpt-6-astra` / `xhigh` Codex CLI sessions. Every arm receives three proposal slots and the same numerical softmax contract, compiler settings, six discovery cases and nine held-out cases. Retained recipes and deterministic enumeration are controls. Candidate and timing-block budgets are matched; total authoring/search wall time is reported separately. This is not an equal-wall-time experiment.

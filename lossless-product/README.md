@@ -66,10 +66,10 @@ Add an `llm` object to the job:
     "provider": "your-provider",
     "model": "your-model",
     "credential_env": ["MY_MODEL_API_KEY"],
-    "timeout_seconds": 120
+    "timeout_seconds": 1800
   },
   "budget": {
-    "wall_time_seconds": 180,
+    "wall_time_seconds": 3600,
     "max_candidates": 4,
     "max_llm_calls": 1
   }
@@ -84,7 +84,7 @@ Merge those fields into the generated job while keeping its workload and contrac
 
 Dots show nine held-out case speedups per selected kernel; diamonds show geometric means. Five-minute kernel speed is unmeasured. [Figure data and interpretation](docs/qualification-041-043.md#readme-search-time-figure) · [SVG](docs/assets/search-time-043.svg).
 
-The unreleased source exposes both limits directly: `lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m` previews the frozen job; use the same options with `lossless optimize` to run it. Total search time and per-response time are distinct, and candidate/call caps still apply. Runs can finish early. [JSON/Python configuration](docs/alpha.md#search-time-and-performance-unreleased-cli-overrides) · [Study and payback](docs/qualification-041-043.md#043-independent-model-authoring).
+The unreleased source defaults to **30 minutes per LLM response** when `llm.timeout_seconds` is omitted. Set that JSON field or use `--llm-timeout 1h` to change it. `lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m` previews the frozen job; use the same options with `lossless optimize` to run it. Each response is capped by remaining total search time after reserving evaluation time, so a short job budget can cut it off earlier. Candidate/call caps still apply, and runs can finish early. [JSON/Python configuration](docs/alpha.md#search-time-and-performance-unreleased-cli-overrides) · [Expanded timer study and payback](docs/timers-044.md).
 
 Your `complete(prompt: str)` calls your preferred model and returns the JSON proposal string or object. The prompt contains the response schema, contract, permitted transformations, hardware context, and discovery feedback. A command alternative accepts one JSON request on stdin and emits one proposal batch on stdout. No model SDK or hosted Lossless service is required. Prefer a capable reasoning model for difficult searches; improved gains are a hypothesis to measure, not a guarantee. Native adapters accept C candidates; MLX currently lets the LLM choose among retained allocator policies rather than generating arbitrary GPU programs.
 

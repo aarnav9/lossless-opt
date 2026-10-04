@@ -10,6 +10,12 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Numbered campaigns
 
+- **045 — Experiment (numerical, iterative model search):** Run one time-aware, one-hour propose → benchmark → revise trajectory from retained and campaign-044 seeds; compare with the frozen first-round choice and an enumeration control at equal candidate/timing allowances.
+- **Result — no confirmed incremental overall gain:** Nine valid proposals across three completed rounds, then a timeout; final speed was 1.00284× first-round choice and 1.00958× enumeration, both failing the incremental gate. Search/evaluation took 59.20 minutes versus enumeration's 97.92 seconds. One trajectory; Gaussian timings; no promotion. [Results, limitations, chart and evidence](lossless-product/docs/iterate-045.md).
+
+- **044 — Experiment (numerical, authoring budgets):** Compare announced 5-, 30- and 60-minute one-shot allowances with an unannounced 60-minute control, three independent authors each, globally sealed discovery and fresh paired final measurements.
+- **Result — completion threshold, no consistent one-hour advantage:** All five-minute authors timed out; nine others returned 27 valid proposals, gaining 16.8–21.8% over retained. Direct 60/30-minute ratios were 1.0023×/1.0283×/0.9954×; only one pair won every case. Unannounced authors finished sooner with similar speed. No general time-scaling claim or promotion. [Results, payback, chart and evidence](lossless-product/docs/timers-044.md).
+
 - **043 — Experiment (numerical, independent model search):** Compare three fresh Codex CLI authors against retained and enumerated softmax candidates with three proposal slots per arm, sealed holdouts, separate total-cost reporting and paired frozen-winner replay.
 - **Result — promising, experimental:** With a 30-minute cap, all three authors completed in 6:50–10:08; all nine proposals passed numerical validation. Frozen LLM winners gained 20.6–21.0% over retained in fresh paired replay, while enumeration lost. Authoring plus evaluation took 25.0 minutes across three runs; search-only payback was 6.8 million–1.19 billion calls. The earlier five-minute timeout pilot is separate. No default promotion. [Study design and full evidence](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring).
 

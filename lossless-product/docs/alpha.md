@@ -37,7 +37,7 @@ The harness resolves and freezes these inputs first. It then builds a discovery-
 
 ## Search time and performance (unreleased CLI overrides)
 
-**Treat optimization time as a performance tuning input: more time is likely to help when useful proposals or evaluations are being cut short.** It increases opportunity, not guaranteed speed. Search can reach a plateau or retain the same implementation. The 043 follow-up found useful kernels after raising a five-minute authoring cap to 30 minutes; it did not establish that 30 minutes beats every shorter completed run, or that eight hours beats 30 minutes. [Measured results and cost](qualification-041-043.md#043-independent-model-authoring).
+**Treat optimization time as a performance tuning input: more time can help when useful proposals or evaluations are being cut short.** It increases opportunity, not guaranteed speed. Campaign 044's five-minute authors timed out, while all 30- and 60-minute authors completed. One hour did not consistently beat 30 minutes in that one-shot study. [Measured results and cost](timers-044.md).
 
 Time limits belong to the frozen search budget/LLM configuration. The correctness contract defines which outputs are acceptable and remains unchanged. Configure these existing JSON fields, retaining the workload and contract from your job:
 
@@ -58,11 +58,13 @@ Time limits belong to the frozen search budget/LLM configuration. The correctnes
 | Input | Meaning |
 | --- | --- |
 | `budget.wall_time_seconds` / `--budget 8h` | Maximum total search allowance, including setup, model calls, compilation and evaluation |
-| `llm.timeout_seconds` / `--llm-timeout 30m` | Maximum time for one author response; clipped to remaining time after the controller reserves evaluation time |
+| `llm.timeout_seconds` / `--llm-timeout 30m` | Maximum time for one author response; defaults to 1,800 seconds (30 minutes), clipped to remaining time after the controller reserves evaluation time |
 | `budget.max_candidates` | Candidate cap, including retained recipes; at most 100 in this alpha |
 | `budget.max_llm_calls` | Upper bound on author calls, not a promise to use them all |
 
-The default per-response timeout remains 30 seconds for compatibility. Increase it explicitly for slow reasoning models; raising `--budget` alone does not change it. Configure any shorter SDK/CLI-wrapper timeout separately. These allowances are maximums, so a search can stop early. Native search can use feedback across multiple calls within its limits; MLX currently makes at most one allocator-policy proposal call and does not become an autonomous GPU-kernel search when given more time.
+**Current source defaults to 30 minutes per response.** Omit `llm.timeout_seconds` to use 1,800 seconds, or supply any positive finite duration in seconds. CLI `--llm-timeout` and Python `with_time_limits(llm_timeout_seconds=...)` override the configured value. Explicit limits in existing jobs remain effective; the immutable `v0.1.0a1` release retains its previous 30-second default. Resolved jobs record the effective configured timeout even when the input omitted it.
+
+The total search budget remains separate and can cut a response off earlier: the 60-second native template does not become a 30-minute search. Allow enough total time for authoring, compilation and final evaluation. Configure any shorter SDK/CLI-wrapper timeout separately. These allowances are maximums, so a search can stop early. Native search can use feedback across multiple calls within its limits; MLX currently makes at most one allocator-policy proposal call and does not become an autonomous GPU-kernel search when given more time.
 
 Preview CLI overrides without running a provider or changing the source JSON, then use the same overrides to execute:
 
@@ -90,11 +92,11 @@ The original `Workload` and source JSON are unchanged. The resolved JSON records
 Choose either a callback or a command:
 
 ```json
-{"callback": "provider.py:complete", "credential_env": ["MY_MODEL_API_KEY"], "timeout_seconds": 30}
+{"callback": "provider.py:complete", "credential_env": ["MY_MODEL_API_KEY"], "timeout_seconds": 1800}
 ```
 
 ```json
-{"command": ["python", "provider.py"], "credential_env": ["MY_MODEL_API_KEY"], "timeout_seconds": 30}
+{"command": ["python", "provider.py"], "credential_env": ["MY_MODEL_API_KEY"], "timeout_seconds": 1800}
 ```
 
 Store that object in the job's `llm` field. Named callbacks run in a fresh interpreter. Native Python callers may also pass an in-memory `llm` callable to `lossless.optimize`; that POSIX callback runs in a forked worker. MLX jobs require the named callback or command form. Command arguments are an argv list; no shell expansion occurs. Commands run from the configuration directory and receive only basic environment variables plus explicitly named credentials. Do not put secrets in the JSON files. Local callbacks are trusted Python code.
@@ -176,7 +178,7 @@ Merge these fields into `my-job/lossless.json`, preserving its existing workload
 }
 ```
 
-The callback path resolves relative to the job JSON. The callback selects the model; `llm.provider` and `llm.model` are labels, not built-in SDK routing. The whole-job budget includes setup, provider calls, compilation, checks, and timing. Each call receives at most its configured timeout and the remaining search budget. Built-in candidates also consume candidate slots. Slow responses can exhaust the budget; a completed search can legitimately retain the reference.
+This short callback example explicitly uses a 120-second Lossless limit and a 100-second SDK timeout; both can be increased for longer reasoning. The callback path resolves relative to the job JSON. The callback selects the model; `llm.provider` and `llm.model` are labels, not built-in SDK routing. The whole-job budget includes setup, provider calls, compilation, checks, and timing. Each call receives at most its configured timeout and the remaining search budget. Built-in candidates also consume candidate slots. Slow responses can exhaust the budget; a completed search can legitimately retain the reference.
 
 ```sh
 lossless inspect ./my-job/lossless.json
