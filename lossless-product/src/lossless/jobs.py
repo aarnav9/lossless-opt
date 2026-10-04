@@ -7,6 +7,8 @@ import json
 import math
 from pathlib import Path
 
+DEFAULT_LLM_TIMEOUT_SECONDS = 30 * 60
+
 ADAPTERS = {
     "native.copy": "copy",
     "native.softmax": "softmax",
@@ -263,7 +265,10 @@ class Workload:
                 or not all(isinstance(x, str) and x for x in llm["credential_env"])
             ):
                 raise ValueError("credential_env must contain variable names, not secret values")
-            positive(llm.get("timeout_seconds", 30), "llm.timeout_seconds")
+            positive(
+                llm.setdefault("timeout_seconds", DEFAULT_LLM_TIMEOUT_SECONDS),
+                "llm.timeout_seconds",
+            )
         proof = value.setdefault("proofs", {"check": False})
         fields(proof, {"check"}, "proofs")
         if type(proof.setdefault("check", False)) is not bool:

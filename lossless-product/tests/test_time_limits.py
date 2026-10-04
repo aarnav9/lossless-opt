@@ -16,6 +16,29 @@ from lossless.providers import bounded_timeout
 
 
 class TimeLimitTests(unittest.TestCase):
+    def test_default_is_frozen_visible_and_bounded_without_changing_the_input(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "job.json"
+            cfg = template()
+            cfg["llm"] = {"command": ["unused-provider"]}
+            config.write_text(json.dumps(cfg))
+            saved = config.read_bytes()
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                main(["inspect", str(config)])
+            resolved = json.loads(stdout.getvalue())
+            self.assertEqual(resolved["llm"]["timeout_seconds"], 1800)
+            self.assertEqual(resolved["budget"]["wall_time_seconds"], 60)
+            self.assertEqual(config.read_bytes(), saved)
+            cfg["llm"]["timeout_seconds"] = 1800
+            self.assertEqual(
+                identity(resolved), identity(Workload.from_dict(cfg, base=directory).resolve())
+            )
+        for connection in (None, {}, resolved["llm"]):
+            self.assertEqual(bounded_timeout(connection, 7200), 1800)
+            self.assertEqual(bounded_timeout(connection, 12), 12)
+            self.assertEqual(bounded_timeout(connection, -1), 0)
+
     def test_quiet_search_emits_progress_and_stops_on_error(self):
         observed = threading.Event()
         messages = []
@@ -37,7 +60,7 @@ class TimeLimitTests(unittest.TestCase):
         cfg = template()
         cfg["llm"] = {"callback": "provider.py:complete", "timeout_seconds": 30}
         original = Workload.from_dict(cfg)
-        updated = original.with_time_limits(seconds=28800, llm_timeout_seconds=1800)
+        updated = original.with_time_limits(seconds=28800, llm_timeout_seconds=3600)
         before, after = original.resolve(), updated.resolve()
         self.assertEqual(original.config, cfg)
         self.assertEqual(after["contract"], before["contract"])
@@ -47,7 +70,8 @@ class TimeLimitTests(unittest.TestCase):
         self.assertEqual(after["budget"]["max_llm_calls"], before["budget"]["max_llm_calls"])
         self.assertNotEqual(identity(before), identity(after))
         self.assertEqual(after["budget"]["wall_time_seconds"], 28800)
-        self.assertEqual(bounded_timeout(after["llm"], 5000), 1800)
+        self.assertEqual(before["llm"]["timeout_seconds"], 30)
+        self.assertEqual(bounded_timeout(after["llm"], 5000), 3600)
         self.assertEqual(bounded_timeout(after["llm"], 12), 12)
 
     def test_inspect_and_optimize_use_the_same_overrides_without_editing_the_file(self):
@@ -58,13 +82,13 @@ class TimeLimitTests(unittest.TestCase):
             config = root / "job.json"
             config.write_text(json.dumps(cfg))
             saved = config.read_bytes()
-            options = [str(config), "--budget", "8h", "--llm-timeout", "30m"]
+            options = [str(config), "--budget", "8h", "--llm-timeout", "1h"]
             stdout = io.StringIO()
             with contextlib.redirect_stdout(stdout):
                 main(["inspect", *options])
             inspected = json.loads(stdout.getvalue())
             self.assertEqual(inspected["budget"]["wall_time_seconds"], 28800)
-            self.assertEqual(inspected["llm"]["timeout_seconds"], 1800)
+            self.assertEqual(inspected["llm"]["timeout_seconds"], 3600)
 
             def execute(workload, *, output, resume):
                 self.assertEqual(workload.resolve(), inspected)

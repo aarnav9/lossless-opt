@@ -12,10 +12,15 @@ import subprocess
 import tempfile
 import time
 
+from .jobs import DEFAULT_LLM_TIMEOUT_SECONDS
+
 
 def bounded_timeout(connection, remaining_seconds):
     """Same configured timeout and remaining-budget rule for every adapter."""
-    return min((connection or {}).get("timeout_seconds", 30), max(0, remaining_seconds))
+    return min(
+        (connection or {}).get("timeout_seconds", DEFAULT_LLM_TIMEOUT_SECONDS),
+        max(0, remaining_seconds),
+    )
 
 
 def _callback_child(connection, callback, prompt, base):
@@ -59,7 +64,9 @@ def _kill(process):
             process.terminate()
 
 
-def call(context, connection, *, callback=None, base=Path("."), timeout=30):
+def call(
+    context, connection, *, callback=None, base=Path("."), timeout=DEFAULT_LLM_TIMEOUT_SECONDS
+):
     """Return a parsed proposal batch. Only explicit transports may use credentials.
 
     Callback workers use POSIX fork to support ordinary Python callables without
