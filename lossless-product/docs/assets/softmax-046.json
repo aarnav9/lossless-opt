@@ -1,0 +1,3691 @@
+{
+  "points": [
+    {
+      "distribution": "gaussian",
+      "interface": "bound",
+      "process_geomeans": [
+        1.1524475208598377,
+        1.152658949948016,
+        1.147173791816063
+      ],
+      "pooled_geomean": 1.1507572872696321
+    },
+    {
+      "distribution": "gaussian",
+      "interface": "ordinary",
+      "process_geomeans": [
+        1.0963778601287624,
+        1.084028351447797,
+        1.1029578363004295
+      ],
+      "pooled_geomean": 1.0944265061956269
+    },
+    {
+      "distribution": "uniform",
+      "interface": "bound",
+      "process_geomeans": [
+        1.1524563808801338,
+        1.1493346688406658,
+        1.1488643260146627
+      ],
+      "pooled_geomean": 1.1502173546713992
+    },
+    {
+      "distribution": "uniform",
+      "interface": "ordinary",
+      "process_geomeans": [
+        1.1445171533660756,
+        1.1678584389951165,
+        1.0992616033217866
+      ],
+      "pooled_geomean": 1.1368535509116073
+    },
+    {
+      "distribution": "extreme",
+      "interface": "bound",
+      "process_geomeans": [
+        1.120354080666876,
+        1.11568494201157,
+        1.1237223235937968
+      ],
+      "pooled_geomean": 1.1199155980531323
+    },
+    {
+      "distribution": "extreme",
+      "interface": "ordinary",
+      "process_geomeans": [
+        1.097203208504744,
+        1.103926703977137,
+        1.082612391508162
+      ],
+      "pooled_geomean": 1.0945445273931014
+    },
+    {
+      "distribution": "near_ties",
+      "interface": "bound",
+      "process_geomeans": [
+        1.149732275837031,
+        1.1498445496567726,
+        1.1500287058413303
+      ],
+      "pooled_geomean": 1.14986850395218
+    },
+    {
+      "distribution": "near_ties",
+      "interface": "ordinary",
+      "process_geomeans": [
+        1.1439720565736908,
+        1.0734477414036803,
+        1.1058321846288306
+      ],
+      "pooled_geomean": 1.1073761936409576
+    },
+    {
+      "distribution": "constant",
+      "interface": "bound",
+      "process_geomeans": [
+        7.4202734316077725,
+        7.560426035276944,
+        7.492433261696549
+      ],
+      "pooled_geomean": 7.490825617845965
+    },
+    {
+      "distribution": "constant",
+      "interface": "ordinary",
+      "process_geomeans": [
+        2.724168048144563,
+        2.3935040120344477,
+        2.4134206164532133
+      ],
+      "pooled_geomean": 2.505918972999072
+    },
+    {
+      "distribution": "single_peak",
+      "interface": "bound",
+      "process_geomeans": [
+        4.93926377366914,
+        4.960456206618458,
+        4.865041297544686
+      ],
+      "pooled_geomean": 4.921416528976355
+    },
+    {
+      "distribution": "single_peak",
+      "interface": "ordinary",
+      "process_geomeans": [
+        2.133055529935607,
+        1.8757841610329782,
+        2.1420301488398072
+      ],
+      "pooled_geomean": 2.0464612944000797
+    }
+  ],
+  "observations": [
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1897145807378475
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1531758161323378
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.184939255571378
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1035171957987944
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.109585747240444
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1654746423927178
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1109926096691234
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1089068973314375
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.2546048617954855
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.2046748735882045
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.14023522297808
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1746597355535904
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1054078790131452
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1101052631578947
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1670924784039787
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1173835082647825
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1051103368176538
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.2587258969978032
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1783161482743931
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1339157354204275
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1743051212938007
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1095705787582104
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.108890621953597
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.1639893229363003
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.0993719985223496
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.0971088913899831
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "gaussian",
+      "speedup": 1.2695573885215092
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.3613221542887972
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0443139348638548
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0405267179567699
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0573706515939787
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.098854755340021
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1361315891464792
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 0.9871709798717098
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0862167025630984
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0931809515587116
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.059996815033044
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 0.6815328832881672
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1138601747074612
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0893049434576338
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.3265294073915346
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1159951837682744
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1456310008661519
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0929811720019427
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.2722064719872375
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 0.9937198480702765
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0802098529190096
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1458888290375662
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0699117314221047
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0859058823529413
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1168219074403765
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.1102579643366794
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.0922891150595135
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "gaussian",
+      "speedup": 1.2480444364809173
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1891630020881956
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1516083408884858
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1744933991917377
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1065711895546226
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1130122279230612
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1644693343682175
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.0967224252647363
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1105214582371943
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.2764172700877334
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1921237772316997
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1537544234315054
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1749985611510791
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1071428571428572
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1142378736338747
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1618599798506366
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.0859156641147163
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1091875373045244
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.2543249154901572
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1898983489722577
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1525596704236152
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.173498875867349
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.109214249874561
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.111224912288348
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.166123636648038
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.0868696647178953
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.1044558975283587
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "uniform",
+      "speedup": 1.2556681678122776
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.051534031764856
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1767476261869065
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.139052274815749
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0574795574795575
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1035522648139635
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1494199813641763
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.232308714061071
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.2494301744093463
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1576447204968945
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.2267113163972287
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0969033692967356
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1314832040568314
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.117873417721519
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0109042352617592
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0970566008106863
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.6406746319811543
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1014501175797782
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1847698655269296
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.112809969967271
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0977068456194128
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1203442383749953
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0978653690186535
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.058533022713072
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0741309345327337
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0809880644574354
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.0889611706826072
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "uniform",
+      "speedup": 1.1654848882664102
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1287135058914017
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1025699257450838
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1113391482811699
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.111161484943068
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1104833247819395
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1017493203913318
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.0813270182784371
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1316830140503216
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.2086689392232788
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.0972646438784102
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.0834876276528338
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1081430730478592
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1167007297970015
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1174968071519795
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1064171460456218
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.097680167014614
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1193781545484187
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1983628400796285
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1346055674785906
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.0854890156057528
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.120513899226562
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.11903946263644
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1279519872328143
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.110619893804372
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.0966458486652095
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1241741666114389
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "extreme",
+      "speedup": 1.1979591836734693
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0122648635039384
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 0.7968166580360306
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0851714179647762
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.2362874162323159
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.2253805244819365
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0644623746610655
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.2567526067455
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.1269097060175444
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.1528506666162868
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.063597049096922
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.1059270456786066
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0644393409327004
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.1949003429728464
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0183268905986114
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.069013065326633
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0840243712730102
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.105444445298501
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.2475551470032995
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.006128735632184
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0730802179234964
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.077061713322287
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.1395906744120656
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.068677424612877
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0293651489502331
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.0365385023040876
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.138188199166484
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "extreme",
+      "speedup": 1.187862341186629
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1911247343010847
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1416847101980752
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1750144881266764
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.101701636188643
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1189516507706352
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1608195094692424
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1014107536394442
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1023245872150478
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.264518066731185
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1889677221522232
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1512618142136726
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.172556053811659
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1071280049903232
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1135236138732874
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.159937565781466
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.0872501560783256
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.101415534694459
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.2783855208161792
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1882335539441637
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1403236129804097
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1730860600144977
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.110818280643906
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1123120300751879
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1611647389316477
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.1028749553837003
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.113165906362545
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "near_ties",
+      "speedup": 1.2568072049765386
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1415344015080113
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1068565574776963
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1234863437452844
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.068282621082621
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0433131651599135
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1162702565361378
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0548289509219568
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.4439871094471068
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.2473118279569892
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.12445735864241
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.039537906137184
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0239714490920533
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0679848152423053
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.106215053696749
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0534550546668822
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0109465179223134
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1154131577091377
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1266068640740787
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.079655438602358
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.069433526166912
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.12940857230959
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.0983167483864185
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.053850217001835
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1030435773428202
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1657935151627832
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.1377793094299025
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "near_ties",
+      "speedup": 1.119783714193756
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.58344785811036
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 7.415551136439468
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.45512046029977
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.002691790040377
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 5.907886056971514
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.463400468406148
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.089675174647564
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 5.9016389436072405
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 8.415012355717616
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.66521389308366
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 7.479533426207333
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.560525646460365
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.089986256644439
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 5.891421919149477
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.585638819300732
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.093643198906356
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.125064638053556
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.097110621419128
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.59468300226002
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 7.4517495652173915
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.532113994045087
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 5.962639684216378
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 5.920668986008577
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 9.546937986074353
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.010596776792071
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 6.205160414910928
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "constant",
+      "speedup": 8.685279187817258
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 5.244720681768336
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.9643481224214563
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.8560518551507226
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.1397692470808263
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.7505411272025029
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.104202286247191
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.4575866188769413
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.6334242824531255
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.4726830534787974
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.1350669590854683
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.040100538599641
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.8216299424430655
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.9722563652326603
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.1540279259550417
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 4.433557803806424
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.927252042689041
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.9176920614715809
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.8037634291915356
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.4102289597658952
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.9842327272727274
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.306265873832067
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.47742721977796
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.286302483069978
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 3.0293090965945972
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.368991250122012
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 2.576589646680631
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "constant",
+      "speedup": 1.3544020029370591
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.733456769222188
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.627980014275517
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.612026706221288
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.236526316192138
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.206020997393404
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.681951517142656
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.495372625426206
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.5412101657388915
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.684811434854316
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.668228053746645
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.63925884667179
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.774279379157428
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.248809074004104
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.262054755674251
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.720109843683988
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.541987975692449
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.451467138849285
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.718223217486359
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.675396055767707
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.6344451106352595
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.631845236052092
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.239120038259206
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.230818226710275
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.750342641337457
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 3.9278846153846154
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 4.4911795841209825
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "bound",
+      "distribution": "single_peak",
+      "speedup": 5.665277722660952
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.209364605062863
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.546172012263218
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.610361187964724
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.917376786930593
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.6789456878283842
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.5094721723518854
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.7729837096955399
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.89127644349705
+    },
+    {
+      "process": 0,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.298145194010033
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 4.862657232704402
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 0.49616766197352274
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 0.8198400158826012
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.946709044914147
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 3.0306731947243
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.6082537966112724
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.84059696671196
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.9582758940470497
+    },
+    {
+      "process": 1,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.7312339595023178
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 509,
+        "layout": "f",
+        "rows": 34
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.5634430971512052
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1027,
+        "layout": "f",
+        "rows": 35
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.5327224206825467
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 521,
+        "layout": "f",
+        "rows": 48
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.6237874314635174
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2053,
+        "layout": "f",
+        "rows": 62
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.681528512084592
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 2039,
+        "layout": "f",
+        "rows": 66
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.3645545071627825
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 313,
+        "layout": "f",
+        "rows": 95
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.6684829617164487
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4093,
+        "layout": "f",
+        "rows": 126
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.755576462019362
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 4099,
+        "layout": "f",
+        "rows": 130
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 1.8601135271229114
+    },
+    {
+      "process": 2,
+      "case": {
+        "columns": 1031,
+        "layout": "f",
+        "rows": 259
+      },
+      "interface": "ordinary",
+      "distribution": "single_peak",
+      "speedup": 2.9501337359417876
+    }
+  ],
+  "scope": "Nine final Fortran shapes; three fresh processes; numerical softmax on Apple M2. Lines span process geometric means, not confidence intervals."
+}

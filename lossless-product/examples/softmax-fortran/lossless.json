@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "name": "qualified-softmax-fortran",
+  "workload": {
+    "adapter": "native.softmax",
+    "cases": [
+      {
+        "id": "discovery_15",
+        "split": "discovery",
+        "rows": 32,
+        "columns": 1024,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_16",
+        "split": "discovery",
+        "rows": 33,
+        "columns": 1025,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_17",
+        "split": "discovery",
+        "rows": 63,
+        "columns": 2047,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_18",
+        "split": "discovery",
+        "rows": 64,
+        "columns": 2048,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_19",
+        "split": "discovery",
+        "rows": 65,
+        "columns": 2049,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_20",
+        "split": "discovery",
+        "rows": 96,
+        "columns": 311,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_21",
+        "split": "discovery",
+        "rows": 127,
+        "columns": 4095,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_22",
+        "split": "discovery",
+        "rows": 128,
+        "columns": 4096,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_23",
+        "split": "discovery",
+        "rows": 129,
+        "columns": 4097,
+        "layout": "f"
+      },
+      {
+        "id": "discovery_24",
+        "split": "discovery",
+        "rows": 257,
+        "columns": 1024,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_7",
+        "split": "evaluation",
+        "rows": 34,
+        "columns": 509,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_8",
+        "split": "evaluation",
+        "rows": 35,
+        "columns": 1027,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_9",
+        "split": "evaluation",
+        "rows": 48,
+        "columns": 521,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_10",
+        "split": "evaluation",
+        "rows": 62,
+        "columns": 2053,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_11",
+        "split": "evaluation",
+        "rows": 66,
+        "columns": 2039,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_12",
+        "split": "evaluation",
+        "rows": 95,
+        "columns": 313,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_13",
+        "split": "evaluation",
+        "rows": 126,
+        "columns": 4093,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_14",
+        "split": "evaluation",
+        "rows": 130,
+        "columns": 4099,
+        "layout": "f"
+      },
+      {
+        "id": "evaluation_15",
+        "split": "evaluation",
+        "rows": 259,
+        "columns": 1031,
+        "layout": "f"
+      }
+    ]
+  },
+  "contract": {
+    "preset": "numerical",
+    "required_evidence": "validated"
+  },
+  "objective": {
+    "metric": "latency",
+    "min_speedup": 1.02,
+    "comparator": "numpy_buffered"
+  },
+  "budget": {
+    "wall_time_seconds": 120,
+    "max_candidates": 3,
+    "max_llm_calls": 1
+  },
+  "target": {
+    "device": "auto"
+  },
+  "output": {
+    "directory": "./lossless-runs"
+  },
+  "llm": {
+    "provider": "frozen-recipe-046",
+    "model": "none",
+    "callback": "recipe.py:complete",
+    "timeout_seconds": 10
+  }
+}
