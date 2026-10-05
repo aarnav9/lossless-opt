@@ -26,12 +26,22 @@ def main(directory):
         for name in names:
             parts = Path(name).parts
             if any(
-                p in {"research", ".venv", ".lake", "lossless-runs", ".env", "__pycache__"}
+                p
+                in {
+                    "research",
+                    ".venv",
+                    ".lake",
+                    ".lossless",
+                    "lossless-runs",
+                    ".env",
+                    "__pycache__",
+                }
                 for p in parts
             ) or name.endswith((".safetensors", ".gguf", ".so", ".dylib", ".pyc")):
                 raise ValueError(f"unexpected artifact content: {name}")
         for suffix in [
             "lossless/cli.py",
+            "lossless/codex_provider.py",
             "lossless/profiling.py",
             "lossless/constraints.py",
             "lossless/_profile_worker.py",
@@ -44,6 +54,14 @@ def main(directory):
         ]:
             if not any(n.endswith(suffix) for n in names):
                 raise ValueError(f"missing package resource: {suffix}")
+        if archive.suffix != ".whl":
+            for suffix in [
+                "examples/softmax-fortran/recipe.py",
+                "examples/softmax-fortran/kernel.c",
+                "experiments/kernelbench_049/upstream/LICENSE",
+            ]:
+                if not any(n.endswith(suffix) for n in names):
+                    raise ValueError(f"missing source-distribution resource: {suffix}")
         records[archive.name] = {
             "archive_bytes": archive.stat().st_size,
             "file_bytes": file_bytes,

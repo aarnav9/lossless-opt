@@ -1,0 +1,106 @@
+{
+  "repository": "https://github.com/ScalingIntelligence/KernelBench",
+  "revision": "423217d9fda91e0c2d67e4a43bf62f96f6d104f1",
+  "tasks": [
+    {
+      "task": "L1_02",
+      "source": "level1/2_Standard_matrix_multiplication_.py",
+      "sha256": "136a33c4d598d07cd7931ef8c0eff4e683c221af6fc43c2d89b6632d3f9902a0"
+    },
+    {
+      "task": "L1_03",
+      "source": "level1/3_Batched_matrix_multiplication.py",
+      "sha256": "310fb3bdf4f69ea178a5b5868bf204e83196cba71e4750be3fbbcb68b78d37f7"
+    },
+    {
+      "task": "L1_19",
+      "source": "level1/19_ReLU.py",
+      "sha256": "cbbfc9409662168ee7a5d3e7f7a59bf56e0faf9d763197e7f6a41fb5942dd63a"
+    },
+    {
+      "task": "L1_40",
+      "source": "level1/40_LayerNorm.py",
+      "sha256": "8d975d7cee6946513dcfb6ba84c971e53a890f9d9c6f0a4fb828904941f25975"
+    },
+    {
+      "task": "L1_48",
+      "source": "level1/48_Mean_reduction_over_a_dimension.py",
+      "sha256": "5fedf7c91096731d6d0edf00ade5b31b835c07e39be159512446fb4479fd5b35"
+    },
+    {
+      "task": "L1_42",
+      "source": "level1/42_Max_Pooling_2D.py",
+      "sha256": "615a5a6d6baa0d13774cc17b305dd0588625e13a829bdef16395f5cd101e06bc"
+    },
+    {
+      "task": "L1_50",
+      "source": "level1/50_conv_standard_2D__square_input__square_kernel.py",
+      "sha256": "86ecad0e77b2c9f81d6c171f1325e85f4f23ae9ad4410bbfd096fca62e84d673"
+    },
+    {
+      "task": "L1_86",
+      "source": "level1/86_conv_depthwise_separable_2D.py",
+      "sha256": "cee48ffdb13900385835c6390154a3886bd9ad8b84154ae1d37f0148cd8feabe"
+    },
+    {
+      "task": "L2_01",
+      "source": "level2/1_Conv2D_ReLU_BiasAdd.py",
+      "sha256": "45ee3a3db038396c982207b36812086bf1b94472ebbf229c5e76c5ea0b90f89f"
+    },
+    {
+      "task": "L2_09",
+      "source": "level2/9_Matmul_Subtract_Multiply_ReLU.py",
+      "sha256": "110e75834cd898f532262ce516e318b8e7a9e85acda705baefcebe687ff85b21"
+    },
+    {
+      "task": "L2_12",
+      "source": "level2/12_Gemm_Multiply_LeakyReLU.py",
+      "sha256": "0150537a4e53a29b1436d22667aa05b26c30301dd865d5ccf0f929b2c0cc29f6"
+    },
+    {
+      "task": "L2_40",
+      "source": "level2/40_Matmul_Scaling_ResidualAdd.py",
+      "sha256": "333bf992fd77297a4c43f4287b44662dcc43c8036be69d486b28e7a9db7bffd5"
+    },
+    {
+      "task": "L2_56",
+      "source": "level2/56_Matmul_Sigmoid_Sum.py",
+      "sha256": "00070bf8cc6a0d0ff1c4cbb78729620575164e67cb03ef1d646bbab332ae1fa3"
+    },
+    {
+      "task": "L2_59",
+      "source": "level2/59_Matmul_Swish_Scaling.py",
+      "sha256": "af4bfb47631eb3eee01055c0ae090e7452edacb0aa35fa40d117de2675bc2720"
+    },
+    {
+      "task": "L2_65",
+      "source": "level2/65_Conv2d_AvgPool_Sigmoid_Sum.py",
+      "sha256": "7bd02c41c99f336d8515c06cd299fcd95dcc575f3aa1114b4de84b81cadbe7d4"
+    },
+    {
+      "task": "L2_67",
+      "source": "level2/67_Conv2d_GELU_GlobalAvgPool.py",
+      "sha256": "3a9572034d80dd060bb523e1d265aa941113a8044ecd30c614e764fdf029d94a"
+    },
+    {
+      "task": "L3_01",
+      "source": "level3/1_MLP.py",
+      "sha256": "3fabb8e6bb6f0f5a9524a62226ce25fc3a8f5289464e809a29a85919536c4efc"
+    },
+    {
+      "task": "L3_04",
+      "source": "level3/4_LeNet5.py",
+      "sha256": "517275f989a3c3b7bb8a9e5a9bf63b843b167bf2c7fb93db147f64ff2c1e16de"
+    },
+    {
+      "task": "L3_06",
+      "source": "level3/6_GoogleNetInceptionModule.py",
+      "sha256": "a3d863c2a2c6f54ca5509ab39bd4c9f2ad31c960a0bb4200ad1acbede9f3ee85"
+    },
+    {
+      "task": "L3_17",
+      "source": "level3/17_SqueezeNetFireModule.py",
+      "sha256": "99864d7e0e7e3b7c06fc4316dd25c2422fec8ba4413d7e2a55c2c5964f89737b"
+    }
+  ]
+}

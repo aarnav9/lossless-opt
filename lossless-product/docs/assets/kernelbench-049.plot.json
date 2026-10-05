@@ -1,0 +1,242 @@
+[
+  {
+    "task": "L1_02",
+    "process": 1,
+    "geomean": 0.9915505790324477,
+    "confirmed": false
+  },
+  {
+    "task": "L1_03",
+    "process": 1,
+    "geomean": 1.0044622900741698,
+    "confirmed": false
+  },
+  {
+    "task": "L1_19",
+    "process": 1,
+    "geomean": 0.9875223583911025,
+    "confirmed": false
+  },
+  {
+    "task": "L1_40",
+    "process": 1,
+    "geomean": 1.0043618727194104,
+    "confirmed": false
+  },
+  {
+    "task": "L1_48",
+    "process": 1,
+    "geomean": 0.9971555161664463,
+    "confirmed": false
+  },
+  {
+    "task": "L1_42",
+    "process": 1,
+    "geomean": 2.02561712562544,
+    "confirmed": true
+  },
+  {
+    "task": "L1_50",
+    "process": 1,
+    "geomean": 1.0113349450693452,
+    "confirmed": false
+  },
+  {
+    "task": "L1_86",
+    "process": 1,
+    "geomean": 1.9807308648240647,
+    "confirmed": false
+  },
+  {
+    "task": "L2_01",
+    "process": 1,
+    "geomean": 1.021817516317933,
+    "confirmed": false
+  },
+  {
+    "task": "L2_09",
+    "process": 1,
+    "geomean": 0.9935076747726493,
+    "confirmed": false
+  },
+  {
+    "task": "L2_12",
+    "process": 1,
+    "geomean": 1.0114983228922503,
+    "confirmed": false
+  },
+  {
+    "task": "L2_40",
+    "process": 1,
+    "geomean": 1.0126640024143412,
+    "confirmed": false
+  },
+  {
+    "task": "L2_56",
+    "process": 1,
+    "geomean": 1.0429681159839403,
+    "confirmed": false
+  },
+  {
+    "task": "L2_59",
+    "process": 1,
+    "geomean": 0.997985192705488,
+    "confirmed": false
+  },
+  {
+    "task": "L2_65",
+    "process": 1,
+    "geomean": 1.6087766028719062,
+    "confirmed": true
+  },
+  {
+    "task": "L2_67",
+    "process": 1,
+    "geomean": 1.079120935849683,
+    "confirmed": false
+  },
+  {
+    "task": "L3_01",
+    "process": 1,
+    "geomean": 0.9946989351626034,
+    "confirmed": false
+  },
+  {
+    "task": "L3_04",
+    "process": 1,
+    "geomean": 1.3749168302851265,
+    "confirmed": false
+  },
+  {
+    "task": "L3_06",
+    "process": 1,
+    "geomean": 1.397791474419997,
+    "confirmed": false
+  },
+  {
+    "task": "L3_17",
+    "process": 1,
+    "geomean": 1.0694819606662092,
+    "confirmed": false
+  },
+  {
+    "task": "L1_02",
+    "process": 2,
+    "geomean": 1.000074244710827,
+    "confirmed": false
+  },
+  {
+    "task": "L1_03",
+    "process": 2,
+    "geomean": 1.0001889957931343,
+    "confirmed": false
+  },
+  {
+    "task": "L1_19",
+    "process": 2,
+    "geomean": 1.0017420928659084,
+    "confirmed": false
+  },
+  {
+    "task": "L1_40",
+    "process": 2,
+    "geomean": 1.002177595140479,
+    "confirmed": false
+  },
+  {
+    "task": "L1_48",
+    "process": 2,
+    "geomean": 1.005115394254936,
+    "confirmed": false
+  },
+  {
+    "task": "L1_42",
+    "process": 2,
+    "geomean": 2.062486007314827,
+    "confirmed": true
+  },
+  {
+    "task": "L1_50",
+    "process": 2,
+    "geomean": 1.0289234411564745,
+    "confirmed": false
+  },
+  {
+    "task": "L1_86",
+    "process": 2,
+    "geomean": 2.010227904762386,
+    "confirmed": false
+  },
+  {
+    "task": "L2_01",
+    "process": 2,
+    "geomean": 1.0202579348528988,
+    "confirmed": false
+  },
+  {
+    "task": "L2_09",
+    "process": 2,
+    "geomean": 0.9940720448365475,
+    "confirmed": false
+  },
+  {
+    "task": "L2_12",
+    "process": 2,
+    "geomean": 1.0079243981419224,
+    "confirmed": false
+  },
+  {
+    "task": "L2_40",
+    "process": 2,
+    "geomean": 1.035661446943376,
+    "confirmed": false
+  },
+  {
+    "task": "L2_56",
+    "process": 2,
+    "geomean": 1.0304367202968157,
+    "confirmed": false
+  },
+  {
+    "task": "L2_59",
+    "process": 2,
+    "geomean": 0.9768303337169584,
+    "confirmed": false
+  },
+  {
+    "task": "L2_65",
+    "process": 2,
+    "geomean": 1.5605953050297523,
+    "confirmed": true
+  },
+  {
+    "task": "L2_67",
+    "process": 2,
+    "geomean": 1.0903582285109412,
+    "confirmed": false
+  },
+  {
+    "task": "L3_01",
+    "process": 2,
+    "geomean": 1.0085260131010632,
+    "confirmed": false
+  },
+  {
+    "task": "L3_04",
+    "process": 2,
+    "geomean": 1.319166177050917,
+    "confirmed": false
+  },
+  {
+    "task": "L3_06",
+    "process": 2,
+    "geomean": 1.5368726688774914,
+    "confirmed": false
+  },
+  {
+    "task": "L3_17",
+    "process": 2,
+    "geomean": 1.0427256080465566,
+    "confirmed": false
+  }
+]

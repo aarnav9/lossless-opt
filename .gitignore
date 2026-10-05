@@ -31,7 +31,7 @@ htmlcov/
 /runs/
 lossless-runs/
 /weights/
-/.lossless/
+.lossless/
 *.safetensors
 *.gguf
 *.log

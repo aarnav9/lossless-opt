@@ -17,7 +17,7 @@ htmlcov/
 lossless-runs/
 /artifacts/
 /weights/
-/.lossless/
+.lossless/
 .env
 .env.*
 !.env.example

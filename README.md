@@ -52,6 +52,12 @@ Three independent authors per condition received the same **native numerical sof
 
 A [one-hour iterative follow-up](lossless-product/docs/iterate-045.md) added measured feedback between responses. Three rounds returned nine valid kernels; a fourth timed out. The final choice was only 1.00284× the first-round choice on fresh paired cases and failed the incremental improvement gate. Iterative search/evaluation took 59.20 minutes; enumeration took 97.92 seconds and delivered similar overall speed. This single trajectory does not establish that longer iterative search improves performance.
 
+A [three-model pilot](lossless-product/docs/models-047.md) then gave Sol, Astra and Luna the same 30-minute ceiling and six call slots. None passed the incremental gate against the shared seed or enumeration. Astra had the highest paired mean; Luna reached similar speed to Sol in about half the search/evaluation time. The enumeration control took 61.07 seconds. One trajectory per model does not establish a general ranking.
+
+A [broader MLX implementation experiment](lossless-product/docs/fullstack-048.md) allowed one author to revise scheduling, KV movement and graph execution. Six implementations passed discovery exactness; the selected source reached 1.098× the frozen strongest eligible references in two fresh held-out processes. It failed the full gate on long-single speed and one ragged first-token latency observation, so remains experimental. A sleep interruption also extended the nominal one-hour search beyond its wall-time allowance. This broader authoring interface is a research harness, not shipped product functionality.
+
+A [20-task KernelBench-derived MLX pilot](lossless-product/docs/kernelbench-049.md) extends that research to operators, fusions and vision/MLP graphs. All tasks passed final numerical checks; max pooling (2.044×) and a convolution/pooling pipeline (1.585×) passed their full task speed gates. The full-suite gate failed despite a 1.149× held-out mean. These are M2-sized numerical experiments, not official KernelBench CUDA scores or shipped recipes.
+
 Set both limits in the job: `budget.wall_time_seconds` controls the whole search; `llm.timeout_seconds` controls each LLM response (**default 30 minutes / 1,800 seconds in current source**). The source CLI also supports explicit overrides once a provider is configured:
 
 ```sh
@@ -131,18 +137,21 @@ Your `complete(prompt: str)` callback returns a proposal JSON string or object. 
 | Connection | Setup |
 | --- | --- |
 | Claude API | Install `anthropic` in the same virtual environment, set `ANTHROPIC_API_KEY`, and supply a Python callback using your chosen model. [Minimal callback and job configuration](lossless-product/docs/alpha.md#connecting-claude-or-codex). |
-| Codex CLI | A user-supplied command wrapper invokes `codex exec` with a proposal JSON Schema and returns the final proposal object. It can reuse the CLI's saved authentication. [Official OpenAI documentation](https://learn.chatgpt.com/docs/non-interactive-mode). |
+| Codex CLI | Current source ships `python -m lossless.codex_provider`, using saved ChatGPT sign-in and structured proposals. [Ready-to-run job and subscription setup](lossless-product/docs/codex.md). |
 | Claude Code | A user-supplied command wrapper invokes `claude -p` with a proposal JSON Schema and extracts `structured_output` from its JSON response. [Official Claude Code documentation](https://code.claude.com/docs/en/headless). |
 
-The callback/command interface is implemented. **Turnkey Claude/Codex connectors are not bundled; packaged provider tests use local fixtures.** Campaign 043 separately exercises real Codex CLI authoring. A CLI wrapper must return proposal JSON rather than its tool's metadata or event stream. The [connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex) explains the boundary and current limitations.
+The callback/command interface is implemented. **The Codex connector is available in current source, outside the published `v0.1.0a1` wheel.** Claude transports remain user-supplied. Codex uses your subscription allowance; API billing is separate. A live copy smoke verified the command path, evaluation and export/load, correctly retaining NumPy when the proposal did not win. [Setup, tested CLI version and costs](lossless-product/docs/codex.md) · [General connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex).
 
 ### What the LLM tests establish
 
 - The CPU suite uses a deterministic provider that returns the reference C implementation as a control candidate. It exercises prompt delivery, compilation, correctness checks, timing, separate evaluation, and export/load.
 - The fresh-environment MLX test uses a deterministic provider proposing the 64 MiB allocator policy. The real harness evaluates it; the retained 256 MiB recipe wins that run.
 - Regression tests cover malformed responses, timeouts, credential echoes, and withholding evaluation cases from proposal prompts.
+- The source Codex connector has a live ChatGPT-signed-in native-copy smoke; it returned an eligible proposal in 37.55 seconds and exported the retained reference. Model access probes passed for GPT-6.1 Sol, GPT-6 Astra and GPT-6 Luna.
 
 A separate manual Codex-guided native study compared authored candidates against retained recipes and enumeration. [Campaign 043](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring) adds independent live Codex CLI sessions; it tests model proposals through the native experiment harness, not a shipped vendor connector.
+
+For a useful workload without model authoring, the [opt-in Fortran softmax recipe](lossless-product/examples/softmax-fortran/README.md) revalidates a frozen kernel locally and exports guards for 19 specific shapes. [Campaign 046](lossless-product/docs/softmax-046.md) qualified it across distributions and fresh processes, including ordinary application calls. It is a numerical CPU recipe; the broader default recipes remain unchanged.
 
 The fixture tests establish protocol and execution behavior, not live-model proposal quality. The measured MLX retained-recipe speedup did not come from a live model call. [Validation record](lossless-product/docs/retention.md#local-verification-2-october-2026).
 

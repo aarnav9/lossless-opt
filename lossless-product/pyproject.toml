@@ -30,6 +30,8 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
+# Preserve pinned, hash-verified third-party benchmark source bytes.
+extend-exclude = ["experiments/kernelbench_049/upstream"]
 
 [tool.ruff.lint]
 select = ["F"]
