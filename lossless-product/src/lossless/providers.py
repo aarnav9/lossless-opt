@@ -111,6 +111,9 @@ def call(
             if k in {"PATH", "HOME", "TMPDIR", "LANG", *connection.get("credential_env", [])}
         }
         env["PYTHONUNBUFFERED"] = "1"
+        # Let command transports honor the resolved allowance, including the
+        # remaining search budget, without requiring a second timeout setting.
+        env["LOSSLESS_PROVIDER_TIMEOUT_SECONDS"] = str(timeout)
         with (
             tempfile.TemporaryFile() as source,
             tempfile.TemporaryFile() as output,

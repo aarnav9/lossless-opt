@@ -188,7 +188,7 @@ lossless report ./lossless-runs/claude-test
 
 ### Codex CLI or Claude Code
 
-Both can be connected through a user-supplied command wrapper. The wrapper reads the Lossless request from stdin, asks the CLI for a proposal using an actual JSON Schema for the active adapter, and writes only the proposal batch to stdout. The request's `response_format` illustrates the expected object; it is not itself a JSON Schema.
+Current source includes a [ready-to-run Codex connector and job](codex.md) using saved ChatGPT sign-in: `python -m lossless.codex_provider`. Claude Code and custom CLI integrations use a user-supplied command wrapper. A wrapper reads the Lossless request from stdin, asks the CLI for a proposal using an actual JSON Schema for the active adapter, and writes only the proposal batch to stdout. The request's `response_format` illustrates the expected object; it is not itself a JSON Schema.
 
 - **Codex CLI:** `codex exec` accepts stdin context, supports `--output-schema`, and reuses saved CLI authentication. Its ordinary stdout is the final message; `--json` produces a JSONL event stream that must be parsed before returning a proposal. [Official OpenAI documentation](https://learn.chatgpt.com/docs/non-interactive-mode).
 - **Claude Code:** `claude -p` supports `--output-format json` with `--json-schema`. Extract the `structured_output` field; do not forward the enclosing session metadata as a Lossless proposal. [Official Claude Code documentation](https://code.claude.com/docs/en/headless).
@@ -206,11 +206,16 @@ Once that wrapper exists, replace the callback `llm` object with a command objec
 
 `provider_command.py` is user-supplied; this filename is not a shipped executable. Preserve the configured job budget. Command arguments are an argv list, not a shell pipeline. Commands inherit the basic environment plus named `credential_env` entries; forward any required custom auth/configuration variables explicitly. Run proposal generation with only the inputs and permissions it needs. Lossless retains responsibility for executing and accepting candidates. Local callbacks and commands are trusted code, and withholding evaluation data from the prompt is not filesystem isolation.
 
+Current source supplies `LOSSLESS_PROVIDER_TIMEOUT_SECONDS` to command transports
+with the effective response allowance after applying the configured timeout and
+remaining job budget. The bundled Codex connector honors it automatically;
+custom commands may use it too. The parent still enforces that deadline.
+
 ### What has been tested
 
 The CPU workflow regression sends a deterministic provider the real discovery context and receives the reference C implementation as a control candidate. It then exercises compilation, contract checks, timing, separate evaluation, and export/load. The installed MLX check sends a deterministic command the request and receives a 64 MiB allocator proposal; the retained 256 MiB recipe is selected. Malformed responses, timeout behavior, credential echoes, and evaluation-prompt separation have regression coverage.
 
-No live Claude/Codex run was part of those checks. The measured MLX retention gain comes from the retained recipe, and does not establish live-model proposal quality or search ROI. [Campaign 043](qualification-041-043.md#043-independent-model-authoring) separately exercises real Codex CLI authoring through the native experiment harness. It does not validate the packaged callback/command examples against a hosted service. [Recorded validation](retention.md).
+Those automated checks use local fixtures. A separate live native-copy smoke now validates the source Codex connector through the public command boundary, separate evaluation and artifact export/load. Its eligible proposal did not beat NumPy and the reference was retained. [Tested CLI, receipt and setup](codex.md). No live Claude or MLX-provider quality claim follows. The measured MLX retention gain comes from the retained recipe. Earlier [campaign 043](qualification-041-043.md#043-independent-model-authoring) measured Codex authoring through a separate research harness. [Recorded validation](retention.md).
 
 ## Reports and deployment
 
