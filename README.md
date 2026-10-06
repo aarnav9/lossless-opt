@@ -33,6 +33,18 @@ The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report
 
 ## Profile before searching
 
+**Bring an existing application (current source):** `lossless init --project PATH --output .lossless/app`
+detects the selected environment and generates setup with entry-point suggestions.
+Supply representative cases and an invocation, inspect the readable preflight,
+then use `lossless replay` to check reference repeatability in fresh workspaces.
+This is the first stage of the [application workflow plan](lossless-product/docs/implementation.md#current-priority-bring-an-existing-application-5-october-2026);
+callable profiling and optional Codex assessment are also available with
+`lossless profile JOB --explain`. An opt-in
+[`search-application` experiment](lossless-product/docs/application-search.md) can
+now author scoped source changes and test complete callable speedups; guarded
+application deployment remains under development.
+[Intake guide](lossless-product/docs/applications.md) · [Profiling and model assessment](lossless-product/docs/application-profiling.md) · [Scoped ModPoly source experiment: 1.058× on repeated calls](lossless-product/docs/application-search-study.md).
+
 ```sh
 lossless init --template softmax --output ./softmax-demo
 lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-runs/profile
@@ -41,6 +53,35 @@ lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-r
 The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a1.md).
 
 Unreleased source adds frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. The published `v0.1.0a1` assets are unchanged.
+
+## CPU application experiment
+
+**Faster spectrum processing with exact tested outputs, on an Apple M2 CPU.**
+Live GPT-6 Astra source search optimized polynomial setup and temporary-buffer
+reuse in a spectrum-processing application built around pybaselines 1.2.1.
+One frozen candidate was tested on eleven new workload profiles, with one
+OpenBLAS thread on both sides:
+
+| Comparison | Request speedup | Less request time |
+| --- | ---: | ---: |
+| Stock public calls | **1.757×** | **43.1%** |
+| Stock reusable `Baseline` objects | **1.282×** | **22.0%** |
+| Reusable objects + previous optimization | **1.152×** | **13.2%** |
+
+Returned arrays, weights, coefficients and complete convergence histories matched
+bit-for-bit; inputs and retained earlier outputs also matched. Both reusable-object
+comparisons passed every speed, setup and memory gate. Against the strongest
+baseline, traced allocation was equal or lower on every profile.
+
+**This remains experimental.** The overall study retained the reference because
+two profiles exceeded the separate allocation limits against public calls, largely
+reflecting the existing reuse lifecycle. These are complete in-memory request
+timings on a synthetic application around a real library; import/setup is measured
+separately. They do not establish exactness or speedups for arbitrary code. Search
+used two sessions with intervening feedback, so this is not a controlled timer
+comparison. [Results, costs and model-free reproduction](lossless-product/docs/application-continuation-study.md)
+· [Raw evidence](lossless-product/docs/evidence/application-continuation-pybaselines.json.gz)
+· [Frozen source proposal](lossless-product/experiments/application_intake/continuation-candidate.json).
 
 ## Search time is a performance tuning input
 

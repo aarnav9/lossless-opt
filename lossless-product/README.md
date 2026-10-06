@@ -49,6 +49,19 @@ The native harness measures calls with preallocated buffers, including ctypes di
 
 ## Configure a job and your LLM
 
+For an existing local application, current source also supports
+`lossless init --project PATH --output .lossless/app`, readable `lossless inspect`,
+and explicit `lossless replay` with a function/model factory or command and
+representative inputs. This generates configuration and checks reference
+repeatability without model calls. `lossless profile JOB --explain` adds callable
+profiling and an optional evidence-linked Codex assessment. The experimental
+[`search-application` loop](docs/application-search.md) authors scoped source
+changes, checks exact observations and measures complete callable speedups.
+Guarded application deployment remains under development.
+[ModPoly experiment: 1.058× on scoped repeated calls](docs/application-search-study.md).
+[Profiling guide](docs/application-profiling.md) · [Intake guide](docs/applications.md) · [Example](examples/application/README.md)
+· [Eight-part product plan](docs/implementation.md#current-priority-bring-an-existing-application-5-october-2026).
+
 ```sh
 lossless init --template softmax --output ./my-job
 lossless inspect ./my-job/lossless.json
@@ -103,6 +116,25 @@ The [opt-in Fortran softmax recipe](examples/softmax-fortran/README.md) needs no
 ![Installed exact MLX recipe: 1.945× throughput versus stock serial MLX on one recorded Apple M2 batch, with matching tested tokens, log-probability bits and active KV state.](docs/assets/mlx-retention.png)
 
 This is a warm batch measurement of the retained recipe on a pinned model/runtime/device. It does not measure live-LLM search gains. [Source data and reproduction scope](docs/retention.md#readme-performance-figure).
+
+## Recorded CPU application experiment
+
+Live Astra source search on a pybaselines spectrum-processing application produced
+**1.282× request speed over stock reusable objects** and **1.152× over reusable
+objects plus the previous optimization** on eleven new Apple M2 CPU profiles.
+Speedup over stock public calls was 1.757×. All comparisons used one OpenBLAS thread;
+returned arrays, weights, coefficients and complete convergence histories matched
+bit-for-bit, including input and retained-output checks.
+
+Both reusable-object comparisons passed every speed, setup and memory gate. The
+strongest-baseline comparison used equal or less traced allocation in every case.
+The overall study still retained the reference: two public-call allocation limits
+failed, largely reflecting the existing reuse lifecycle. This is experimental
+evidence for complete in-memory requests in a synthetic application around a real
+library; import/setup is measured separately. Guarded application deployment and
+exactness on arbitrary inputs remain outside this result.
+[Full results, search cost and model-free reproduction](docs/application-continuation-study.md)
+· [Raw evidence](docs/evidence/application-continuation-pybaselines.json.gz).
 
 ## Formal reasoning and dependencies
 
