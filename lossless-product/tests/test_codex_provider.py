@@ -116,6 +116,24 @@ class CodexProviderTests(unittest.TestCase):
         self.assertIn("project_doc_max_bytes=0", argv)
         self.assertEqual(argv[argv.index("--model") + 1], "gpt-6.1-sol")
 
+    def test_usage_limit_is_reported_without_a_valid_proposal(self):
+        events = [
+            {"type": "error", "message": "usage limit"},
+            {"type": "turn.failed", "error": {"message": "usage limit"}},
+        ]
+        with (
+            tempfile.TemporaryDirectory() as temp,
+            patch.object(codex, "command", side_effect=self.fake_command({}, events)),
+        ):
+            receipt = codex.invoke(
+                {}, Path(temp) / "limited", model="test", effort="medium", timeout=3
+            )
+        self.assertFalse(receipt["eligible"])
+        self.assertEqual(receipt["provider_messages"], ["usage limit"])
+        self.assertEqual(
+            codex.provider_messages([{"type": "error", "error": "offline"}]), ["offline"]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

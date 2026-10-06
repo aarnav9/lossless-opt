@@ -15,12 +15,25 @@ def load(path):
     return load_artifact(path)
 
 
-def profile(workload, *, artifact=None, repeats=7, budget=None, output=None):
+def profile(workload, *, artifact=None, repeats=None, budget=None, output=None, analysis=None):
     from .profiling import profile as run
 
-    return run(workload, artifact=artifact, repeats=repeats, budget=budget, output=output)
+    return run(
+        workload,
+        artifact=artifact,
+        repeats=repeats,
+        budget=budget,
+        output=output,
+        analysis=analysis,
+    )
+
+
+def replay(config, *, output, repeats=None, budget=None, split="discovery"):
+    from .applications import replay as run
+
+    return run(config, output=output, repeats=repeats, budget=budget, split=split)
 
 
 from .jobs import Budget, Workload
 
-__all__ = ["Budget", "Workload", "optimize", "load", "profile", "__version__"]
+__all__ = ["Budget", "Workload", "optimize", "load", "profile", "replay", "__version__"]

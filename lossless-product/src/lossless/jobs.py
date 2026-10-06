@@ -104,6 +104,10 @@ class Workload:
 
     def resolve(self, budget=None):
         value = copy.deepcopy(self.config)
+        if isinstance(value, dict) and value.get("kind") == "application":
+            raise ValueError(
+                "application jobs support 'lossless inspect', 'lossless replay' and 'lossless profile'; use 'lossless search-application' with an explicit source plan for experiments; guarded application export is not implemented yet"
+            )
         fields(
             value,
             {

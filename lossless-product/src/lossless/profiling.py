@@ -165,7 +165,21 @@ def save_report(directory, summary):
     )
 
 
-def profile(workload, *, artifact=None, repeats=7, budget=None, output=None):
+def profile(workload, *, artifact=None, repeats=None, budget=None, output=None, analysis=None):
+    config = workload.config if isinstance(workload, Workload) else read_json(workload)
+    if isinstance(config, dict) and config.get("kind") == "application":
+        if artifact is not None:
+            raise ValueError("application profiling does not compare deployment artifacts yet")
+        if isinstance(workload, Workload):
+            raise ValueError("pass the application configuration filename to profile")
+        from .applications.profiling import profile as profile_application
+
+        return profile_application(
+            workload, repeats=repeats, budget=budget, output=output, analysis=analysis
+        )
+    if analysis not in (None, False):
+        raise ValueError("model assessment is available for application profiles only")
+    repeats = 7 if repeats is None else repeats
     if sys.platform not in {"darwin", "linux"}:
         raise ValueError("profiling currently requires macOS or Linux")
     if type(repeats) is not int or not 3 <= repeats <= 50:

@@ -15,7 +15,6 @@ import signal
 import subprocess
 import sys
 import tempfile
-import time
 
 from .jobs import read_json
 
@@ -40,9 +39,13 @@ def environment():
     }
 
 
-def require_chatgpt():
+def require_chatgpt(timeout=10):
     status = subprocess.run(
-        ["codex", "login", "status"], capture_output=True, text=True, timeout=10, env=environment()
+        ["codex", "login", "status"],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=environment(),
     )
     if status.returncode or "Logged in using ChatGPT" not in status.stdout + status.stderr:
         raise ValueError(
@@ -159,14 +162,47 @@ def stop_tree(process):
     process.wait()
 
 
-def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
+def provider_messages(events):
+    """Retain bounded CLI failure diagnostics independently of schema errors."""
+    messages = []
+    for event in events:
+        if event.get("type") not in {"error", "turn.failed"}:
+            continue
+        error = event.get("error")
+        message = event.get("message") or (
+            error.get("message") if isinstance(error, dict) else error
+        )
+        if isinstance(message, str) and message[:2000] not in messages:
+            messages.append(message[:2000])
+        if len(messages) == 3:
+            break
+    return messages
+
+
+def invoke(
+    request,
+    folder,
+    *,
+    model,
+    effort,
+    timeout,
+    maximum=1,
+    probe=False,
+    schema_override=None,
+    validator=None,
+):
     """One response, no retries. Return a local receipt; never invent dollar cost."""
     from ._native.common import sha, write
+    from .applications.runtime import clock
 
     if not math.isfinite(timeout) or timeout <= 0 or not 1 <= maximum <= 3:
         raise ValueError("positive finite timeout and 1..3 proposals required")
     if effort not in {"low", "medium", "high", "xhigh", "max"}:
         raise ValueError("unsupported reasoning effort")
+    if (schema_override is None) != (validator is None) or (probe and schema_override is not None):
+        raise ValueError(
+            "custom structured responses require both schema and validator, without probe"
+        )
     folder = Path(folder).resolve()
     folder.mkdir(parents=True, exist_ok=False)
     schema = (
@@ -177,11 +213,12 @@ def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
             "properties": {"ok": {"type": "boolean"}},
         }
         if probe
-        else response_schema(maximum, request.get("adapter") == "mlx.fixed_count")
+        else schema_override
+        or response_schema(maximum, request.get("adapter") == "mlx.fixed_count")
     )
     write(folder / "schema.json", schema)
     context = dict(request)
-    if not probe:
+    if not probe and schema_override is None:
         context["max_proposals"] = maximum
         context["transport_instructions"] = (
             "Return only the requested proposal JSON. No tools, browsing, repository access or execution. Use only supplied discovery evidence. Propose changes; never change the evaluator, contract or acceptance thresholds. Return before the response allowance expires."
@@ -193,8 +230,10 @@ def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
         else:
             proposal["source"] = "complete C source exporting the supplied ABI"
         context["response_format"] = {"schema_version": 1, "proposals": [proposal]}
+    elif schema_override is not None:
+        context["transport_timeout_upper_bound_seconds"] = timeout
     write(folder / "prompt.json", context)
-    started = time.monotonic()
+    started = clock()
     timed_out = False
     with tempfile.TemporaryDirectory(prefix="lossless-codex-empty-") as empty:
         argv = command(folder, empty, model, effort)
@@ -224,18 +263,19 @@ def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
             pending = json.dumps(context, allow_nan=False)
             try:
                 while True:
-                    remaining = timeout - (time.monotonic() - started)
+                    remaining = timeout - (clock() - started)
                     if remaining <= 0:
                         timed_out = True
                         stop_tree(process)
                         break
                     try:
                         process.communicate(pending, timeout=min(30, remaining))
+                        timed_out = clock() - started > timeout
                         break
                     except subprocess.TimeoutExpired:
                         pending = None
                         print(
-                            f"[{datetime.now(timezone.utc).isoformat(timespec='seconds')}] Codex model={model} elapsed={time.monotonic() - started:.0f}s allowance={timeout:.0f}s",
+                            f"[{datetime.now(timezone.utc).isoformat(timespec='seconds')}] Codex model={model} elapsed={clock() - started:.0f}s allowance={timeout:.0f}s",
                             file=sys.stderr,
                             flush=True,
                         )
@@ -259,6 +299,8 @@ def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
         if probe:
             if response != {"ok": True}:
                 errors.append("probe response was not ok")
+        elif validator is not None:
+            validator(response)
         else:
             fields = set(schema["properties"]["proposals"]["items"]["properties"])
             if (
@@ -307,15 +349,17 @@ def invoke(request, folder, *, model, effort, timeout, maximum=1, probe=False):
     if eligible:
         write(folder / "response.json", response)
     receipt = {
+        "transport_source_sha256": sha(Path(__file__)),
         "model": model,
         "effort": effort,
-        "elapsed_seconds": time.monotonic() - started,
+        "elapsed_seconds": clock() - started,
         "eligible": eligible,
         "timed_out": timed_out,
         "returncode": process.returncode,
         "turn_completed": bool(completed),
         "tool_items": forbidden,
         "errors": errors,
+        "provider_messages": provider_messages(events),
         "usage": usage,
         "cost_usd": None,
         "response_sha256": sha(folder / "response.json") if eligible else None,

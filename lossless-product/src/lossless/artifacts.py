@@ -12,6 +12,14 @@ from ._native.common import sha, write
 def export(run, destination):
     run, destination = Path(run).resolve(), Path(destination).resolve()
     summary = read_json(run / "report.json")
+    if isinstance(summary, dict) and summary.get("kind") in {
+        "application_replay",
+        "application_profile",
+        "application_search",
+    }:
+        raise ValueError(
+            "reference replay, profiling and source experiments do not produce a guarded deployment artifact"
+        )
     if not isinstance(summary, dict) or "adapter" not in summary:
         raise ValueError("invalid or changed optimization report")
     if summary["adapter"] == "mlx.fixed_count":
