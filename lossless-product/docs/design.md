@@ -6,6 +6,13 @@ This draft defines how Lossless becomes a general optimizer with a clear user wo
 
 The general optimizer direction, bring-your-own LLM support, and retention of the valuable research gains are requirements. The remaining choices below are recommendations for discussion, not implemented capabilities or finalized scope.
 
+**Current implementation priority:** the [eight-part application workflow plan](implementation.md#current-priority-bring-an-existing-application-5-october-2026)
+starts with importing an existing local application, detecting its environment,
+generating configuration and replaying representative inputs. The earlier
+operator templates remain supported examples; they do not define the intended
+limit of the product. See [application intake](applications.md) for executable
+behavior and the boundary between replay and future optimization.
+
 ## Product scope: ML and numerical computation
 
 Lossless is a GPU-focused optimizer for ML and numerical computations. A job can target a whole supported model, a subgraph, an individual operation, or a linear-algebra routine. CPU references and supported CPU optimization recipes remain useful parts of the product. The optimization boundary must be explicit so the report measures the behavior the user actually deploys.

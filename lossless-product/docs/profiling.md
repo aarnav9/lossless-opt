@@ -1,13 +1,19 @@
 # Profile a supported workload
 
-`lossless profile` measures a workload without searching, invoking a provider, installing proof tools, or changing acceptance. It writes `report.html`, `report.json`, a sanitized `profile_job.json` and a timestamped `run.log`. Use the HTML report to compare startup, repeated execution, memory and host hotspots; retain JSON for raw samples.
+`lossless profile` measures a workload without searching, installing proof tools, or changing acceptance. Registered adapter profiling does not invoke a provider. It writes `report.html`, `report.json`, a sanitized `profile_job.json` and a timestamped `run.log`. Use the HTML report to compare startup, repeated execution, memory and host hotspots; retain JSON for raw samples.
+
+**Existing application jobs:** current source also supports callable application
+profiling, with a different report schema and optional `--explain` model assessment.
+See [application profiling](application-profiling.md) for its measurement boundaries,
+configuration and live external-repository results. The remainder of this guide
+describes registered native/MLX adapters.
 
 ```sh
 lossless init --template softmax --output ./softmax-demo
 lossless profile ./softmax-demo/lossless.json --repeats 7 --budget 30s --output ./lossless-runs/softmax-profile
 ```
 
-The native adapters use generated Gaussian float32 inputs for the configured **discovery** shapes and layouts. MLX uses the actual discovery request texts and token counts. Evaluation cases remain closed. This first version profiles registered adapters, not arbitrary Python functions or imported model graphs.
+The native adapters use generated Gaussian float32 inputs for the configured **discovery** shapes and layouts. MLX uses the actual discovery request texts and token counts. Evaluation cases remain closed. These adapter paths are separate from the newer application callable profiler.
 
 To compare an already exported implementation:
 

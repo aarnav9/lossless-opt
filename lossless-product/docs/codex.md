@@ -85,6 +85,12 @@ in this work; MLX live-provider behavior is not established by those checks.
 
 ## What was actually checked
 
+Current source also uses this transport for [application profile assessment](application-profiling.md).
+The response is an evidence-linked experiment plan, not native C proposals.
+[The pybaselines study](application-profile-study.md) completed a real Astra/medium
+assessment through ChatGPT sign-in, with no model tools or code modification.
+The measurements remain deterministic and separate from model hypotheses.
+
 On 4 October 2026, Codex CLI **0.159.0** reported ChatGPT sign-in. Minimal
 schema-constrained probes succeeded for `gpt-6.1-sol`, `gpt-6-astra`, and
 `gpt-6-luna`, all at `xhigh`. Access depends on the account and client; consult the

@@ -6,6 +6,6 @@ recursive-include tests *.py
 recursive-include scripts *.py
 recursive-include experiments *.py *.c *.json *.md LICENSE
 recursive-include examples *.py *.c *.json *.md
-recursive-include docs *.md *.mmd *.dot *.png *.svg *.json
+recursive-include docs *.md *.mmd *.dot *.png *.svg *.json *.gz
 prune examples/*/.lossless
 global-exclude *.pyc

@@ -1,0 +1,46 @@
+[
+  {
+    "schema_version": 1,
+    "hypothesis": "The modpoly loop is the largest measured host self-time contributor in the long case. Reusing private clipping, weighted-data, and alternating baseline buffers may reduce allocation overhead while retaining the same arithmetic operations, convergence checks, and result ownership. This candidate has not been benchmarked or verified for exact equality.",
+    "edits": [
+      {
+        "path": "pybaselines/polynomial.py",
+        "symbol": "_Polynomial.modpoly",
+        "body": "y, weight_array, pseudo_inverse = self._setup_polynomial(\n    data, weights, poly_order, calc_vander=True, calc_pinv=True, copy_weights=True\n)\nsqrt_w = np.sqrt(weight_array)\nif use_original:\n    y0 = y\n\nweighted_y = sqrt_w * y\ncoef = pseudo_inverse @ weighted_y\nvandermonde = self._polynomial.vandermonde\nbaseline = vandermonde @ coef\nif mask_initial_peaks:\n    # Preserve the original initial fit and masking arithmetic.\n    weight_array[baseline + np.std(y - baseline) < y] = 0\n    sqrt_w = np.sqrt(weight_array)\n    pseudo_inverse = np.linalg.pinv(sqrt_w[:, None] * vandermonde)\n\nclipped_y = np.empty_like(y)\nbaseline_buffer = np.empty_like(baseline)\ntol_history = np.empty(max_iter)\nfor i in range(max_iter):\n    baseline_old = baseline\n    np.minimum(y0 if use_original else y, baseline, out=clipped_y)\n    y = clipped_y\n    np.multiply(sqrt_w, y, out=weighted_y)\n    coef = pseudo_inverse @ weighted_y\n    np.matmul(vandermonde, coef, out=baseline_buffer)\n    baseline = baseline_buffer\n    baseline_buffer = baseline_old\n    calc_difference = relative_difference(baseline_old, baseline)\n    tol_history[i] = calc_difference\n    if calc_difference < tol:\n        break\n\nparams = {'weights': weight_array, 'tol_history': tol_history[:i + 1]}\nif return_coef:\n    params['coef'] = _convert_coef(coef, self.x_domain)\n\nreturn baseline, params\n"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "hypothesis": "The buffer-reuse candidate matched discovery outputs but did not establish a performance benefit. This candidate instead targets the repeated relative_difference and norm overhead measured across iterative cases. For the supported real one-dimensional baselines, it inlines NumPy's default norm arithmetic: flatten in memory order, self-dot, square root, then the unchanged denominator clamp and division. Matrix products, clipping, allocations, masking, and stopping semantics remain as in the reference. Exact equality and performance require verification; no speedup is claimed.",
+    "edits": [
+      {
+        "path": "pybaselines/polynomial.py",
+        "symbol": "_Polynomial.modpoly",
+        "body": "y, weight_array, pseudo_inverse = self._setup_polynomial(\n    data, weights, poly_order, calc_vander=True, calc_pinv=True, copy_weights=True\n)\nsqrt_w = np.sqrt(weight_array)\nif use_original:\n    y0 = y\n\ncoef = pseudo_inverse @ (sqrt_w * y)\nbaseline = self._polynomial.vandermonde @ coef\nif mask_initial_peaks:\n    # use baseline + deviation since without deviation, half of y should be above baseline\n    weight_array[baseline + np.std(y - baseline) < y] = 0\n    sqrt_w = np.sqrt(weight_array)\n    pseudo_inverse = np.linalg.pinv(sqrt_w[:, None] * self._polynomial.vandermonde)\n\ntol_history = np.empty(max_iter)\nfor i in range(max_iter):\n    baseline_old = baseline\n    y = np.minimum(y0 if use_original else y, baseline)\n    coef = pseudo_inverse @ (sqrt_w * y)\n    baseline = self._polynomial.vandermonde @ coef\n    difference = (baseline - baseline_old).ravel(order='K')\n    old_flat = baseline_old.ravel(order='K')\n    numerator = np.sqrt(difference.dot(difference))\n    denominator = np.maximum(np.sqrt(old_flat.dot(old_flat)), _MIN_FLOAT)\n    calc_difference = numerator / denominator\n    tol_history[i] = calc_difference\n    if calc_difference < tol:\n        break\n\nparams = {'weights': weight_array, 'tol_history': tol_history[:i + 1]}\nif return_coef:\n    params['coef'] = _convert_coef(coef, self.x_domain)\n\nreturn baseline, params\n"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "hypothesis": "The previous inline-norm candidate matched discovery outputs, but noisy timings and the weighted-case regression leave performance unresolved. This candidate further reduces loop overhead by removing redundant flattening of the one-dimensional subtraction and matrix-vector outputs and retaining a local Vandermonde reference. It preserves the same self-dot, square-root, denominator clamp, clipping, matrix products, and stopping arithmetic. Exact equality and performance remain subject to verification.",
+    "edits": [
+      {
+        "path": "pybaselines/polynomial.py",
+        "symbol": "_Polynomial.modpoly",
+        "body": "y, weight_array, pseudo_inverse = self._setup_polynomial(\n    data, weights, poly_order, calc_vander=True, calc_pinv=True, copy_weights=True\n)\nsqrt_w = np.sqrt(weight_array)\nif use_original:\n    y0 = y\n\nvandermonde = self._polynomial.vandermonde\ncoef = pseudo_inverse @ (sqrt_w * y)\nbaseline = vandermonde @ coef\nif mask_initial_peaks:\n    # Preserve the original initial fit and masking arithmetic.\n    weight_array[baseline + np.std(y - baseline) < y] = 0\n    sqrt_w = np.sqrt(weight_array)\n    pseudo_inverse = np.linalg.pinv(sqrt_w[:, None] * vandermonde)\n\nsqrt = np.sqrt\nmaximum = np.maximum\ntol_history = np.empty(max_iter)\nfor i in range(max_iter):\n    baseline_old = baseline\n    y = np.minimum(y0 if use_original else y, baseline)\n    coef = pseudo_inverse @ (sqrt_w * y)\n    baseline = vandermonde @ coef\n    difference = baseline - baseline_old\n    numerator = sqrt(difference.dot(difference))\n    denominator = maximum(sqrt(baseline_old.dot(baseline_old)), _MIN_FLOAT)\n    calc_difference = numerator / denominator\n    tol_history[i] = calc_difference\n    if calc_difference < tol:\n        break\n\nparams = {'weights': weight_array, 'tol_history': tol_history[:i + 1]}\nif return_coef:\n    params['coef'] = _convert_coef(coef, self.x_domain)\n\nreturn baseline, params\n"
+      }
+    ]
+  },
+  {
+    "schema_version": 1,
+    "hypothesis": "Combine the discovery-matched inline norm arithmetic with reuse of the weighted-data and clipping buffers. Keep baseline matrix products allocating normally to avoid an extra baseline buffer for short runs. Clipping first allocates a private array, then reuses it without modifying the original input. This targets repeated allocations and norm dispatch in the measured iterative hotspots. Previous timings remain noisy; exact correctness and performance of this combination are unverified.",
+    "edits": [
+      {
+        "path": "pybaselines/polynomial.py",
+        "symbol": "_Polynomial.modpoly",
+        "body": "y, weight_array, pseudo_inverse = self._setup_polynomial(\n    data, weights, poly_order, calc_vander=True, calc_pinv=True, copy_weights=True\n)\nsqrt_w = np.sqrt(weight_array)\nif use_original:\n    y0 = y\n\nvandermonde = self._polynomial.vandermonde\nweighted_y = sqrt_w * y\ncoef = pseudo_inverse @ weighted_y\nbaseline = vandermonde @ coef\nif mask_initial_peaks:\n    weight_array[baseline + np.std(y - baseline) < y] = 0\n    sqrt_w = np.sqrt(weight_array)\n    pseudo_inverse = np.linalg.pinv(sqrt_w[:, None] * vandermonde)\n\nsqrt = np.sqrt\nmaximum = np.maximum\nclipped_y = None\ntol_history = np.empty(max_iter)\nfor i in range(max_iter):\n    baseline_old = baseline\n    clipped_y = np.minimum(y0 if use_original else y, baseline, out=clipped_y)\n    y = clipped_y\n    np.multiply(sqrt_w, y, out=weighted_y)\n    coef = pseudo_inverse @ weighted_y\n    baseline = vandermonde @ coef\n    difference = baseline - baseline_old\n    numerator = sqrt(difference.dot(difference))\n    denominator = maximum(sqrt(baseline_old.dot(baseline_old)), _MIN_FLOAT)\n    calc_difference = numerator / denominator\n    tol_history[i] = calc_difference\n    if calc_difference < tol:\n        break\n\nparams = {'weights': weight_array, 'tol_history': tol_history[:i + 1]}\nif return_coef:\n    params['coef'] = _convert_coef(coef, self.x_domain)\n\nreturn baseline, params\n"
+      }
+    ]
+  }
+]

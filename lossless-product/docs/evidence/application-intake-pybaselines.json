@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "study": "application-intake-pybaselines",
+  "created_at": "2026-10-05T13:24:38.606285+00:00",
+  "upstream": {
+    "url": "https://github.com/derb12/pybaselines",
+    "revision": "6f8d927e08577a9c5af5f34129b14d57c12725f6",
+    "tag": "v1.2.1",
+    "license": "BSD-3-Clause",
+    "license_sha256": "ba5bad5416e3062204a5f467f7335833b328fd52d94f58a28d40159f4a6209c0",
+    "bundled_notices_sha256": "48271ec6165d664683b552a00f8529939b8421293a56d3b262de5c398810248e"
+  },
+  "study_source_sha256": "4be0563854db9ede7e42f3fcc5546e93ea0aa76707bba7b91e1dcc8b383b606a",
+  "environment": {
+    "python": "3.11.3 (v3.11.3:f3909b8bc8, Apr  4 2023, 20:12:10) [Clang 13.0.0 (clang-1300.0.29.30)]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64"
+  },
+  "relevant_packages": {
+    "numpy": "1.26.4",
+    "scipy": "1.16.0",
+    "numba": "0.61.2",
+    "llvmlite": "0.44.0",
+    "pentapy": null
+  },
+  "intake_record_sha256": "10470bd4583eb8002a64675228fcf7f0edc710f26934bee084cdae66fd808f4d",
+  "source_files": 150,
+  "source_bytes": 2318757,
+  "discovered_functions": 515,
+  "first_suggestions": [
+    "pybaselines/_banded_utils.py:difference_matrix",
+    "pybaselines/_banded_utils.py:diff_penalty_diagonals",
+    "pybaselines/_banded_utils.py:diff_penalty_matrix",
+    "pybaselines/_compat.py:dia_object",
+    "pybaselines/_compat.py:csr_object",
+    "pybaselines/_compat.py:identity",
+    "pybaselines/_compat.py:diags",
+    "pybaselines/classification.py:golotvin",
+    "pybaselines/classification.py:dietrich",
+    "pybaselines/classification.py:std_distribution",
+    "pybaselines/classification.py:fastchrom",
+    "pybaselines/classification.py:cwt_br"
+  ],
+  "discovery_truncated": false,
+  "scope": "Unmodified upstream algorithms with our own synthetic spectra. Exact reference repeatability only; no optimization, algorithm-accuracy assessment, clinical data, or speedup benchmark. Evaluation cases are explicitly opened after discovery; they are public and not secret holdouts.",
+  "algorithms": {
+    "asls": {
+      "entry": "pybaselines.whittaker:asls",
+      "suggested_by_discovery": true,
+      "cases_sha256": "74dca69c9748aaa9ba299ef978ae36697db1de7f04bd523753abbf631a6325f0",
+      "discovery": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 8.412092791404575,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "be370cba34d026c32377359d16414f5632969b947897bfb1ad28f42dad59b9a6",
+        "manifest_sha256": "ec3dc8607f11756f660cb595745a861f1bb59d5dedf9414edd0d8ea11f8ed101",
+        "cases": [
+          {
+            "id": "short",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "b549c9197b988a2d2966d6a9efebdaff63ba64ac82403be7c8c66f2337c662d7"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "b549c9197b988a2d2966d6a9efebdaff63ba64ac82403be7c8c66f2337c662d7"
+              }
+            ]
+          },
+          {
+            "id": "medium",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "737750e245e33542c45f9d4adcef613abdde596abb3442393f29205dabdc57fd"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "737750e245e33542c45f9d4adcef613abdde596abb3442393f29205dabdc57fd"
+              }
+            ]
+          },
+          {
+            "id": "long",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "2e314af42763289fbe61256726f2925a0243ff7e626e9c60546da85e9d477721"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "2e314af42763289fbe61256726f2925a0243ff7e626e9c60546da85e9d477721"
+              }
+            ]
+          },
+          {
+            "id": "flat",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "b951b31ddcb206de6b89a75db092166b6caa65155d2d786a652ee35674f3cd2b"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "b951b31ddcb206de6b89a75db092166b6caa65155d2d786a652ee35674f3cd2b"
+              }
+            ]
+          }
+        ]
+      },
+      "evaluation": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 4.225545166991651,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "249a61044c8a2a9c72038d85acfda2f1490e740f668ce3dabfe26924b658cebb",
+        "manifest_sha256": "a4b980bbedb5f9bb5959d32d30604d008764e48c596566f420799b612f279af3",
+        "cases": [
+          {
+            "id": "odd_length",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "7185318f94f1b78d729e83f2e7bfd02dbc88c7d85b10c4714a53c1e990eb26c7"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "7185318f94f1b78d729e83f2e7bfd02dbc88c7d85b10c4714a53c1e990eb26c7"
+              }
+            ]
+          },
+          {
+            "id": "new_noise",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "e943acf48176454d3e78d180987124ee0ad607fe5a1f03284af35202f34113d1"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "e943acf48176454d3e78d180987124ee0ad607fe5a1f03284af35202f34113d1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "modpoly": {
+      "entry": "pybaselines.polynomial:modpoly",
+      "suggested_by_discovery": true,
+      "cases_sha256": "7e8d4497bdb909eb9c5ef436030eecdaf5f88dbc90151cc4f77ad7e84eb08131",
+      "discovery": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 8.08883695770055,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "84048508ffcbe4838df5d37a28b4c6d46bd795e3d1ff748ee83fc45749780dc8",
+        "manifest_sha256": "594010fc2a0906b18322eeea87b9d72d16d8d69a9c39efbd8e1533981bc456c9",
+        "cases": [
+          {
+            "id": "short",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "f0322b091d60a7149de09070f448ed10f81759cfea95a2c7ae1c63aca78db4ad"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "f0322b091d60a7149de09070f448ed10f81759cfea95a2c7ae1c63aca78db4ad"
+              }
+            ]
+          },
+          {
+            "id": "medium",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "3786dae5da4bc06ade34b23e9d412f0198af37cbb7a92a01e0cc50f1b90c916b"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "3786dae5da4bc06ade34b23e9d412f0198af37cbb7a92a01e0cc50f1b90c916b"
+              }
+            ]
+          },
+          {
+            "id": "long",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "23cd08a54acdb776c8469b1bf40ebd4d0c1d3cfe855251c65c992d9a8a05adce"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "23cd08a54acdb776c8469b1bf40ebd4d0c1d3cfe855251c65c992d9a8a05adce"
+              }
+            ]
+          },
+          {
+            "id": "flat",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "2d48f760a5e4a5e82bce4fe4b3575db8df5edddc222a9e90b9da87f703f4891a"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "2d48f760a5e4a5e82bce4fe4b3575db8df5edddc222a9e90b9da87f703f4891a"
+              }
+            ]
+          }
+        ]
+      },
+      "evaluation": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 4.351685875095427,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "40812399823af75f97646e8c7d4ee9f641e01e835e8ee8955f01e12699bb7b44",
+        "manifest_sha256": "43600823a74db21bc566db85ceccc99f72ce2d8bfaa9683ccbc846e5614a9d02",
+        "cases": [
+          {
+            "id": "odd_length",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "2ed6bf83755e56fd29cb9eaf289fb63796a448e34b98d74f37dd095e1e4f7fdb"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "2ed6bf83755e56fd29cb9eaf289fb63796a448e34b98d74f37dd095e1e4f7fdb"
+              }
+            ]
+          },
+          {
+            "id": "new_noise",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "96272242c6f439a14a3cac1226c20cd953894f8a4b5247a3e699ca79fd5c4c3a"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "96272242c6f439a14a3cac1226c20cd953894f8a4b5247a3e699ca79fd5c4c3a"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "snip": {
+      "entry": "pybaselines.smooth:snip",
+      "suggested_by_discovery": true,
+      "cases_sha256": "77fdd6e1dc2e12d431d8b15bac25aaf76c8929803181101c507dfb3396b46c43",
+      "discovery": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 7.593276666942984,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "bd35816861797c5113d34dd7466f4833e55b76ce5ea3567df2090b282aa06b48",
+        "manifest_sha256": "ee8a9231cee6d1d36d4699402bc47a8f30a9c1791913c6ee7969c3307dd2c316",
+        "cases": [
+          {
+            "id": "short",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "e520f940f4ff50d7b6d6919e92da0e89cc413332571832619d3cdd34f0fad36d"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "e520f940f4ff50d7b6d6919e92da0e89cc413332571832619d3cdd34f0fad36d"
+              }
+            ]
+          },
+          {
+            "id": "medium",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "7b40bffd6c474161a5352b33f4c92aed065aff8a2bba1a1431f35f948587380d"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "7b40bffd6c474161a5352b33f4c92aed065aff8a2bba1a1431f35f948587380d"
+              }
+            ]
+          },
+          {
+            "id": "long",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "c0c6063693a4778be7e6c932f7faad274ecab4f28a8434561ae52c61a2e775fa"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "c0c6063693a4778be7e6c932f7faad274ecab4f28a8434561ae52c61a2e775fa"
+              }
+            ]
+          },
+          {
+            "id": "flat",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "1a7bf13752206864fede2e95af5e740d53ef11442682a41905bdc55e78106f92"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "1a7bf13752206864fede2e95af5e740d53ef11442682a41905bdc55e78106f92"
+              }
+            ]
+          }
+        ]
+      },
+      "evaluation": {
+        "status": "replayed",
+        "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+        "source_unchanged": true,
+        "elapsed_seconds_diagnostic": 4.074707999825478,
+        "llm_calls": 0,
+        "optimization_performed": false,
+        "report_sha256": "00daa6fc8bc9a9acc9dfcce7bf148049781caa34f37890c921c1a8edf89786fd",
+        "manifest_sha256": "7047ba59664e6557bc11307555e7de67324dd8843dd811137777e1b241f2704e",
+        "cases": [
+          {
+            "id": "odd_length",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "f1b7c23fe6059dbd89af5a0f6b7a4ae3cb6bd1f959c0d3718f328ba8a0c0eadf"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "f1b7c23fe6059dbd89af5a0f6b7a4ae3cb6bd1f959c0d3718f328ba8a0c0eadf"
+              }
+            ]
+          },
+          {
+            "id": "new_noise",
+            "repeatable": true,
+            "attempts": [
+              {
+                "status": "completed",
+                "fingerprint": "3926a22c774f0608e175542fd3c02df932171b8227077050ff47c36b8538df64"
+              },
+              {
+                "status": "completed",
+                "fingerprint": "3926a22c774f0608e175542fd3c02df932171b8227077050ff47c36b8538df64"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "invalid_parameter_control": {
+    "status": "failed",
+    "source_identity": "b83d65c4c3dfc1322a339cd62244906bf00f90905c7d53861a28585143d0abdc",
+    "source_unchanged": true,
+    "elapsed_seconds_diagnostic": 1.3416899996809661,
+    "llm_calls": 0,
+    "optimization_performed": false,
+    "report_sha256": "433d15d72db05fe572a8d8933eaa2a2565551469fb347fedab18638f8c7133db",
+    "manifest_sha256": "2263acf754b49499110e959d4c0c40f54ec4b048f7c8584ad5418f2b96847e0e",
+    "cases": [
+      {
+        "id": "short",
+        "repeatable": false,
+        "attempts": [
+          {
+            "status": "failed",
+            "error": "ValueError",
+            "message": "p must be between 0 and 1"
+          }
+        ]
+      }
+    ]
+  },
+  "source_unchanged": true,
+  "status": "passed",
+  "replayed_cases": 18,
+  "successful_reference_processes": 36,
+  "elapsed_seconds_diagnostic": 44.120952792000026,
+  "runner_sha256": {
+    "worker.py": "8bbe1cca4290dc40a5a56a11428dec93319d98483a7768ef48773206bc8d920b",
+    "config.py": "a6d7e1070446dfce5db199153624f3d71bc57f65f769da59a2e83d3985d0e925",
+    "discovery.py": "6ebde9c7bc6022ac0982b10640ed95067bc7850a8a6ae85732d8aea06e7e5461",
+    "__init__.py": "a3bccbc400201e45071444ea606602bcf0b2e15199d0cb22a3bb6702b71c307a",
+    "runtime.py": "0705718a5e6699e7701dda5e09d4bc3ef1f659e2a6803697c45cd37310863462",
+    "replay.py": "a9aff4b26e246fa29b70a3ac31b978a7c90d80d8157d1288da3f3f431ba39189"
+  },
+  "confirmation_of_initial_run": {
+    "initial_summary_sha256": "3b9c55bdcbcec9fc26bf812d46da90805563bcdd2fa639015353ea8a2915cf2d",
+    "initial_status": "passed",
+    "initial_elapsed_seconds_diagnostic": 41.30135041708127,
+    "matching_case_fingerprints": 18,
+    "initial_first_suggestions": [
+      "docs/examples/general/plot_masked_data.py:masked_arpls",
+      "docs/examples/misc/plot_beads_preprocessing.py:make_data",
+      "docs/examples/spline/plot_lam_vs_num_knots.py:optimize_lam",
+      "docs/examples/spline/plot_pspline_whittaker.py:optimize_lam",
+      "docs/examples/two_d/plot_along_axes_1d_baseline.py:plot_contour_with_projection",
+      "docs/examples/two_d/plot_along_axes_1d_baseline.py:plot_1d",
+      "docs/examples/two_d/plot_whittaker_2d_dof.py:mean_squared_error",
+      "docs/examples/two_d/plot_whittaker_2d_dof.py:plot_contour_with_projection",
+      "docs/examples/whittaker/plot_lam_vs_data_size.py:optimize_lam",
+      "docs/examples/whittaker/plot_lam_vs_data_size.py:iasls",
+      "docs/examples/whittaker/plot_whittaker_solvers.py:sparse_asls",
+      "docs/modify_module_docstring.py:condense_module_docstring"
+    ],
+    "scope": "Fresh repeats before and after deterministic entry-point ordering change; no implementation changes to upstream."
+  }
+}

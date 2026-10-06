@@ -6,6 +6,89 @@ Build the product as an independently installable project inside `lossless-produ
 
 This is a proposed implementation sequence. The source alpha implements the core workflow and selected adapters; use the retention inventory for what has been extracted and tested.
 
+## Current priority: bring an existing application (5 October 2026)
+
+The product goal is: **bring an existing workload; Lossless identifies expensive
+work, optimizes its implementation, and measures the improvement in the actual
+application.** Users should not need a new handwritten experiment harness or a
+named operator template for every computation. The following eight workstreams
+are the current plan; the historical extraction plan below records the foundation.
+
+| Step | Deliverable | Completion evidence |
+| --- | --- | --- |
+| **1. Application intake and replay — initial scope implemented** | Local project/entry-point or command intake, deterministic discovery, detected environment, generated JSON configuration, representative cases, isolated fresh-workspace replay and source/input provenance | Previously unseen application runs without importing research code; missing setup is explained; repeats, failures, changed inputs and timeouts are recorded; original checkout is preserved |
+| **2. Application profiling — active** | Source-linked CPU/GPU execution, allocation/copy/synchronization, startup and workload-frequency attribution | Correct synchronized measurements identify expensive regions; clean measurements quantify profiler overhead |
+| 3. Execution backends | Shared workload lifecycle plus Python/NumPy, MLX/Metal, PyTorch/device and native execution interfaces | New computations use a backend without adding per-operation controller branches; capture constraints are explicit |
+| 4. General implementation authoring | Retained/compiler/enumerated/model candidates; source patches and graph/kernel changes; budgeted propose/test/revise loop | Candidates can change scheduling, buffers, layout and kernels while evaluator/reference/contract remain protected; compatible results are reused |
+| 5. Application correctness | Frozen observers for outputs, mutation, aliasing, RNG, state, exceptions and ordering; independent cases and scoped proofs | Failures cannot be accepted; stateful continuation and composed numerical errors are checked; validation and proof remain distinct |
+| 6. Integrated acceptance | Complete-application comparison against original and a frozen deployment comparator; fresh-process confirmation, startup/memory/latency and payback | Exported-path overhead is counted; an isolated kernel win cannot substitute for an application win; final cases are not reused for tuning |
+| 7. Deployment | Loadable replacement or reviewable source patch/build, identities, bounded caches, input guards and safe reference path | Installed deliverable reproduces the measured result; invalidation, disabling and state-safe fallback work |
+| 8. External qualification | Unseen repositories, complete numerical/vision/inference/mixed applications and each advertised device family | Publish distributions of wins, no-wins, failures, setup effort and unsupported cases, with repeated independent runs |
+
+### Step 1 decisions
+
+Use a **local checkout first**. Record Git revision/dirty state when available;
+a remote repository connection can later materialize a checkout into this same
+interface. Do not require a GitHub account or upload source for ordinary setup.
+Future remote intake must pin a revision, make credentials explicit, and keep
+repository access separate from permission to run its code.
+
+Prefer deterministic discovery of files, entry-point candidates, manifests and
+the selected Python environment. Inspection must not import the project, install
+dependencies or execute its build/test commands. A user supplies representative
+inputs and chooses an ambiguous invocation; the tool must not invent those.
+
+The connected LLM can later propose missing setup or driver/configuration changes
+from bounded, relevant context. Such suggestions use the same strict schema and
+replay checks, with visible provenance. They cannot silently execute installation
+commands, invent correctness requirements, alter validation cases or decide that
+setup passed. Account connection and LLM assistance are planned extensions to
+the deterministic intake path, not prerequisites for it.
+
+Reference replay executes trusted local code explicitly, using copied source and
+fresh processes/workspaces, a bounded deadline and captured observations. This is
+process/state isolation, not a security sandbox: absolute paths, network and
+external services can still have side effects. External fixtures and state need
+an explicit reproducible boundary. A successful replay establishes only observed
+repeatability; it is not optimization acceptance or proof of arbitrary behavior.
+
+The user-facing implementation and remaining limits are documented in
+[application intake](applications.md). Unsupported application optimization and
+deployment paths must report unavailable until their workstreams are implemented.
+The first [external repository check](application-intake-study.md) passed on
+unmodified pybaselines functions and exposed a discovery-ordering issue that is
+now covered by a regression test. It establishes scoped intake/replay evidence.
+
+### Step 2 implementation and model boundary
+
+[Application profiling](application-profiling.md) now measures callable discovery
+cases in fresh processes, preserving declared call sequences. Clean call timing,
+host attribution and traced allocation run separately; setup and process memory
+are reported with their boundaries. GPU kernel/copy attribution, command-level
+profiling and production workload-frequency inference remain open.
+
+A configured model connection automatically receives bounded measured evidence
+and relevant frozen-source excerpts after successful profiling. The initial
+transport uses subscription-backed Codex, with Astra/medium defaults and a
+configurable 30-minute response cap clipped to the whole profiling budget.
+The model proposes evidence-linked experiments; it cannot edit source, change
+the evaluator or declare acceptance. Reports remain available when it fails.
+[The external pybaselines study](application-profile-study.md) exercises this
+handoff with a real model response. General implementation authoring and
+application speedup qualification are being developed across steps 4–7.
+
+### Source-search pilot (steps 4–6)
+
+[`search-application`](application-search.md) now runs a bounded Codex
+propose/test/revise loop over explicitly allowed Python function bodies. It
+freezes the original callable comparator, source, contract and case split;
+measures fresh-process AB/BA pairs; retains exact output/input/previous-output
+checks; and opens final cases only after freezing one discovery winner. Startup,
+memory, search cost and payback are reported. It produces a reviewable local patch
+only if all configured gates pass. This is a source experiment, not completion
+of steps 4–7: automatic source-scope selection, general semantic observers,
+stronger comparator discovery, guarded installation and state-safe fallback remain.
+
 ## Preserve the gains before simplifying the architecture
 
 Use this inventory to decide the initial adapter set. All percentages below describe the cited research workload and comparator, not a future product guarantee. The MLX rows have overlapping dependencies and must not be added or multiplied together.
