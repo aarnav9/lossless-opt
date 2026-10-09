@@ -10,6 +10,9 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Numbered campaigns
 
+- **050 — Experiment (exact/lossless, CPU speculative decoding):** Screen smaller-model draft lengths and prompt lookup on FP32 SmolLM2-360M, then freeze one choice per family and compare four new 64-token prompts with seven paired repeats, full probability/KV bits and forced continuation checks.
+- **Result — token-matching gains, exact contract failed:** Prompt lookup reached 3.830× on repetition, 1.986× on summarization and 1.646× across four cases; a 135M draft averaged 1.016× with prose regressions. All tested tokens matched, but every final probe changed probability/KV/continuation bits. CPU-only pilot, separate from M2 results; no product promotion. [Results and reproducible evidence](lossless-product/docs/speculative-050.md).
+
 - **049 — Experiment (numerical, KernelBench-derived MLX pilot):** Validate eight operators, eight fused computations and four small graphs against pinned upstream PyTorch sources; freeze eager/compiled/shapeless MLX references, then run one shared 60-minute author loop and two fresh held-out processes.
 - **Result — two scoped wins, full-suite gate failed:** Three valid implementations from five calls (one capacity failure, one timeout); selected source reached 1.14634×/1.15098× frozen references in fresh held-out processes, with all 20 tasks numerically/memory eligible. Max pooling (2.044×) and convolution/average-pool/sigmoid/sum (1.585×) passed discovery and both final task gates. Search 58:00, total 58:48; numerical M2-sized study, no official CUDA score or product promotion. [Results, graph, costs and evidence](lossless-product/docs/kernelbench-049.md).
 
