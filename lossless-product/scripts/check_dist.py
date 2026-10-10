@@ -41,6 +41,7 @@ def main(directory):
                 raise ValueError(f"unexpected artifact content: {name}")
         for suffix in [
             "lossless/cli.py",
+            "lossless/_native/deployment.py",
             "lossless/codex_provider.py",
             "lossless/applications/worker.py",
             "lossless/applications/replay.py",
@@ -78,6 +79,12 @@ def main(directory):
                 "experiments/application_intake/summarize_continuation.py",
                 "experiments/application_intake/qualify_continuation.py",
                 "experiments/application_intake/continuation-candidate.json",
+                "experiments/application_intake/cpu-control-candidate.json",
+                "experiments/application_intake/current_cpu_study.py",
+                "experiments/application_intake/measure_cpu_outputs.py",
+                "docs/benchmarking.md",
+                "docs/evidence/cpu-output-vs-stock.json.gz",
+                "docs/evidence/current-cpu-no-solver.json.gz",
                 "docs/application-broader-study.md",
                 "docs/application-continuation-study.md",
                 "docs/evidence/application-broader-pybaselines.json.gz",

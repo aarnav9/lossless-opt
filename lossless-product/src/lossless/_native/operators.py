@@ -148,6 +148,22 @@ def executors(operator, case, arrays, baseline, candidate):
         return call
 
     funcs = {"native_baseline": native(baseline), "proposal": native(candidate)}
+    funcs.update(library_functions(operator, arrays, out, inv, px))
+
+    def guards():
+        return all(bool(np.all(s[:16] == GUARD) and np.all(s[-16:] == GUARD)) for s in stores)
+
+    def poison():
+        out.fill(np.nan)
+
+    return funcs, guards, poison
+
+
+def library_functions(operator, arrays, out, inv=None, px=None):
+    """Same arithmetic for guarded validation and ordinary library deployment."""
+    x, r, w = arrays
+    rows, cols = x.shape
+    funcs = {}
     if operator == "copy":
         funcs["numpy_copy"] = lambda: np.copyto(out, x) or out
     elif operator == "softmax":
@@ -187,13 +203,18 @@ def executors(operator, case, arrays, baseline, candidate):
 
         funcs["numpy_buffered"] = numpy_call
 
-    def guards():
-        return all(bool(np.all(s[:16] == GUARD) and np.all(s[-16:] == GUARD)) for s in stores)
+    return funcs
 
-    def poison():
-        out.fill(np.nan)
 
-    return funcs, guards, poison
+def bind_comparator(operator, arrays, library, comparator):
+    """Allocate deployment buffers without benchmark red zones or poisoning."""
+    if comparator == "native_baseline":
+        return bind_native(arrays, library)
+    x = arrays[0]
+    out = np.empty(x.shape, dtype=np.float32)
+    inv = np.empty(x.shape[0], dtype=np.float32) if operator == "rmsnorm_residual" else None
+    px = np.empty(x.shape, dtype=np.float32) if operator == "rmsnorm_residual" else None
+    return library_functions(operator, arrays, out, inv, px)[comparator]
 
 
 def bind_native(arrays, library):

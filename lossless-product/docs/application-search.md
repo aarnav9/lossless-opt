@@ -86,9 +86,17 @@ Before search, Lossless freezes the source, cases, runner hashes, contract,
 - Exact output and input fingerprints on every measured invocation, including
   previous outputs re-observed after later calls. A changed reference fails.
 - At least 1.02× equal-case geometric-mean speedup; no case worse than 1/1.03×.
+- No declared call position worse than 1/1.03× (`max_call_regression: 0.03`),
+  so an aggregate win cannot hide a slow request inside a sequence.
 - Final fixed-sample, one-sided sign-test p ≤ 0.05 for round speedup above 1.02×.
 - Median import/factory setup increase ≤ 100 ms per case; separate memory passes
   require RSS and traced allocation peaks ≤ 1.2× reference.
+
+`timing_scope` defaults to `calls`. Set it to `setup_and_calls` for a lifecycle
+that pays application import/factory setup on every sequence. Both use complete
+calls, per-position regression limits and the same correctness gates. Setup-plus-
+sequence times are combined per process before analysis, and payback uses the
+chosen boundary. [Measurement policy and public benchmark choices](benchmarking.md).
 
 All gates are configurable in the plan, frozen before execution. Each pair runs
 the original and candidate in **separate fresh processes**; AB/BA order is balanced

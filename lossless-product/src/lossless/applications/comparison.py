@@ -102,6 +102,8 @@ def run_case(root, snapshot, value, case, folder, deadline, progress, mode="timi
         "call_fingerprints": [identity(row) for row in observation["calls"]],
         "retained_fingerprint": identity(observation["retained_outputs"]),
         "sequence_seconds": result["sequence_seconds"],
+        "setup_and_sequence_seconds": result["setup_seconds"] + result["sequence_seconds"],
+        "call_seconds": times[2:],
         "setup_seconds": result["setup_seconds"],
         "first_call_seconds": times[2],
         "process_seconds": receipt["elapsed_seconds"],
@@ -115,16 +117,17 @@ def run_case(root, snapshot, value, case, folder, deadline, progress, mode="timi
     }
 
 
-def statistics_for(rows, minimum_speedup):
+def statistics_for(rows, minimum_speedup, timing_scope="calls"):
+    if timing_scope not in {"calls", "setup_and_calls"}:
+        raise ValueError("application timing_scope must be calls or setup_and_calls")
+    metric = "sequence_seconds" if timing_scope == "calls" else "setup_and_sequence_seconds"
     cases, rounds = [], []
     count = len(rows[0]["pairs"])
     for row in rows:
         pairs = row["pairs"]
         if len(pairs) != count:
             raise ValueError("incomplete timing pairs")
-        ratios = [
-            p["reference"]["sequence_seconds"] / p["candidate"]["sequence_seconds"] for p in pairs
-        ]
+        ratios = [p["reference"][metric] / p["candidate"][metric] for p in pairs]
         medians = {
             variant: {
                 key: statistics.median(p[variant][key] for p in pairs)
@@ -138,12 +141,55 @@ def statistics_for(rows, minimum_speedup):
             }
             for variant in ("reference", "candidate")
         }
+        for variant in medians:
+            medians[variant]["setup_and_sequence_seconds"] = statistics.median(
+                p[variant].get(
+                    "setup_and_sequence_seconds",
+                    p[variant]["setup_seconds"] + p[variant]["sequence_seconds"],
+                )
+                for p in pairs
+            )
+        call_stats = None
+        if all("call_seconds" in p[v] for p in pairs for v in ("reference", "candidate")):
+            calls = len(pairs[0]["reference"]["call_seconds"])
+            if not calls or any(
+                len(p[v]["call_seconds"]) != calls
+                for p in pairs
+                for v in ("reference", "candidate")
+            ):
+                raise ValueError("incomplete per-call timings")
+            if any(
+                not math.isfinite(t) or t <= 0
+                for p in pairs
+                for v in ("reference", "candidate")
+                for t in p[v]["call_seconds"]
+            ):
+                raise ValueError("invalid per-call timings")
+            call_stats = []
+            for position in range(calls):
+                call_ratios = [
+                    p["reference"]["call_seconds"][position]
+                    / p["candidate"]["call_seconds"][position]
+                    for p in pairs
+                ]
+                call_stats.append(
+                    {
+                        "position": position,
+                        "speedup": math.exp(statistics.mean(map(math.log, call_ratios))),
+                        "paired_ratios": call_ratios,
+                        "medians_seconds": {
+                            v: statistics.median(p[v]["call_seconds"][position] for p in pairs)
+                            for v in ("reference", "candidate")
+                        },
+                    }
+                )
         cases.append(
             {
                 "id": row["id"],
                 "speedup": math.exp(statistics.mean(map(math.log, ratios))),
                 "paired_ratios": ratios,
                 "medians": medians,
+                "calls": call_stats,
             }
         )
     for i in range(count):
@@ -152,6 +198,8 @@ def statistics_for(rows, minimum_speedup):
     # Fixed final sample size; no sequential peeking or reuse for another author.
     sign_p = sum(math.comb(count, k) for k in range(wins, count + 1)) / 2**count
     return {
+        "timing_scope": timing_scope,
+        "timing_metric": metric,
         "cases": cases,
         "case_balanced_geomean_speedup": math.exp(statistics.mean(map(math.log, rounds))),
         "round_speedups": rounds,
@@ -174,6 +222,7 @@ def compare(
     deadline,
     progress,
     minimum_speedup,
+    timing_scope="calls",
 ):
     folder.mkdir(parents=True)
     rows = [{"id": c["id"], "pairs": []} for c in cases]
@@ -226,7 +275,9 @@ def compare(
                         == pair["candidate"]["retained_fingerprint"],
                     )
                     return report
-        report.update(status="matched", statistics=statistics_for(rows, minimum_speedup))
+        report.update(
+            status="matched", statistics=statistics_for(rows, minimum_speedup, timing_scope)
+        )
     except (ValueError, OSError, TimeoutError) as error:
         report.update(status="failed", reason=str(error))
     finally:
@@ -242,4 +293,10 @@ def eligible(report, policy, *, final):
         return False
     if any(c["speedup"] < 1 / (1 + policy["max_case_regression"]) for c in stats["cases"]):
         return False
+    if "max_call_regression" in policy:
+        for case in stats["cases"]:
+            if not case.get("calls") or any(
+                call["speedup"] < 1 / (1 + policy["max_call_regression"]) for call in case["calls"]
+            ):
+                return False
     return not final or stats["sign_test_p"] <= policy["significance"]

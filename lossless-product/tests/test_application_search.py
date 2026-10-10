@@ -188,6 +188,7 @@ class ApplicationSearchTests(unittest.TestCase):
                 {
                     "reference": dict(
                         sequence_seconds=ref,
+                        call_seconds=[ref],
                         setup_seconds=1,
                         first_call_seconds=ref,
                         process_seconds=1,
@@ -195,6 +196,7 @@ class ApplicationSearchTests(unittest.TestCase):
                     ),
                     "candidate": dict(
                         sequence_seconds=candidate,
+                        call_seconds=[candidate],
                         setup_seconds=1,
                         first_call_seconds=candidate,
                         process_seconds=1,

@@ -204,7 +204,7 @@ class Workload:
         )
         fields(
             objective,
-            {"metric", "min_speedup", "comparator", "constraints"},
+            {"metric", "min_speedup", "comparator", "constraints", "timing_scope"},
             "objective",
             {"metric"},
         )
@@ -212,9 +212,13 @@ class Workload:
 
         validate_constraints(objective.get("constraints", {}), work["adapter"])
         if work["adapter"] == "mlx.fixed_count":
+            if "timing_scope" in objective:
+                raise ValueError("timing_scope is native-only; MLX measures complete requests")
             if objective.setdefault("comparator", "stock_serial") != "stock_serial":
                 raise ValueError("MLX comparator must be stock_serial")
         else:
+            if objective.setdefault("timing_scope", "call") not in {"call", "bound"}:
+                raise ValueError("native objective.timing_scope must be call or bound")
             from ._native.operators import COMPARATORS, validate_comparator
 
             operator = ADAPTERS[work["adapter"]]
