@@ -7,6 +7,7 @@ import sys
 
 from .jobs import read_json
 from ._native.common import sha, write
+from ._native.deployment import NativeOperation as NativeOperation
 
 
 def export(run, destination):
@@ -64,12 +65,18 @@ def export(run, destination):
         "cases": resolved["workload"]["cases"],
         "contract": summary["contract"],
         "evidence": "validated",
-        "scope": "Finite case evidence. Timed deployment interface is bind(...), then repeated bound calls; bind validates and allocates outside steady-state timing.",
+        "timing_scope": summary.get("timing_scope", "bound"),
+        "scope": "Finite case evidence. "
+        + (
+            "Acceptance measured ordinary operation(...) calls, including guards, allocation, binding and dispatch."
+            if summary.get("timing_scope", "bound") == "call"
+            else "Acceptance measured repeated bound() calls; input guards, binding and allocation are excluded."
+        ),
         "hashes": {p.name: sha(p) for p in destination.iterdir() if p.is_file()},
     }
     write(destination / "manifest.json", manifest)
     (destination / "USAGE.txt").write_text(
-        "import lossless\noperation = lossless.load('PATH_TO_THIS_DIRECTORY')\n# x must be float32; optional residual/weight apply to RMSNorm.\nresult = operation(x)\n# For the measured preallocated interface:\n# bound = operation.bind(x)\n# result = bound()\n# Bound inputs must satisfy the contract for every invocation.\n# No LLM or proof checker is called during execution.\n"
+        "import lossless\noperation = lossless.load('PATH_TO_THIS_DIRECTORY')\n# x must be float32; optional residual/weight apply to RMSNorm.\nresult = operation(x)\n# manifest.json timing_scope identifies the measured interface.\n# Explicit reusable-buffer interface:\n# bound = operation.bind(x)\n# result = bound()\n# Bound inputs must satisfy the contract for every invocation.\n# No LLM or proof checker is called during execution.\n"
     )
     return destination
 
@@ -107,114 +114,3 @@ def load(path):
     if manifest["adapter"] not in {"native.copy", "native.softmax", "native.rmsnorm_residual"}:
         raise ValueError("unsupported artifact adapter")
     return NativeOperation(path, manifest)
-
-
-class NativeOperation:
-    def __init__(self, path, manifest):
-        import numpy as np
-        from ._native.operators import load_library
-
-        self.manifest = manifest
-        self.operator = manifest["adapter"].split(".")[1]
-        self.library = None
-        self.fallback_reason = None
-        self.cases = {(c["rows"], c["columns"], c["layout"]) for c in manifest["cases"]}
-        compatible = (
-            manifest["platform"] == sys.platform
-            and manifest["machine"] == platform.machine()
-            and manifest["numpy"] == np.__version__
-        )
-        binary = manifest.get("binary")
-        if compatible and binary and binary in manifest["hashes"]:
-            self.library = load_library(path / binary)
-        else:
-            self.fallback_reason = "artifact environment differs or compiled binary is absent"
-
-    def bind(self, x, residual=None, weight=None):
-        """Bind buffers once. Caller preserves their shape, strides and contract.
-
-        Output/scratch ownership belongs to this bound callable. Its return value
-        is overwritten by its next call; separate bindings have separate buffers.
-        Input mutations must remain within the admitted domain. No concurrent calls.
-        """
-        import numpy as np
-        from ._native import operators
-
-        if not isinstance(x, np.ndarray) or x.dtype != np.float32 or x.ndim != 2 or not x.size:
-            raise ValueError("x must be a nonempty rank-two float32 array")
-        if any(s <= 0 or s % 4 for s in x.strides):
-            raise ValueError("only positive aligned strides are supported")
-        rows, cols = x.shape
-        if x.strides == (cols * 4, 4):
-            layout = "c"
-        elif x.strides == (4, rows * 4):
-            layout = "f"
-        elif x.strides == (cols * 8, 8):
-            layout = "slice2"
-        else:
-            layout = None
-        if self.operator != "copy":
-            bound = 10000 if self.operator == "softmax" else 1000
-            if not np.isfinite(x).all() or np.max(np.abs(x)) > bound:
-                raise ValueError("input lies outside the numerical contract")
-        if self.operator == "rmsnorm_residual":
-            if (
-                not isinstance(residual, np.ndarray)
-                or residual.dtype != np.float32
-                or residual.shape != x.shape
-                or residual.strides != x.strides
-            ):
-                raise ValueError("residual must match x shape, dtype and strides")
-            if (
-                not isinstance(weight, np.ndarray)
-                or weight.dtype != np.float32
-                or weight.shape != (cols,)
-                or not weight.flags.c_contiguous
-            ):
-                raise ValueError("weight must be a contiguous float32 vector matching columns")
-            if (
-                not np.isfinite(residual).all()
-                or np.max(np.abs(residual)) > 1000
-                or not np.isfinite(weight).all()
-                or np.max(np.abs(weight)) > 2
-                or np.shares_memory(x, residual)
-                or np.shares_memory(x, weight)
-                or np.shares_memory(residual, weight)
-            ):
-                raise ValueError(
-                    "RMSNorm buffers must be finite and nonoverlapping, with abs(residual)<=1000 and abs(weight)<=2"
-                )
-        else:
-            residual = x  # unused by copy and softmax implementations
-            weight = np.ones(cols, dtype=np.float32)
-        arrays = (x, residual, weight)
-        case = {"rows": rows, "columns": cols, "layout": layout}
-        compatible = (
-            layout is not None and (rows, cols, layout) in self.cases and self.library is not None
-        )
-        if not compatible:
-            self.fallback_reason = (
-                self.fallback_reason or "shape or layout outside validated artifact cases"
-            )
-
-            def reference():
-                return np.asarray(
-                    operators.reference(self.operator, arrays), dtype=np.float32, order="C"
-                )
-
-            return reference
-        if self.manifest["selected"] == "reference":
-            funcs, _, _ = operators.executors(
-                self.operator, case, arrays, self.library, self.library
-            )
-            comparator = self.manifest.get("comparator", "native_baseline")
-            if comparator not in funcs:
-                self.fallback_reason = "declared comparator unavailable; independent reference used"
-                return lambda: np.asarray(
-                    operators.reference(self.operator, arrays), dtype=np.float32, order="C"
-                )
-            return funcs[comparator]
-        return operators.bind_native(arrays, self.library)
-
-    def __call__(self, x, residual=None, weight=None):
-        return self.bind(x, residual, weight)()

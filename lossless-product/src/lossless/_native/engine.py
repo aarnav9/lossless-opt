@@ -30,6 +30,10 @@ def initialize(spec_path, run, *, hardware_report=None, hardware_notes=None):
     spec["comparator"] = validate_comparator(
         spec["operator"], spec.get("comparator", "native_baseline")
     )
+    # Low-level research specs retain their historical bound-buffer default.
+    # Public Workload jobs explicitly freeze ordinary-call timing instead.
+    if spec.setdefault("timing_scope", "bound") not in {"call", "bound"}:
+        raise ValueError("timing_scope must be call or bound")
     cases = spec["cases"]
     ids = [c["id"] for c in cases]
     if len(ids) != len(set(ids)) or not cases:
@@ -297,6 +301,7 @@ def job_specs(run, state, stage):
                 "kind": "benchmark",
                 "operator": spec["operator"],
                 "comparator": spec["comparator"],
+                "timing_scope": spec["timing_scope"],
                 "case": case,
                 "baseline": baseline,
                 "candidate": str(run / "build" / (name + suffix)),
@@ -364,6 +369,7 @@ def execute(run, stage, max_jobs=None, deadline=None):
                 },
                 "contract": manifest["hashes"]["contract.json"],
                 "comparator": spec["comparator"],
+                "timing_scope": spec["timing_scope"],
             }
             write(job_path, job)
             entry = {
@@ -717,6 +723,7 @@ def report(run):
             "validated_before_evaluation": len(valid),
             "comparator": spec["comparator"],
             "frozen_global_choice": choice,
+            "timing_scope": spec["timing_scope"],
             "frozen_choice_evaluation": chosen,
             "evaluation_by_candidate": by_candidate,
             "numerical_checks_including_repeated_baselines": checks,
@@ -751,7 +758,8 @@ def report(run):
             "",
             "Each candidate was measured in its own process with interleaved native/library baselines. Comparison ratios use confirmation data; the library envelope uses screening choices. Only the precommitted global choice is the primary evaluation result; other candidates are diagnostic.",
             "",
-            "Numerical checks are finite, not proofs. Bootstrap intervals describe within-job noise and have no multiple-comparison correction. CPU only; setup and compilation excluded from steady-state timing. Allocations/conversions inside library calls are timed; native scratch buffers are preallocated. Worker budget excludes LLM/controller development time and token cost. Process isolation contains crashes but is not a security sandbox.",
+            f"Timing scope: {spec['timing_scope']}. Ordinary call timing includes deployment guards, allocation, binding and dispatch; bound timing excludes binding and allocation. Compilation, artifact loading and fixture generation are excluded. Kernel-only diagnostics never override the frozen acceptance boundary.",
+            "Numerical checks are finite, not proofs. Bootstrap intervals describe within-job noise and have no multiple-comparison correction. CPU only. Worker budget excludes LLM/controller development time and token cost. Process isolation contains crashes but is not a security sandbox.",
         ]
         (run / "REPORT.md").write_text("\n".join(lines) + "\n")
         event(run, state, "report_written")

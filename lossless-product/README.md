@@ -45,7 +45,7 @@ bound = operation.bind(x)
 y = bound()
 ```
 
-The native harness measures calls with preallocated buffers, including ctypes dispatch. `operation(x)` also allocates and validates; those additional costs are not included in the reported native speedup. A bound result is overwritten on its next call. Preserve the bound arrays' dtype, shape, strides, and value-domain contract; use separate bindings for separate workers. Unseen shapes/layouts or changed environments use the reference. Artifact hashes detect changed files; they are not signatures. Load artifacts you trust.
+New source native jobs default to `objective.timing_scope: "call"`: acceptance measures ordinary `operation(x)` calls, including guards, allocation, binding and dispatch. Kernel-only timings are diagnostic. Select `"bound"` explicitly only when the application reuses bound buffers; that boundary excludes binding and allocation. Historical results retain their original measurement scope. A bound result is overwritten on its next call. Preserve the bound arrays' dtype, shape, strides, and value-domain contract; use separate bindings for separate workers. Unseen shapes/layouts or changed environments use the reference. Artifact hashes detect changed files; they are not signatures. Load artifacts you trust. [Benchmark boundaries, regression gates and public suite choices](docs/benchmarking.md).
 
 ## Configure a job and your LLM
 

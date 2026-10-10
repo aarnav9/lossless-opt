@@ -59,6 +59,7 @@ def compile_job(job):
 
 def benchmark_job(job):
     from . import operators
+    from .deployment import NativeOperation
 
     operator = job["operator"]
     case = job["case"]
@@ -66,6 +67,23 @@ def benchmark_job(job):
     contract = operators.CONTRACTS[operator]
     baseline = operators.load_library(job["baseline"])
     candidate = operators.load_library(job["candidate"])
+    timing_scope = job.get("timing_scope", "bound")
+    if timing_scope not in {"call", "bound"}:
+        raise ValueError("unknown native timing scope")
+
+    def ordinary_calls(arrays, names):
+        args = arrays if operator == "rmsnorm_residual" else (arrays[0],)
+        calls = {}
+        for name in names:
+            operation = NativeOperation.from_loaded_library(
+                operator,
+                candidate if name == "proposal" else baseline,
+                [case],
+                comparator=None if name == "proposal" else name,
+            )
+            calls[name] = lambda op=operation: op(*args)
+        return calls
+
     validation = {}
     seed = job["seed"]
     from . import cache
@@ -76,6 +94,7 @@ def benchmark_job(job):
         "seed": seed,
         "baseline": sha(job["baseline"]),
         "candidate": sha(job["candidate"]),
+        "timing_scope": timing_scope,
     }
     directory = job.get("cache", {}).get("directory") if job.get("reuse_validation") else None
     validation_hit = False
@@ -92,6 +111,7 @@ def benchmark_job(job):
                 funcs, guards, poison = operators.executors(
                     operator, case, arrays, baseline, candidate
                 )
+                deployed = ordinary_calls(arrays, funcs) if timing_scope == "call" else {}
                 # Validate trusted implementations before the proposal; a baseline defect stops the campaign.
                 for name in [n for n in funcs if n != "proposal"] + ["proposal"]:
                     poison()
@@ -102,6 +122,15 @@ def benchmark_job(job):
                     value["passed"] = (
                         value["passed"] and value["guards_intact"] and value["inputs_unchanged"]
                     )
+                    if name in deployed:
+                        value["ordinary_call"] = operators.check(
+                            operator, deployed[name](), expected
+                        )
+                        value["passed"] = (
+                            value["passed"]
+                            and value["ordinary_call"]["passed"]
+                            and operators.digest(arrays) == before
+                        )
                     validation.setdefault(name, {})[distribution] = value
                     if not value["passed"]:
                         return {
@@ -112,7 +141,7 @@ def benchmark_job(job):
                             "case": case,
                         }
             cache.save(folder, {"validation": validation})
-    phases = {}
+    phases, kernel_only = {}, {}
     for phase, offset, blocks in [
         ("screening", 10000, job["screening_blocks"]),
         ("confirmation", 20000, job["confirmation_blocks"]),
@@ -120,9 +149,14 @@ def benchmark_job(job):
         arrays = operators.input_arrays(operator, case, seed + offset)
         before = operators.digest(arrays)
         funcs, guards, _ = operators.executors(operator, case, arrays, baseline, candidate)
+        measured = ordinary_calls(arrays, funcs) if timing_scope == "call" else funcs
         phases[phase] = measure(
-            funcs, seed + offset + job["candidate_seed"], blocks, job["target_ns"]
+            measured, seed + offset + job["candidate_seed"], blocks, job["target_ns"]
         )
+        if timing_scope == "call":
+            kernel_only[phase] = measure(
+                funcs, seed + offset + job["candidate_seed"], blocks, job["target_ns"]
+            )
         if not guards() or operators.digest(arrays) != before:
             return {
                 "status": "incorrect",
@@ -139,6 +173,13 @@ def benchmark_job(job):
         "status": "ok",
         "case": case,
         "validation": validation,
+        "timing_scope": timing_scope,
+        "kernel_only": kernel_only,
+        "measurement_scope": (
+            "Ordinary deployment calls: guards, allocation, binding and dispatch included. Library loading and fixture generation excluded. kernel_only is diagnostic."
+            if timing_scope == "call"
+            else "Preallocated calls including dispatch; allocation and binding excluded."
+        ),
         **phases,
         "library_choice": library,
         "validation_cache_hit": validation_hit,

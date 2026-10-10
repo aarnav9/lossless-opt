@@ -33,6 +33,11 @@ The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report
 
 ## Profile before searching
 
+Unreleased source now selects native candidates using complete public calls by
+default, including guards, allocations and dispatch. Application searches also
+gate regressions at each declared call position and can include startup costs.
+[Benchmark policy and public suite choices](lossless-product/docs/benchmarking.md).
+
 **Bring an existing application (current source):** `lossless init --project PATH --output .lossless/app`
 detects the selected environment and generates setup with entry-point suggestions.
 Supply representative cases and an invocation, inspect the readable preflight,
@@ -82,6 +87,15 @@ used two sessions with intervening feedback, so this is not a controlled timer
 comparison. [Results, costs and model-free reproduction](lossless-product/docs/application-continuation-study.md)
 · [Raw evidence](lossless-product/docs/evidence/application-continuation-pybaselines.json.gz)
 · [Frozen source proposal](lossless-product/experiments/application_intake/continuation-candidate.json).
+
+A later fixed-output comparison against **unmodified reusable pybaselines**
+measured **1.289x request speedup (22.4% less time)** for the saved local output,
+including ordinary CPU request overhead, with exactness/setup/memory/regression
+checks passed on three new-seed profiles. The saved main output measured 1.091x
+but failed its small-input regression gate. These are experimental program
+outputs, not evidence that a new optimizer version is generally better.
+Import/setup plus only four requests showed essentially no gain.
+[Before/after protocol, results and reproduction](lossless-product/experiments/application_intake/README.md#final-optimized-program-versus-the-original-input).
 
 ## Search time is a performance tuning input
 

@@ -219,6 +219,12 @@ Those automated checks use local fixtures. A separate live native-copy smoke now
 
 ## Reports and deployment
 
+New source native jobs default to `objective.timing_scope: "call"`: selection,
+confirmation and search payback use ordinary exported calls including guards,
+allocation, binding and dispatch. Use `"bound"` only for an application that
+actually reuses bound buffers. Kernel-only measurements are separate diagnostics;
+old campaigns retain their original scope. [Full benchmark policy](benchmarking.md).
+
 A run directory contains the resolved job, expanded contract, hardware evidence, immutable source/harness hashes, discovery feedback, a frozen selection, evaluation measurements, model-call receipts, `report.json`, `report.html`, and logs. CPU workers have individual logs in `jobs/`; MLX writes its worker progress to `run.log`.
 
 Outcomes are `accepted`, `reference_retained`, or `incomplete`. Acceptance requires correctness, the minimum speedup, and a confirmation interval favoring the candidate. Timing noise can legitimately retain the reference. The deployment comparator is explicit in `objective.comparator` and frozen in the job before proposals or measurements. Native defaults are `numpy_copy` for copy and `numpy_buffered` for softmax/RMSNorm; `native_baseline` is an explicit alternative, and softmax also supports `scipy_softmax_float64` with the numerical extra. Discovery selection and final acceptance use that same comparator, including a per-case confirmation interval. A no-win exported artifact executes the declared comparator when available; unsupported environments use the independent reference. Diagnostic library-envelope comparisons never select a new comparator from evaluation data.

@@ -36,7 +36,7 @@ Use a fresh output directory. A separate worker runs under the total wall budget
 
 ## Native measurements
 
-The named `objective.comparator` is the reference. First-call and warm timings use the ordinary Lossless callable, including its input validation, binding and allocation. Bound-buffer calls are measured separately through `operation.bind(...)`, matching the optimizer's preallocated timing interface. Input generation, reference compilation and implementation loading are separately recorded.
+The named `objective.comparator` is the reference. First-call and warm timings use the ordinary Lossless callable, including its input validation, binding and allocation. This matches new source native jobs' default `objective.timing_scope: "call"`. Bound-buffer calls are measured separately through `operation.bind(...)`; they match explicit `"bound"` jobs and historical preallocated results. Input generation, reference compilation and implementation loading are separately recorded. [Benchmark boundaries and representative workloads](benchmarking.md).
 
 Warm samples are interleaved repeat-block averages, with their raw values and run order retained. Their p95 is descriptive variation among those averages, not a production request-tail percentile. The first invocation of each case occurs in a fresh profiling worker after libraries are loaded; this is not a guarantee of cold operating-system caches.
 
