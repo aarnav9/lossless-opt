@@ -79,6 +79,15 @@ application speedup qualification are being developed across steps 4–7.
 
 ### Source-search pilot (steps 4–6)
 
+The [CPU investigation catalog](cpu-investigation.md) now connects bounded CPU
+hardware facts and discovery layout/library/CPU-time/page-fault diagnostics to
+application profiling and search. Its 22 sourced cards include interactions and
+formal obligations; independent coverage records distinguish author review from
+evaluated attempts. Hardware counters and compiler-output adapters remain open.
+Lean templates are references, not checked candidate proofs. The
+[matched author pilot](cpu-checklist-study.md) evaluates the additional context
+and review cost against the previous author under equal caps.
+
 [`search-application`](application-search.md) now runs a bounded Codex
 propose/test/revise loop over explicitly allowed Python function bodies. It
 freezes the original callable comparator, source, contract and case split;

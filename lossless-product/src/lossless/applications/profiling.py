@@ -12,6 +12,7 @@ from ..jobs import positive
 from .config import analysis_settings, resolve
 from .replay import replay
 from .runtime import clock
+from . import architecture as cpu
 
 
 @dataclass
@@ -32,6 +33,7 @@ def summarize(row):
     ]
     return {
         "id": row["id"],
+        "diagnostics": traced.get("diagnostics", {}),
         "observations_repeatable": row["repeatable"],
         "timing": {
             "sequence_samples_seconds": samples,
@@ -39,6 +41,12 @@ def summarize(row):
             "first_call_median_seconds": call_medians[0],
             "per_call_median_seconds": call_medians,
             "calls_per_sequence": len(call_medians),
+            "setup_and_sequence_samples_seconds": [
+                d["setup_seconds"] + d["sequence_seconds"] for d in clean
+            ],
+            "median_setup_and_sequence_seconds": median(
+                d["setup_seconds"] + d["sequence_seconds"] for d in clean
+            ),
             "continuation_scope": "Continuation timing exists only for explicitly supplied multi-call cases; calls may do different work. No implicit warmup.",
         },
         "setup": {
@@ -94,6 +102,7 @@ def save_report(directory, summary):
                 [
                     "Setup median ms",
                     "Declared sequence median ms",
+                    "Setup + sequence median ms",
                     "Calls per sequence",
                     "Process peak RSS MiB",
                 ],
@@ -101,6 +110,7 @@ def save_report(directory, summary):
                     [
                         f"{case['setup']['median_seconds'] * 1000:.3f}",
                         f"{case['timing']['median_sequence_seconds'] * 1000:.3f}",
+                        f"{case['timing']['median_setup_and_sequence_seconds'] * 1000:.3f}",
                         case["timing"]["calls_per_sequence"],
                         f"{case['memory']['process_peak_rss_bytes'] / 2**20:.1f}",
                     ]
@@ -142,6 +152,8 @@ def save_report(directory, summary):
             + "</p></section>"
         ]
     assessment = summary.get("assessment", {"status": "disabled"})
+    if "checklist_coverage" in summary:
+        body.append(cpu.render(summary["checklist_coverage"]))
     body += ["<h2>Model assessment: " + escape(assessment["status"]) + "</h2>"]
     if "response" in assessment:
         response = assessment["response"]
@@ -180,7 +192,7 @@ def save_report(directory, summary):
     )
 
 
-def profile(config, *, repeats=None, budget=None, output=None, analysis=None):
+def profile(config, *, repeats=None, budget=None, output=None, analysis=None, architecture=None):
     started = clock()
     resolved, _ = resolve(config)
     if not resolved["entry"] or resolved["entry"]["kind"] != "callable":
@@ -193,6 +205,9 @@ def profile(config, *, repeats=None, budget=None, output=None, analysis=None):
     budget = positive(
         resolved["profile"]["wall_time_seconds"] if budget is None else budget, "profile budget"
     )
+    architecture = resolved["profile"]["architecture"] if architecture is None else architecture
+    if type(architecture) is not bool:
+        raise ValueError("architecture must be boolean")
     settings = analysis_settings(
         None
         if analysis is False
@@ -225,6 +240,7 @@ def profile(config, *, repeats=None, budget=None, output=None, analysis=None):
         "repeats": repeats,
         "total_seconds": budget,
         "analysis": settings,
+        "architecture": architecture,
     }
 
     def progress(message):
@@ -236,6 +252,20 @@ def profile(config, *, repeats=None, budget=None, output=None, analysis=None):
         if summary["status"] == "replayed":
             summary["profiles"] = [summarize(row) for row in summary["cases"]]
             summary["status"] = "profiled"
+            if architecture:
+                progress(
+                    "CPU context: bounded hardware query and catalog screening; unavailable counters remain unknown"
+                )
+                summary["architecture"] = cpu.collect(
+                    resolved["environment"]["python"], started + budget
+                )
+                summary["cpu_catalog"] = cpu.catalog()
+                summary["checklist_coverage"] = cpu.initial_coverage(
+                    summary["cpu_catalog"], summary["architecture"]["hardware"]
+                )
+                write(directory / "hardware.json", summary["architecture"])
+                write(directory / "cpu_catalog.json", summary["cpu_catalog"])
+                write(directory / "checklist.json", summary["checklist_coverage"])
             save_report(directory, summary)
             if settings:
                 if clock() >= started + budget:

@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "scope": "Repository-relative research provenance. Sources are build/authoring history, never runtime imports. Product files may contain new guards and API adaptations.",
+  "groups": [
+    {
+      "product_files": [
+        "retained/racing.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/frontier_032/racing.py",
+          "sha256": "7faae2de1e8e0540609aecd7e5b43cd07a8de25ae54bee03c5f63835c37fcd38"
+        }
+      ],
+      "adaptation": "Adapted bounded-score rejection rule; no automatic acceptance or device drift proof."
+    },
+    {
+      "product_files": [
+        "resources/rms_candidates_004.c"
+      ],
+      "source_files": [
+        {
+          "path": "research/results/batch_004_20260930T060446Z/discovery_candidates.c",
+          "sha256": "645220ec1b32f83779ab40118e69530a562dc5786159ae7257a5ba757b4f0893"
+        }
+      ],
+      "adaptation": "Retained fixed generated pool; selected functions exposed through independently evaluated ABI wrappers."
+    },
+    {
+      "product_files": [
+        "execution.py",
+        "_native/call_policy.py",
+        "_native/deployment.py",
+        "applications/retained.py",
+        "retained/modpoly.c",
+        "retained/modpoly.json",
+        "retained/modpoly_native.py",
+        "retained/pybaselines.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/cpu_100/study.py",
+          "sha256": "0e4df303e834d491056982b51240549bf546ab53ace28feadcff8a69f8b01801"
+        },
+        {
+          "path": "lossless-product/experiments/cpu_100/compiled.py",
+          "sha256": "2f857ba5b7269129e0ce6d262990fc052f13de1f454e1b3f3332e36cb197d2ca"
+        },
+        {
+          "path": "lossless-product/experiments/cpu_100/parallel.py",
+          "sha256": "96827c8f5938298b94e258e80b2ea8a54e93091ad68bbb092f5fb222e9f0f12a"
+        },
+        {
+          "path": "lossless-product/experiments/cpu_100/prepared.py",
+          "sha256": "d7f22147d2c8912277ca9006dca7d322cdbe69f3ec22f3208652c3ac24d2b504"
+        },
+        {
+          "path": "lossless-product/experiments/cpu_100/runtime.py",
+          "sha256": "b7e4dbf89d15704c3df12aa6523e4e11084ed34fa00dd37bd63ec9827551858b"
+        },
+        {
+          "path": "lossless-product/experiments/application_intake/continuation-candidate.json",
+          "sha256": "bce8c55fc8d8428aa4e8d6635892316b7e14e21c2170cb6c289f8b49c0b69c4a"
+        },
+        {
+          "path": "lossless-product/experiments/application_intake/cpu-control-candidate.json",
+          "sha256": "173db6a354b9baa26f6a6404991e2c7a2b59fad9af48e856b3ae3cde2f1b4461"
+        }
+      ],
+      "adaptation": "Adapted mechanisms and guarded compositions, not byte-identical extraction; optional lifecycle and runtime admission added."
+    },
+    {
+      "product_files": [
+        "retained/_torch_rewrite.py",
+        "retained/_torch_decoder.py",
+        "retained/torch_native.cpp",
+        "retained/torch_cpu.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/pretrained_native/transform.py",
+          "sha256": "5b4277270279c6f5122ab91b32324070aede7ad236c1e6061ca82609131f1729"
+        },
+        {
+          "path": "research/experiments/pretrained_native/models.py",
+          "sha256": "c8e702bb731b4db3fa3d9e4720f43a6f432a802e550a89958b5cf2908ecd24d3"
+        },
+        {
+          "path": "research/experiments/pretrained_native/native.cpp",
+          "sha256": "8675f2166a03fa213a4570dbffbbc3c1257e200e3b670b6cb53a552b50a53ca0"
+        }
+      ],
+      "adaptation": "Extracted/renamed operation namespace and added explicit guarded API, owned copies, builders and contracts."
+    },
+    {
+      "product_files": [
+        "retained/_onnx_rewrite.py",
+        "retained/onnx_rms.c",
+        "retained/onnx.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/rms_integration/run.py",
+          "sha256": "294bac3b336a843134ed7001ac205f3fc414e6cff2ad0770313066ff56ce9fb4"
+        },
+        {
+          "path": "research/experiments/rms_integration/custom_rms.c",
+          "sha256": "2d7558893a3b03d76acc94b55fad3911a099551800edd5f558b31d169266bba4"
+        }
+      ],
+      "adaptation": "Narrow named graph matcher, caller-supplied build headers; no bundled ORT header."
+    },
+    {
+      "product_files": [
+        "retained/_mps_models.py",
+        "retained/mps_native.mm",
+        "retained/mps_kernels.metal",
+        "retained/mps.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/mps_gemm/models.py",
+          "sha256": "f3a0e590ccff28ebd4c3c07345e42972947d54cdae2d4826f2842d4eb1422a19"
+        },
+        {
+          "path": "research/experiments/mps_gemm/native.mm",
+          "sha256": "303eaf39b2e7320e352b5dd7ac728808a28130e4fb04e25612db59102c83018d"
+        },
+        {
+          "path": "research/experiments/mps_gemm/kernels.metal",
+          "sha256": "7feb0d974e5cfcd1f9c72a78b7cb152c28ec5e56286d9ee56ae60decb3b922fc"
+        }
+      ],
+      "adaptation": "Scoped 013/014 options, renamed namespace and added pinned admission/build API."
+    },
+    {
+      "product_files": [
+        "retained/certified.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/contract_speedups/numerical.py",
+          "sha256": "86434bf696cbfc48fa6cd86cf9aff85bf65b43de84bd7c7ba9e81eb9c3d18c60"
+        },
+        {
+          "path": "research/experiments/frontier_016/structured.py",
+          "sha256": "58b3df358220558a79e55ba81ffd16aeed5a17ad5450fda3f0d107daa2f42902"
+        }
+      ],
+      "adaptation": "Extracted certificate machinery with new owned plans and fail-closed validation. Conditional rounding model, not a BLAS proof."
+    },
+    {
+      "product_files": [
+        "retained/numerical.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/fp32_real_029/numerical.py",
+          "sha256": "95d83073f78d2fb40e601e3606e96df266c8d6796830be7a032afe8f8a02a64d"
+        },
+        {
+          "path": "research/experiments/numerical_frontier_030/numerical.py",
+          "sha256": "18f5416f7c21e64820bb5d45e2c6f62f4bef705fd8b9cc56d9e63251a3d7e854"
+        },
+        {
+          "path": "research/experiments/vision_deblur_031/study.py",
+          "sha256": "19487e89e99ec401ab50ca8a02152ca14cee7ae6dc25ebcfdbcf10bd10abaa2a"
+        }
+      ],
+      "adaptation": "Adapted structured numerical mechanisms. Conditioned least-squares guard/fallback is new; no retained speed claim."
+    },
+    {
+      "product_files": [
+        "retained/bf16_codec.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/experiments/lossless_frontier_025/bf16_codec.py",
+          "sha256": "aee10ce2b93228cf72b4802f628a246049905465b63b787dab73d2371d86495f"
+        }
+      ],
+      "adaptation": "Raw uint16 reversible storage codec; formatting only."
+    },
+    {
+      "product_files": [
+        "retained/_mlx_vision.py",
+        "retained/mlx_vision.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/results/kernelbench_049/candidates/round04.py",
+          "sha256": "419e50cc457f222352ed1d7058073e10900d14faf593cfcc69cf3c1dd6f8b42c"
+        }
+      ],
+      "adaptation": "Retained author source with public API restricted to the two qualified task scopes; finite/layout guards added."
+    },
+    {
+      "product_files": [
+        "retained/_mlx_full_request.py",
+        "retained/mlx_full_request.py"
+      ],
+      "source_files": [
+        {
+          "path": "research/results/fullstack_048/candidates/round_06.py",
+          "sha256": "a3f795bc5f1a7c2fea2fa69953d7939ca1ac322b171b21a03fd4281c0be49d5d"
+        }
+      ],
+      "adaptation": "Dropped unused benchmark baseline metadata; kept algorithm and bounded compiled state. New local model/runtime/request guards. Experimental, failed original tail/TTFT gates."
+    },
+    {
+      "product_files": [
+        "retained/vision.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/vision_mechanisms/study.py",
+          "sha256": "7f741f01823bc9ebee92ef7b809fb173d341ddbf4a86a87027896d565ecdabd8"
+        }
+      ],
+      "adaptation": "Implemented positive cached-sign mechanism with bounded owned constants and inference-mode/autograd distinction."
+    },
+    {
+      "product_files": [
+        "retained/planning.py",
+        "retained/uint8.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/solver_pipeline/planner.py",
+          "sha256": "a7209e7e42e736efda6936782d4b233e69d159bcb5531289da76a91b1d89f8c2"
+        },
+        {
+          "path": "lossless-product/experiments/solver_pipeline/pipeline.py",
+          "sha256": "01ed09f50483291206f332c75a973ab7a5952f6d42fa475b87ef2656a43b5c6c"
+        }
+      ],
+      "adaptation": "Retained additive DP planner and explicit byte pipeline compiler; no generic program solver claim."
+    },
+    {
+      "product_files": [
+        "retained/copy_proof.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/frontier_032/verified_search.py",
+          "sha256": "adebbaaa659755398813b885d3d56415ed842cc7cad9d1c6bed462a0481fcd5d"
+        }
+      ],
+      "adaptation": "Extracted shared index IR/prover/emitter; added finite-domain guards and fail-closed proposal API."
+    },
+    {
+      "product_files": [
+        "retained/spectrum_workload.py"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/experiments/application_intake/spectrum_workload.py",
+          "sha256": "4f698457e0dfeda11156c93467fa03c54bf72b95cd80aca8e13663c70e40a49b"
+        }
+      ],
+      "adaptation": "Unchanged public workload wrapper used by the local composition smoke."
+    },
+    {
+      "product_files": [
+        "resources/softmax_fortran_046.c",
+        "resources/softmax_dispatch_033.c"
+      ],
+      "source_files": [
+        {
+          "path": "lossless-product/examples/softmax-fortran/kernel.c",
+          "sha256": "34d962e0ebe3e012ddba475f224d3570114fa4f3f05f8847adbef31e0cd3235d"
+        },
+        {
+          "path": "lossless-product/experiments/frontier_032/manual_proposals/layout_dispatch.c",
+          "sha256": "626f6a709785df3d1e18f65e448bbc80b4be484b9a2ace57799ee443331a5cc0"
+        }
+      ],
+      "adaptation": "Byte-identical retained numerical sources; proposal still needs fresh admission."
+    }
+  ]
+}

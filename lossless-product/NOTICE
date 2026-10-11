@@ -9,6 +9,9 @@ the original Lossless code remains MIT.
 Retained research code provenance is recorded in
 src/lossless/resources/PROVENANCE.json. Paths there identify the local research
 archive used for extraction, not runtime dependencies.
+The additional executable recipes and adaptations are recorded in
+src/lossless/retained/PROVENANCE.json. Their availability does not imply
+performance qualification or compatibility outside the documented scope.
 
 MLX-LM-derived grouped-head execution retains its MIT notice in
 src/lossless/adapters/mlx/MLX_LM_LICENSE.
@@ -18,8 +21,9 @@ the mathlib Apache 2.0 license in
 src/lossless/resources/theorems/MATHLIB_LICENSE.
 The extraction receipt, mathlib revision and Lake manifest accompany the index.
 
-experiments/application_intake/frozen-candidates.json, broader-candidate.json
-and continuation-candidate.json, and their accompanying compressed evidence,
+experiments/application_intake/frozen-candidates.json, broader-candidate.json,
+continuation-candidate.json, cpu-control-candidate.json and cpu-assisted-candidate.json,
+and their accompanying compressed evidence,
 contain experimental modifications
 of pybaselines 1.2.1's ModPoly and polynomial setup helper bodies, authored by
 GPT-6 Astra and independently evaluated by Lossless. Upstream revision:
@@ -28,6 +32,15 @@ These bodies retain Copyright (c) 2021 Donald Erb and the BSD-3-Clause license
 in experiments/application_intake/PYBASELINES_LICENSE.txt. They are research
 inputs, not a bundled installation of pybaselines. No upstream endorsement
 is claimed.
+
+The executable, hash-guarded source edits in src/lossless/retained/modpoly.json
+and compiled ModPoly adaptation retain the same pybaselines BSD-3-Clause
+notice in src/lossless/retained/PYBASELINES_LICENSE.txt.
+
+The campaign-049 MLX recipes adapt KernelBench task computations; the upstream
+MIT notice is preserved in src/lossless/retained/KERNELBENCH_LICENSE. MLX-LM
+derived cache/model execution in retained recipes retains the MIT notice in
+src/lossless/adapters/mlx/MLX_LM_LICENSE. External model weights are not included.
 
 NumPy, optional SciPy, MLX, MLX-LM, and externally installed Lean/Elan/mathlib
 retain their own licenses. Model weights are not bundled and remain subject

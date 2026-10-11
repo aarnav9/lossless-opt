@@ -2,6 +2,7 @@
 
 import cProfile
 import importlib.util
+import importlib.metadata
 import json
 from pathlib import Path
 import pstats
@@ -100,6 +101,88 @@ def attribution(profiler, root):
     }
 
 
+def input_layouts(value):
+    """Bounded descriptors only, no contents, pointers or evaluation fixtures."""
+    import numpy as np
+
+    rows, seen = [], set()
+    visited = 0
+
+    def visit(item, path, depth=0):
+        nonlocal visited
+        visited += 1
+        if visited > 1024 or depth > 8 or len(rows) >= 32 or id(item) in seen:
+            return
+        if isinstance(item, (np.ndarray, dict, list, tuple)):
+            seen.add(id(item))
+        if isinstance(item, np.ndarray):
+            rows.append(
+                {
+                    "path": path,
+                    "shape": list(item.shape),
+                    "dtype": str(item.dtype),
+                    "strides_bytes": list(item.strides),
+                    "logical_bytes": int(item.nbytes),
+                    "c_contiguous": bool(item.flags.c_contiguous),
+                    "f_contiguous": bool(item.flags.f_contiguous),
+                    "aligned_for_dtype": bool(item.flags.aligned),
+                    "writeable": bool(item.flags.writeable),
+                }
+            )
+        elif isinstance(item, dict):
+            for i, child in enumerate(item.values()):
+                if visited > 1024 or len(rows) >= 32:
+                    break
+                visit(child, f"{path}.value[{i}]", depth + 1)
+        elif isinstance(item, (list, tuple)):
+            for i, child in enumerate(item):
+                if visited > 1024 or len(rows) >= 32:
+                    break
+                visit(child, f"{path}[{i}]", depth + 1)
+
+    visit(value, "inputs")
+    return {
+        "arrays": rows,
+        "bounded": True,
+        "scope": "At most 32 discovery input arrays, depth 8 and 1024 visited objects; logical bytes are not physical traffic. No alias proof or output-layout coverage.",
+    }
+
+
+def runtime_metadata():
+    """Actual loaded modules/pools, gathered after instrumented calls only."""
+    packages = {}
+    for name in ("numpy", "scipy", "torch", "mlx", "threadpoolctl"):
+        if name in sys.modules:
+            try:
+                packages[name] = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                packages[name] = None
+    result = {
+        "loaded_packages": packages,
+        "thread_pools": None,
+        "scope": "Loaded-library metadata after attribution; thread counts are configured limits, not observed active threads. No filesystem paths or unrestricted environment values.",
+    }
+    try:
+        from threadpoolctl import threadpool_info
+
+        allowed = (
+            "user_api",
+            "internal_api",
+            "prefix",
+            "version",
+            "num_threads",
+            "threading_layer",
+            "architecture",
+        )
+        result["thread_pools"] = [
+            {k: row.get(k) for k in allowed} for row in threadpool_info()[:16]
+        ]
+        result["thread_pool_status"] = "queried"
+    except (ImportError, OSError, RuntimeError) as error:
+        result["thread_pool_status"] = "unavailable: " + type(error).__name__
+    return result
+
+
 def run(payload):
     root = Path(payload["workspace"]).resolve()
     mode = payload["profile_mode"]
@@ -128,16 +211,22 @@ def run(payload):
     rows = []
     retained = []
     profiler = cProfile.Profile() if mode == "attribution" else None
+    layouts, cpu_samples, faults = [], [], []
     try:
         for call in payload["case"]["calls"]:
             args, kwargs = inputs(call["args"], root), inputs(call["kwargs"], root)
             before = Observer(payload["max_output_bytes"]).encode({"args": args, "kwargs": kwargs})
+            if profiler and len(layouts) < 8:
+                layouts.append(input_layouts((args, kwargs)))
             synchronize(None, sync, backends)
             peak_before = rss()
             if mode == "memory":
                 tracemalloc.start()
                 base, _ = tracemalloc.get_traced_memory()
                 tracemalloc.reset_peak()
+            if profiler:
+                usage_before = resource.getrusage(resource.RUSAGE_SELF)
+                cpu_before = time.process_time()
             started = time.perf_counter()
             if profiler:
                 profiler.enable()
@@ -148,6 +237,15 @@ def run(payload):
                 if profiler:
                     profiler.disable()
             elapsed = time.perf_counter() - started
+            if profiler:
+                cpu_samples.append(time.process_time() - cpu_before)
+                usage_after = resource.getrusage(resource.RUSAGE_SELF)
+                faults.append(
+                    {
+                        "minor": usage_after.ru_minflt - usage_before.ru_minflt,
+                        "major": usage_after.ru_majflt - usage_before.ru_majflt,
+                    }
+                )
             peak_after = rss()
             measured = {
                 "call_seconds": elapsed,
@@ -190,12 +288,20 @@ def run(payload):
     finally:
         if tracemalloc.is_tracing():
             tracemalloc.stop()
+        cleanup_started = time.perf_counter()
         if cleanup:
             cleanup(selected)
+        elif (
+            type(selected).__module__ == "lossless.execution"
+            and type(selected).__name__ == "IndependentMap"
+        ):
+            selected.close()
+        cleanup_seconds = time.perf_counter() - cleanup_started
     record = {
         "status": "completed",
         "profile_mode": mode,
         "setup_seconds": setup_seconds,
+        "cleanup_seconds": cleanup_seconds,
         "calls": rows,
         "sequence_seconds": sum(r["measurement"]["call_seconds"] for r in rows),
         "synchronization": sorted(backends) or ["synchronous CPU"],
@@ -203,6 +309,14 @@ def run(payload):
     }
     if profiler:
         record["attribution"] = attribution(profiler, root)
+        record["diagnostics"] = {
+            "input_layouts": layouts,
+            "omitted_layout_calls": max(0, len(rows) - len(layouts)),
+            "process_cpu_seconds": cpu_samples,
+            "page_faults": faults,
+            "runtime": runtime_metadata(),
+            "scope": "Separate cProfile process only; CPU/fault samples include profiler overhead and exclude fixtures/observers. CPU time sums process threads and is not a PMU bottleneck classification. Page faults are not TLB misses.",
+        }
     if payload.get("retain_outputs"):
         record["retained_outputs"] = [
             Observer(payload["max_output_bytes"]).encode(item) for item in retained

@@ -1,0 +1,3 @@
+# Preserve the recorded bytes of the retained research pool, including its
+# original line endings/spaces; provenance identifies the source hash.
+src/lossless/resources/rms_candidates_004.c whitespace=-blank-at-eol

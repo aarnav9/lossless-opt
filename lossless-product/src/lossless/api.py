@@ -96,6 +96,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
             "max_proposals": resolved["budget"]["max_candidates"],
             "min_speedup": resolved["objective"]["min_speedup"],
             "comparator": resolved["objective"]["comparator"],
+            "timing_scope": resolved["objective"]["timing_scope"],
             "cache": resolved["cache"],
         }
         import tempfile
@@ -167,7 +168,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
 
     if not state["sealed"]:
         if not state["proposals"]:
-            for proposal in recipes.native_candidates(operator):
+            for proposal in recipes.native_candidates(operator, resolved["workload"]["cases"]):
                 if len(engine.verify(run)["proposals"]) >= resolved["budget"]["max_candidates"]:
                     break
                 submit(proposal)
@@ -282,6 +283,7 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
         "status": status,
         "selected": selected,
         "comparator": resolved["objective"]["comparator"],
+        "timing_scope": resolved["objective"]["timing_scope"],
         "contract": read_json(run / "contract.json"),
         "required_evidence": "validated",
         "job_identity": identity(resolved),
@@ -290,7 +292,13 @@ def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
         "errors": errors,
         "proofs": proof_record,
         "measurements": detail,
-        "scope": "Finite validation on generated cases; exact copy or explicit numerical contract. Native timings include ctypes dispatch with preallocated buffers; Python deployment allocation cost is separate. POSIX trusted-local execution, not a security sandbox.",
+        "scope": "Finite validation on generated cases; exact copy or explicit numerical contract. "
+        + (
+            "Acceptance times ordinary operation(...) calls, including input guards, buffer allocation, binding and dispatch. Kernel-only timings are diagnostic. "
+            if resolved["objective"]["timing_scope"] == "call"
+            else "Explicit bound-buffer acceptance: input guards, allocation and binding are outside timing. These gains apply only to repeated bound() calls. "
+        )
+        + "Artifact loading and input generation are excluded; this is not a whole-application benchmark. POSIX trusted-local execution, not a security sandbox.",
     }
     from .economics import payback
 

@@ -131,9 +131,10 @@ no author tool use, and both responses saved before measurements.
 
 ## Product work and validation
 
-The changes below were tested in the development working tree. This research
-publication includes the experiment sources and evidence; product integration
-is separate, and the published `v0.1.0a1` release assets are unchanged.
+The changes below were tested in the development working tree. The subsequent
+[research integration](research-integration.md) packages these mechanisms as
+scoped candidates and reports fresh local application validation. The published
+`v0.1.0a1` release assets remain unchanged.
 
 Application source search now supports opt-in, declared C helpers alongside
 Python body edits. The helper ABI, source bounds, compilation flags, build

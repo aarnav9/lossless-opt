@@ -158,6 +158,19 @@ class ApplicationProfileTests(unittest.TestCase):
         self.assertEqual(result.summary["status"], "profiled")
         self.assertLess(result.summary["profiles"][0]["timing"]["median_sequence_seconds"], 0.05)
 
+    def test_completion_wait_is_inside_call_timing(self):
+        self.make(
+            "import time\npending=False\ndef run(n):\n global pending\n pending=True\n return n\ndef synchronize():\n global pending\n if pending:\n  time.sleep(.03)\n  pending=False\n"
+        )
+        value = json.loads(self.config.read_text())
+        value["entry"]["synchronize"] = "app.py:synchronize"
+        self.config.write_text(json.dumps(value))
+        result = self.profile()
+        self.assertEqual(result.summary["status"], "profiled")
+        case = result.summary["profiles"][0]
+        self.assertGreaterEqual(case["timing"]["first_call_median_seconds"], 0.025)
+        self.assertEqual(case["synchronization"], ["explicit hook"])
+
     def test_bad_reference_prevents_assessment_and_retains_failure(self):
         self.make("import os\ndef run(n): return os.urandom(16)\n")
         with patch.object(

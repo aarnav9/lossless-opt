@@ -12,6 +12,13 @@ candidate acceptance now use a separate, explicit
 [source-search experiment](application-search.md); guarded application deployment
 remains a later stage.
 
+[CPU investigation](cpu-investigation.md) adds a bounded CPU-only hardware query,
+discovery array layouts, loaded-library/thread-pool metadata, instrumented CPU
+time and page faults. The model receives a versioned 22-area catalog with sources,
+interactions and correctness obligations. Missing hardware counters stay unknown.
+This defaults on through `profile.architecture`; set it to `false` to omit the
+added author context and hardware query. The same total budget applies.
+
 ## One workflow
 
 Start with an [application job](applications.md) containing an invocation and
@@ -69,7 +76,9 @@ Python has the same interface:
 import lossless
 
 result = lossless.profile(
-    ".lossless/my-app/lossless.json", repeats=5, budget=1800,
+    ".lossless/my-app/lossless.json",
+    repeats=5,
+    budget=1800,
     output=".lossless/my-app/runs/profile",
     analysis={"provider": "codex-chatgpt", "model": "gpt-6-astra", "effort": "medium"},
 )
@@ -92,6 +101,10 @@ For repeated requests, declare them using the existing case `calls` array. The
 report retains first-call and per-position medians as well as the summed sequence
 time. Calls can do different work; this is not automatically a warmed latency
 distribution or a measured production workload mix.
+
+Reports also show setup plus sequence time, combined per clean process before
+taking the median. [The benchmark policy](benchmarking.md) explains lifecycle
+selection, representative mixed-input cases and the recommended public suites.
 
 | Measurement | Boundary |
 | --- | --- |

@@ -10,15 +10,17 @@ readme = "README.md"
 # Original code is MIT; bundled mathlib resources and experimental pybaselines
 # candidate bodies retain Apache-2.0 and BSD-3-Clause terms respectively.
 license = "MIT AND Apache-2.0 AND BSD-3-Clause"
-license-files = ["LICENSE", "NOTICE", "src/lossless/adapters/mlx/MLX_LM_LICENSE", "src/lossless/resources/theorems/MATHLIB_LICENSE", "experiments/application_intake/PYBASELINES_LICENSE.txt"]
+license-files = ["LICENSE", "NOTICE", "src/lossless/adapters/mlx/MLX_LM_LICENSE", "src/lossless/resources/theorems/MATHLIB_LICENSE", "experiments/application_intake/PYBASELINES_LICENSE.txt", "src/lossless/retained/PYBASELINES_LICENSE.txt", "src/lossless/retained/KERNELBENCH_LICENSE"]
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24,<3"]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering"]
 
 [project.optional-dependencies]
 numerical = ["scipy>=1.10,<2"]
+applications = ["scipy>=1.10,<2", "threadpoolctl>=3,<4", "psutil>=6,<8", "pybaselines==1.2.1"]
+verification = ["z3-solver>=4.12,<5"]
 mlx = ["mlx==0.32.3; platform_system == 'Darwin' and platform_machine == 'arm64'", "mlx-lm==0.32.0; platform_system == 'Darwin' and platform_machine == 'arm64'"]
-dev = ["build>=1", "scipy>=1.10,<2", "ruff>=0.16,<0.17"]
+dev = ["build>=1", "scipy>=1.10,<2", "psutil>=6,<8", "threadpoolctl>=3,<4", "ruff>=0.16,<0.17"]
 
 [project.scripts]
 lossless = "lossless.cli:main"
@@ -28,11 +30,12 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "lossless" = ["resources/*.c", "resources/*.json", "resources/proofs/*", "resources/theorems/*", "_native/*.m", "adapters/mlx/*.json", "adapters/mlx/*LICENSE"]
+"lossless.retained" = ["*.json", "*.c", "*.cpp", "*.metal", "*.mm", "*LICENSE*"]
 
 [tool.ruff]
 line-length = 100
 # Preserve pinned, hash-verified third-party benchmark source bytes.
-extend-exclude = ["experiments/kernelbench_049/upstream"]
+extend-exclude = ["experiments/kernelbench_049/upstream", "experiments/cpu_100/frozen_native"]
 
 [tool.ruff.lint]
 select = ["F"]

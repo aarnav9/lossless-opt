@@ -12,7 +12,7 @@ The source alpha copies reviewed runtime pieces into the product. It never impor
 | 023 allocator policy | Retained 256 MiB policy; optional LLM comparison against 0/64 MiB |
 | Theorem library | Compressed statement index, source project, extraction receipt, Lean/mathlib pins and notices |
 | 026/027 reusable graphs | Opt-in decoder/full-head alternatives with bounded specialization counts, fresh incremental gates, startup accounting and deployment checks; see campaigns 032–038 |
-| Earlier MPS kernels and certified CPU solves | Not yet exposed as product adapters; retain their research findings in the ledger |
+| Broader positive research, including MPS kernels and certified CPU solves | Exposed as scoped APIs/candidates in `lossless.retained`; [integration coverage, local tests and remaining boundaries](research-integration.md) |
 
 Historical 023 throughput gains around 1.96×/2.38× were scoped to its recorded batches and reference. They are not product-wide guarantees. No CUDA or computer-vision performance gain is claimed. The alpha MLX adapter deliberately preserves its model/runtime/device guards. Broadening them needs fresh evidence.
 

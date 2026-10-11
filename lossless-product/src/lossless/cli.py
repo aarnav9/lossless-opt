@@ -256,7 +256,13 @@ def main(argv=None):
         help="Experimental source-body author/test/revise loop; original project unchanged",
     )
     application_search.add_argument("config", type=Path)
-    application_search.add_argument("--plan", type=Path, required=True)
+    application_choice = application_search.add_mutually_exclusive_group(required=True)
+    application_choice.add_argument("--plan", type=Path)
+    application_choice.add_argument(
+        "--retained",
+        action="store_true",
+        help="Compose recognized retained recipes locally; no model calls",
+    )
     application_search.add_argument("--output", type=Path, required=True)
     application_search.add_argument("--budget", type=duration)
     profile = commands.add_parser(
@@ -402,9 +408,16 @@ def main(argv=None):
                 print(json.dumps(result, indent=2))
                 raise SystemExit(2)
         elif args.command == "search-application":
-            from .applications import search
+            from .applications import search, retained_plan
 
-            outcome = search(args.config, plan=args.plan, output=args.output, budget=args.budget)
+            plan = args.plan
+            if args.retained:
+                from .applications.config import resolve
+
+                value, _ = resolve(args.config)
+                plan = retained_plan(value["project"]["root"], budget=args.budget or 240)
+
+            outcome = search(args.config, plan=plan, output=args.output, budget=args.budget)
             result = {
                 "run": str(outcome.directory),
                 "status": outcome.summary["status"],

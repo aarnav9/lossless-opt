@@ -71,9 +71,23 @@ class ApplicationSearchTests(unittest.TestCase):
     def fake(self, proposal, requests):
         def invoke(request, folder, **kwargs):
             requests.append(copy.deepcopy(request))
-            kwargs["validator"](proposal)
+            response = copy.deepcopy(proposal)
+            if "cpu_investigation" in request:
+                response["checklist"] = [
+                    {
+                        "id": c["id"],
+                        "assessment": "hypothesis"
+                        if c["id"] == "work" and proposal["edits"]
+                        else "unknown",
+                        "reason": "Test hypothesis; other mechanisms unmeasured",
+                        "evidence_ids": ["visible:timing"],
+                        "experiment": c["id"] == "work" and bool(proposal["edits"]),
+                    }
+                    for c in request["cpu_investigation"]["catalog"]["cards"]
+                ]
+            kwargs["validator"](response)
             folder.mkdir(parents=True)
-            (folder / "response.json").write_text(json.dumps(proposal))
+            (folder / "response.json").write_text(json.dumps(response))
             return {"eligible": True, "elapsed_seconds": 0.01, "timed_out": False}
 
         return invoke
@@ -98,6 +112,13 @@ class ApplicationSearchTests(unittest.TestCase):
         self.assertTrue((result.directory / "selected.patch").exists())
         self.assertEqual((self.project / "app.py").read_text(), self.source)
         self.assertTrue(result.summary["runner_unchanged"])
+        self.assertIn("hardware:cpu", requests[0]["evidence"])
+        coverage = result.summary["checklist_coverage"]
+        self.assertFalse(coverage["unreviewed_ids"])
+        work = next(e for e in coverage["entries"] if e["id"] == "work")
+        self.assertEqual(work["status"], "evaluated")
+        self.assertEqual(work["proof_status"], "not_checked")
+        self.assertEqual(work["experiments"][0]["status"], "matched")
         with self.assertRaisesRegex(ValueError, "deployment artifact"):
             export(result.directory, self.root / "deployment")
 
@@ -108,8 +129,18 @@ class ApplicationSearchTests(unittest.TestCase):
         self.assertFalse((result.directory / "evaluation").exists())
         self.assertFalse((result.directory / "selected.patch").exists())
 
+    def test_architecture_disabled_restores_prior_author_context(self):
+        self.plan["architecture"] = False
+        result, requests = self.run_search(self.proposal())
+        self.assertEqual(result.summary["status"], "accepted_experiment")
+        self.assertNotIn("cpu_investigation", requests[0])
+        self.assertNotIn("hardware:cpu", requests[0]["evidence"])
+        self.assertNotIn("checklist_coverage", result.summary)
+
     def test_saved_candidates_do_not_call_a_provider(self):
         self.plan["candidates"] = [self.proposal()]
+        self.plan["architecture"] = False
+        self.plan["discovery_resources"] = True
         with (
             contextlib.redirect_stdout(io.StringIO()),
             patch.object(codex_provider, "invoke", side_effect=AssertionError("no provider")),
@@ -123,6 +154,7 @@ class ApplicationSearchTests(unittest.TestCase):
         self.assertEqual(result.summary["status"], "accepted_experiment", result.summary)
         self.assertEqual(result.summary["llm_calls"], 0)
         self.assertEqual(result.summary["provider_seconds"], 0)
+        self.assertTrue(result.summary["candidates"][0]["discovery_resources"]["eligible"])
 
     def test_reusing_previous_output_buffer_is_rejected(self):
         (self.project / "app.py").write_text(
@@ -188,6 +220,7 @@ class ApplicationSearchTests(unittest.TestCase):
                 {
                     "reference": dict(
                         sequence_seconds=ref,
+                        call_seconds=[ref],
                         setup_seconds=1,
                         first_call_seconds=ref,
                         process_seconds=1,
@@ -195,6 +228,7 @@ class ApplicationSearchTests(unittest.TestCase):
                     ),
                     "candidate": dict(
                         sequence_seconds=candidate,
+                        call_seconds=[candidate],
                         setup_seconds=1,
                         first_call_seconds=candidate,
                         process_seconds=1,

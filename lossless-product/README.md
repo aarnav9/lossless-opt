@@ -6,6 +6,13 @@
 
 The product direction covers ML, vision, and linear algebra. This alpha implements the adapters below. It does not yet optimize arbitrary model graphs or CUDA workloads.
 
+The source also packages [30 retained research mechanisms](docs/research-integration.md)
+as scoped APIs and search candidates, including CPU application composition,
+prepared metadata, worker pools, native/model regions and structured numerical
+solves. A fresh local pybaselines integration passed exact output and resource
+gates at **1.317× complete-call speed**; setup plus three short calls was near
+parity. Applicable candidates compete rather than being enabled indiscriminately.
+
 | Adapter | Computation | Correctness and limits |
 | --- | --- | --- |
 | `native.copy` | Float32 tensor copy on CPU | Exact bit patterns, including NaN payloads and signed zero; finite validation |
@@ -45,7 +52,7 @@ bound = operation.bind(x)
 y = bound()
 ```
 
-The native harness measures calls with preallocated buffers, including ctypes dispatch. `operation(x)` also allocates and validates; those additional costs are not included in the reported native speedup. A bound result is overwritten on its next call. Preserve the bound arrays' dtype, shape, strides, and value-domain contract; use separate bindings for separate workers. Unseen shapes/layouts or changed environments use the reference. Artifact hashes detect changed files; they are not signatures. Load artifacts you trust.
+New source native jobs default to `objective.timing_scope: "call"`: acceptance measures ordinary `operation(x)` calls, including guards, allocation, binding and dispatch. Kernel-only timings are diagnostic. Select `"bound"` explicitly only when the application reuses bound buffers; that boundary excludes binding and allocation. Historical results retain their original measurement scope. A bound result is overwritten on its next call. Preserve the bound arrays' dtype, shape, strides, and value-domain contract; use separate bindings for separate workers. Unseen shapes/layouts or changed environments use the reference. Artifact hashes detect changed files; they are not signatures. Load artifacts you trust. [Benchmark boundaries, regression gates and public suite choices](docs/benchmarking.md).
 
 ## Configure a job and your LLM
 
@@ -57,6 +64,15 @@ repeatability without model calls. `lossless profile JOB --explain` adds callabl
 profiling and an optional evidence-linked Codex assessment. The experimental
 [`search-application` loop](docs/application-search.md) authors scoped source
 changes, checks exact observations and measures complete callable speedups.
+Application search now includes a [sourced CPU checklist](docs/cpu-investigation.md)
+with hardware facts, discovery diagnostics, interactions, correctness obligations
+and coverage reporting. Unknown hardware counters remain explicit; checklist
+coverage does not establish proof or acceptance.
+The initial [matched pilot](docs/cpu-checklist-study.md) favored the previous
+author context and exposed prompt-history overhead, which has since been reduced.
+The [100-experiment CPU campaign](docs/cpu-100-study.md) covers compiled helpers,
+pooling, wrapper overhead, prepared metadata and compiler feedback. Scoped exact
+gains did not pass every final gate. Application search can now opt into declared C helpers.
 Guarded application deployment remains under development.
 [ModPoly experiment: 1.058× on scoped repeated calls](docs/application-search-study.md).
 [Profiling guide](docs/application-profiling.md) · [Intake guide](docs/applications.md) · [Example](examples/application/README.md)

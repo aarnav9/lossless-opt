@@ -75,8 +75,8 @@ def scope_sources(root, scope):
     return result
 
 
-def schema():
-    return {
+def schema(checklist_ids=None, evidence_ids=(), native_scope=()):
+    result = {
         "type": "object",
         "additionalProperties": False,
         "required": ["schema_version", "hypothesis", "edits"],
@@ -95,19 +95,46 @@ def schema():
             },
         },
     }
+    if checklist_ids is not None:
+        from .architecture import notes_schema
+
+        result["required"].append("checklist")
+        result["properties"]["checklist"] = notes_schema(checklist_ids, evidence_ids)
+    if native_scope:
+        from . import native
+
+        result["required"].append("native_sources")
+        result["properties"]["native_sources"] = native.schema(native_scope)
+    return result
 
 
-def validate(proposal, scope):
+def validate(proposal, scope, native_scope=()):
     fields(
         proposal,
-        {"schema_version", "hypothesis", "edits"},
+        {
+            "schema_version",
+            "hypothesis",
+            "edits",
+            "checklist",
+            *(("native_sources",) if native_scope else ()),
+        },
         "proposal",
         {"schema_version", "hypothesis", "edits"},
     )
     if type(proposal["schema_version"]) is not int or proposal["schema_version"] != 1:
         raise ValueError("unsupported candidate schema")
+    if native_scope:
+        from . import native
+
+        native.validate_sources(proposal.get("native_sources", []), native_scope)
     if not isinstance(proposal["hypothesis"], str) or not 1 <= len(proposal["hypothesis"]) <= 8000:
         raise ValueError("candidate hypothesis must be bounded text")
+    if "checklist" in proposal:
+        from .architecture import validate_notes
+
+        validate_notes(proposal["checklist"])
+        if not proposal["edits"] and any(n["experiment"] for n in proposal["checklist"]):
+            raise ValueError("an abstention cannot tag an implementation experiment")
     edits = proposal["edits"]
     if not isinstance(edits, list) or len(edits) > 8:
         raise ValueError("at most eight source edits")
@@ -132,9 +159,9 @@ def validate(proposal, scope):
             raise ValueError("candidate may not rebind module or closure state")
 
 
-def apply(reference, destination, proposal, scope):
+def apply(reference, destination, proposal, scope, native_scope=()):
     """Destination must already be a copied reference; return diff and AST identity."""
-    validate(proposal, scope)
+    validate(proposal, scope, native_scope)
     by_path = {}
     for edit in proposal["edits"]:
         by_path.setdefault(edit["path"], []).append(edit)
@@ -168,4 +195,6 @@ def apply(reference, destination, proposal, scope):
         canonical.setdefault(
             name, ast.dump(ast.parse((destination / name).read_text()), include_attributes=False)
         )
+    if proposal.get("native_sources"):
+        canonical["__native_helpers__"] = proposal["native_sources"]
     return "".join(changes), identity(canonical)

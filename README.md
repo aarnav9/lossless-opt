@@ -33,6 +33,11 @@ The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report
 
 ## Profile before searching
 
+Unreleased source now selects native candidates using complete public calls by
+default, including guards, allocations and dispatch. Application searches also
+gate regressions at each declared call position and can include startup costs.
+[Benchmark policy and public suite choices](lossless-product/docs/benchmarking.md).
+
 **Bring an existing application (current source):** `lossless init --project PATH --output .lossless/app`
 detects the selected environment and generates setup with entry-point suggestions.
 Supply representative cases and an invocation, inspect the readable preflight,
@@ -44,6 +49,13 @@ callable profiling and optional Codex assessment are also available with
 now author scoped source changes and test complete callable speedups; guarded
 application deployment remains under development.
 [Intake guide](lossless-product/docs/applications.md) · [Profiling and model assessment](lossless-product/docs/application-profiling.md) · [Scoped ModPoly source experiment: 1.058× on repeated calls](lossless-product/docs/application-search-study.md).
+
+Application search includes a [sourced CPU investigation checklist](lossless-product/docs/cpu-investigation.md):
+detected hardware, discovery diagnostics, 22 areas with interactions and correctness
+obligations, and a report of reviewed, evaluated and unfinished ideas. Coverage
+does not establish proof or acceptance; unavailable hardware counters stay unknown.
+The first [matched author pilot](lossless-product/docs/cpu-checklist-study.md)
+favored the previous author context and led to a fix for repeated prompt history.
 
 ```sh
 lossless init --template softmax --output ./softmax-demo
@@ -82,6 +94,16 @@ used two sessions with intervening feedback, so this is not a controlled timer
 comparison. [Results, costs and model-free reproduction](lossless-product/docs/application-continuation-study.md)
 · [Raw evidence](lossless-product/docs/evidence/application-continuation-pybaselines.json.gz)
 · [Frozen source proposal](lossless-product/experiments/application_intake/continuation-candidate.json).
+
+## Research integrated into the source package
+
+Thirty retained mechanism entries now expose scoped CPU/application, model,
+vision, numerical and search candidates. Local composition on pinned pybaselines
+measured **1.317× complete-call speed** with exact output/input/ownership checks
+and passing startup/memory gates. Setup plus three short calls was near parity;
+extra compiled/pool combinations did not improve the selected source edits.
+[Integration coverage, evidence and reproduction](lossless-product/docs/research-integration.md).
+These are source-package improvements; the existing prerelease assets are unchanged.
 
 ## 100 sequential CPU experiments
 

@@ -255,7 +255,9 @@ def resolve(config):
     if type(settings["seed"]) is not int or not 0 <= settings["seed"] < 2**32:
         raise ValueError("replay.seed must be a uint32 integer")
     profiling = value.setdefault("profile", {})
-    fields(profiling, {"repeats", "wall_time_seconds"}, "profile")
+    fields(profiling, {"repeats", "wall_time_seconds", "architecture"}, "profile")
+    if type(profiling.setdefault("architecture", True)) is not bool:
+        raise ValueError("profile.architecture must be boolean")
     profiling.setdefault("repeats", 5)
     profiling.setdefault("wall_time_seconds", 1800)
     if type(profiling["repeats"]) is not int or not 3 <= profiling["repeats"] <= 50:
@@ -338,6 +340,12 @@ def preflight_text(info):
         "LLM calls: 0; no author response allowance applies",
         "Execution: fresh processes/copied workspaces; trusted local code",
         f"Profiling: {value['profile']['repeats']} fresh timing repeats + separate attribution/memory; {value['profile']['wall_time_seconds']:g}s total",
+        "CPU checklist: "
+        + (
+            "enabled; bounded hardware query, discovery diagnostics and sourced coverage"
+            if value["profile"]["architecture"]
+            else "disabled"
+        ),
         "Assessment: "
         + (
             f"{value['analysis']['model']} / {value['analysis']['effort']}; up to 1 Codex call, clipped to profile budget"
@@ -410,7 +418,7 @@ def initialize(
         "environment": {"python": os.path.abspath(python or sys.executable), "inherit_env": []},
         "entry": selected,
         "cases": "cases.json",
-        "profile": {"repeats": 5, "wall_time_seconds": 1800},
+        "profile": {"repeats": 5, "wall_time_seconds": 1800, "architecture": True},
         "analysis": None,
         "replay": {
             "repeats": 2,

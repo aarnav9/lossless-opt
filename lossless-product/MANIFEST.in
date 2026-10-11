@@ -2,9 +2,11 @@ include README.md LICENSE NOTICE
 recursive-include src/lossless/resources *.c *.json *.lean *.toml *.gz *LICENSE lean-toolchain
 recursive-include src/lossless/adapters/mlx *.json *LICENSE
 recursive-include src/lossless/_native *.m
+recursive-include src/lossless/retained *.json *.c *.cpp *.metal *.mm *LICENSE*
 recursive-include tests *.py
 recursive-include scripts *.py
 recursive-include experiments *.py *.c *.json *.md LICENSE
+include experiments/solver_pipeline/PlanCost.lean experiments/solver_pipeline/requirements.txt
 recursive-include examples *.py *.c *.json *.md
 recursive-include docs *.md *.mmd *.dot *.png *.svg *.json *.gz
 prune examples/*/.lossless

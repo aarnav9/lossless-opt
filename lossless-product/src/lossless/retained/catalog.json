@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "recipes": [
+    {
+      "id": "matrix_chain",
+      "campaigns": [
+        "001",
+        "029",
+        "030"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.numerical.matrix_chain",
+      "scope": "Established NumPy multi_dot planning; no incremental learned-selector benefit.",
+      "status": "candidate"
+    },
+    {
+      "id": "rms_layouts",
+      "campaigns": [
+        "002",
+        "003",
+        "004",
+        "005"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.recipes.native_candidates",
+      "scope": "Native RMS candidate pool including recovered column_g4 and column_g32; independent ordinary-call evaluation.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "native_softmax",
+      "campaigns": [
+        "006",
+        "033",
+        "039",
+        "044",
+        "045",
+        "046",
+        "047"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.recipes.native_candidates",
+      "scope": "Row/column candidates, scoped Arm64 large-Fortran 046 specialization and experimental 033/039 broad dispatch. All must pass fresh complete-call gates; 033/039 failed historical default promotion.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "onnx_rms",
+      "campaigns": [
+        "008"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.onnx.rewrite",
+      "scope": "Named region, exact graph/epsilon/axis/dtype matching; compile custom op and revalidate full graph.",
+      "status": "candidate"
+    },
+    {
+      "id": "torch_regions",
+      "campaigns": [
+        "010"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.torch_cpu.regions",
+      "scope": "Frozen CPU FP32 RMS/MLP FX pattern, native vector reduction; fallback for gradients/layouts.",
+      "status": "candidate"
+    },
+    {
+      "id": "torch_aten_regions",
+      "campaigns": [
+        "011"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.retained.torch_cpu.regions",
+      "scope": "Candidate preserving ATen arithmetic; sampled exactness must be checked against actual FX graph/runtime.",
+      "status": "candidate"
+    },
+    {
+      "id": "torch_legacy_decoder",
+      "campaigns": [
+        "011"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.torch_cpu.legacy_decoder",
+      "scope": "Torch 2.2.2 / Transformers 4.43.3, no-cache forward. Historical final logits matched bytes but acceptance was numerical; optional packing raises memory.",
+      "status": "candidate"
+    },
+    {
+      "id": "metal_exact",
+      "campaigns": [
+        "012",
+        "013"
+      ],
+      "contract": "exact",
+      "backend": "metal",
+      "api": "lossless.retained.mps.candidate",
+      "scope": "Torch 2.14.0 / Transformers 4.43.3, studied SmolLM2 geometries. Campaign 012 old-runtime implementation superseded by 013.",
+      "status": "candidate"
+    },
+    {
+      "id": "metal_epilogues",
+      "campaigns": [
+        "014"
+      ],
+      "contract": "numerical",
+      "backend": "metal",
+      "api": "lossless.retained.mps.candidate",
+      "scope": "Same pinned model/runtime; epilogue fusion changes floating-point rounding.",
+      "status": "candidate"
+    },
+    {
+      "id": "certified_dense",
+      "campaigns": [
+        "015",
+        "REUSE-AND-CERTIFICATES"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.certified.CertifiedDensePlan",
+      "scope": "Owned dyadic symmetric strictly-DD SPD matrices, FP32 refinement and checked FP64 fallback; conditional outward residual bound.",
+      "status": "candidate"
+    },
+    {
+      "id": "certified_path",
+      "campaigns": [
+        "016"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.certified.CertifiedPathPlan",
+      "scope": "Exact tridiagonal structure, immutable dyadic entries, factor reuse, multiple RHS and vectorized conditional certificate.",
+      "status": "candidate"
+    },
+    {
+      "id": "mlx_retained",
+      "campaigns": [
+        "015",
+        "016",
+        "017",
+        "018",
+        "019",
+        "020",
+        "021",
+        "022",
+        "023",
+        "BATCH-VALIDATION",
+        "FAST-MODEL"
+      ],
+      "contract": "exact",
+      "backend": "metal",
+      "api": "lossless.optimize / mlx.fixed_count",
+      "scope": "Existing pinned MLX batching, liveness, cache/movement and allocator recipe; original prefix caching is baseline functionality.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "bf16_codec",
+      "campaigns": [
+        "025"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.retained.bf16_codec.encode/decode",
+      "scope": "Reversible raw uint16 tile storage including special bits; compression result, no GPU/inference speed claim.",
+      "status": "candidate"
+    },
+    {
+      "id": "mlx_graphs",
+      "campaigns": [
+        "026",
+        "027",
+        "032",
+        "034",
+        "040",
+        "041",
+        "042"
+      ],
+      "contract": "exact",
+      "backend": "metal",
+      "api": "lossless.optimize / mlx.fixed_count",
+      "scope": "Existing bounded decoder/full-head compiled graph alternatives and constraints; whole-model equality gates.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "low_rank_identity",
+      "campaigns": [
+        "029",
+        "030"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.numerical.LowRankIdentityPlan",
+      "scope": "Explicit I+UU.T only, small factor reuse; measured FP64 residual and fallback, no outward certificate.",
+      "status": "candidate"
+    },
+    {
+      "id": "ridge_matrix_free",
+      "campaigns": [
+        "029",
+        "030"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.numerical.ridge_steps",
+      "scope": "Fixed short trajectory; avoids Gram setup. FP evaluation order changes and long trajectories can lose.",
+      "status": "candidate"
+    },
+    {
+      "id": "periodic_deblur",
+      "campaigns": [
+        "031"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.numerical.PeriodicDeblurPlan",
+      "scope": "Periodic 5-tap binomial blur + positive ridge only; real FFT and disposable spectrum ownership.",
+      "status": "candidate"
+    },
+    {
+      "id": "mlx_vision",
+      "campaigns": [
+        "049"
+      ],
+      "contract": "numerical",
+      "backend": "metal",
+      "api": "lossless.retained.mlx_vision.candidate",
+      "scope": "Only two fully qualified task scopes: maxpool and conv/average-pool/sigmoid/sum. Other 18 tasks are not promoted.",
+      "status": "candidate"
+    },
+    {
+      "id": "application_sources",
+      "campaigns": [
+        "APPLICATION-SEARCH",
+        "APPLICATION-BROADER",
+        "APPLICATION-CONTINUATION",
+        "CPU-CHECKLIST"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.applications.retained_plan",
+      "scope": "Hash-guarded pybaselines source revisions, caller/cache/scratch/dispatch edits; broad cached winner superseded by bounded continuation.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "compiled_regions",
+      "campaigns": [
+        "CPU-100/1"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.applications.retained_plan / native_helpers",
+      "scope": "Strict C helpers; ModPoly whole loop only when the same loaded NumPy ILP64 BLAS and layout guards apply.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "independent_workers",
+      "campaigns": [
+        "CPU-100/2"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.execution.IndependentMap",
+      "scope": "Pure independent ordered batches; bounded spawned workers, one BLAS thread, startup/IPC/output assembly/tree RSS included.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "ordinary_call_wrapper",
+      "campaigns": [
+        "CPU-100/3"
+      ],
+      "contract": "exact_relative_to_kernel",
+      "backend": "cpu",
+      "api": "NativeOperation.optimized_calls",
+      "scope": "Raw bindings, direct dispatch, bounded immutable ones and hybrid domain scan. Underlying softmax/RMS contracts remain numerical; opt-in, not a default promotion.",
+      "status": "candidate"
+    },
+    {
+      "id": "prepared_metadata",
+      "campaigns": [
+        "CPU-100/4"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.execution.BoundedPlans / lossless.retained.pybaselines.ModPolyPlan",
+      "scope": "Owned grid/order, explicit preparation, dynamic signals/weights; separate preparation cost, ordinary bounded cache also available.",
+      "status": "integrated_search"
+    },
+    {
+      "id": "siglip_constants",
+      "campaigns": [
+        "VISION-MECHANISMS"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.retained.vision.SiglipLoss",
+      "scope": "CPU square float32/64 logits; bounded sign reuse with unchanged loss and gradient path. No whole-model training qualification.",
+      "status": "candidate"
+    },
+    {
+      "id": "serial_planning",
+      "campaigns": [
+        "SOLVER-PIPELINE"
+      ],
+      "contract": "planning",
+      "backend": "cpu",
+      "api": "lossless.retained.planning.dynamic_program",
+      "scope": "Optimal only within evaluator-owned additive integer cost model; solver showed no incremental speed over fully fused native control.",
+      "status": "candidate"
+    },
+    {
+      "id": "conditioned_least_squares",
+      "campaigns": [
+        "030"
+      ],
+      "contract": "numerical",
+      "backend": "cpu",
+      "api": "lossless.retained.numerical.RefinedLeastSquaresPlan",
+      "scope": "New guarded prepared form of a numerical lead: FP64 conditioning admission, two residual refinements, measured error estimate and QR fallback. Fresh speed qualification required.",
+      "status": "candidate"
+    },
+    {
+      "id": "byte_pointwise_fusion",
+      "campaigns": [
+        "SOLVER-PIPELINE"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.retained.uint8.Uint8Pipeline",
+      "scope": "Explicit byte-operation sequence, native arithmetic or exhaustive scalar LUT; packing/allocation/dispatch stay timed.",
+      "status": "candidate"
+    },
+    {
+      "id": "mlx_whole_request",
+      "campaigns": [
+        "048"
+      ],
+      "contract": "exact",
+      "backend": "metal",
+      "api": "lossless.retained.mlx_full_request.load_candidate",
+      "scope": "Experimental pinned 8-bit SmolLM2 / Apple M2 fixed-count token API. Historical aggregate gain failed tail/TTFT gates; requalification required.",
+      "status": "experimental_candidate"
+    },
+    {
+      "id": "finite_copy_proof_filter",
+      "campaigns": [
+        "034"
+      ],
+      "contract": "exact",
+      "backend": "cpu",
+      "api": "lossless.retained.copy_proof.candidate",
+      "scope": "Optional Z3 shared index IR, positive finite C/F shapes; reject invalid mappings before compilation. Proof filters search only; independent execution checks still required.",
+      "status": "candidate"
+    },
+    {
+      "id": "discovery_racing",
+      "campaigns": [
+        "037"
+      ],
+      "contract": "planning",
+      "backend": "cpu",
+      "api": "lossless.retained.racing.BoundedRace",
+      "scope": "Experimental rejection-only bounded-score timing race; independent stable-score assumptions are not device-drift guarantees. Keep reference and confirm survivors.",
+      "status": "experimental_candidate"
+    }
+  ],
+  "not_promoted": {
+    "007": "ORT softmax integration lost to optimized ORT.",
+    "009": "Projection packing/rewrite lost overall.",
+    "024": "Tiny cache/merge gain failed speed and memory gates.",
+    "028": "No incremental graph-IR gain beyond established compiled graphs.",
+    "035": "Scheduling controls inconclusive.",
+    "038": "Tensor factorization lost.",
+    "043": "Live author budget study supplied candidates now represented by scoped 046, not a new execution mechanism.",
+    "048": "Available only as an experimental candidate; long-single/TTFT failures prevent default promotion.",
+    "CPU-100/5": "Compiler-feedback family failed final performance; no universal diagnostic-context gain.",
+    "030/normal_equations": "Unrestricted normal equations diverged at high condition numbers; only guarded prepared version can be considered.",
+    "VISION-MECHANISMS/bicubic": "Resizing rewrites lost; keep stock. Diagonal SigLIP rewrite also lost against cached-sign comparator.",
+    "036": "Token-only head bounds did not establish a faster recipe and do not preserve the full probability contract."
+  }
+}

@@ -122,7 +122,7 @@ def digest(arrays):
 
 def load_library(path):
     lib = ctypes.CDLL(str(path))
-    ptr = ctypes.POINTER(ctypes.c_float)
+    ptr = ctypes.c_void_p
     lib.kernel.argtypes = [ptr] * 7 + [ctypes.c_size_t] * 4
     lib.kernel.restype = None
     return lib
@@ -148,6 +148,22 @@ def executors(operator, case, arrays, baseline, candidate):
         return call
 
     funcs = {"native_baseline": native(baseline), "proposal": native(candidate)}
+    funcs.update(library_functions(operator, arrays, out, inv, px))
+
+    def guards():
+        return all(bool(np.all(s[:16] == GUARD) and np.all(s[-16:] == GUARD)) for s in stores)
+
+    def poison():
+        out.fill(np.nan)
+
+    return funcs, guards, poison
+
+
+def library_functions(operator, arrays, out, inv=None, px=None):
+    """Same arithmetic for guarded validation and ordinary library deployment."""
+    x, r, w = arrays
+    rows, cols = x.shape
+    funcs = {}
     if operator == "copy":
         funcs["numpy_copy"] = lambda: np.copyto(out, x) or out
     elif operator == "softmax":
@@ -187,16 +203,21 @@ def executors(operator, case, arrays, baseline, candidate):
 
         funcs["numpy_buffered"] = numpy_call
 
-    def guards():
-        return all(bool(np.all(s[:16] == GUARD) and np.all(s[-16:] == GUARD)) for s in stores)
-
-    def poison():
-        out.fill(np.nan)
-
-    return funcs, guards, poison
+    return funcs
 
 
-def bind_native(arrays, library):
+def bind_comparator(operator, arrays, library, comparator):
+    """Allocate deployment buffers without benchmark red zones or poisoning."""
+    if comparator == "native_baseline":
+        return bind_native(arrays, library)
+    x = arrays[0]
+    out = np.empty(x.shape, dtype=np.float32)
+    inv = np.empty(x.shape[0], dtype=np.float32) if operator == "rmsnorm_residual" else None
+    px = np.empty(x.shape, dtype=np.float32) if operator == "rmsnorm_residual" else None
+    return library_functions(operator, arrays, out, inv, px)[comparator]
+
+
+def bind_native(arrays, library, *, immediate=False, raw=False):
     """Deployment buffers without benchmark baselines, red zones or initialization.
 
     Keep the complete public scratch ABI: generated candidates may use all three
@@ -207,8 +228,16 @@ def bind_native(arrays, library):
     out, px, pr = [np.empty((rows, cols), dtype=np.float32) for _ in range(3)]
     inv = np.empty(rows, dtype=np.float32)
     owners = (x, r, w, out, inv, px, pr)
-    pointers = [a.ctypes.data_as(ctypes.POINTER(ctypes.c_float)) for a in owners]
+    pointers = (
+        [int(a.ctypes.data) for a in owners]
+        if raw
+        else [a.ctypes.data_as(ctypes.POINTER(ctypes.c_float)) for a in owners]
+    )
     rs, cs = (s // 4 for s in x.strides)
+
+    if immediate:
+        library.kernel(*pointers, rows, cols, rs, cs)
+        return out
 
     def call():
         library.kernel(*pointers, rows, cols, rs, cs)

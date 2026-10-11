@@ -124,7 +124,7 @@ def cuda_probe():
         return {"status": "unavailable", "reason": "invalid_probe_json"}
 
 
-def collect(*, basic=False):
+def collect(*, basic=False, cpu_only=False):
     start = time.monotonic()
     packages = {}
     for name in PACKAGES:
@@ -136,7 +136,7 @@ def collect(*, basic=False):
     report = {
         "schema_version": 1,
         "collected_utc": datetime.now(timezone.utc).isoformat(),
-        "collection_mode": "basic" if basic else "device_queries",
+        "collection_mode": "basic" if basic else "cpu_queries" if cpu_only else "device_queries",
         "host": {
             "os": system,
             "os_release": platform.release(),
@@ -190,6 +190,10 @@ def collect(*, basic=False):
     if basic:
         report["collection_seconds"] = time.monotonic() - start
         return report
+    if cpu_only:
+        report["scope"] = (
+            "OS-reported CPU facts and interpreter package metadata only; no accelerator queries, compilation, model load, benchmark or network. No runtime admission certificate."
+        )
     cpu, errors = report["host"]["cpu_details"], report["host"]["cpu_query_errors"]
     if system == "Darwin":
         report["host"]["cpu_details_source"] = "sysctl allowlist; cache sizes are CPU caches"
@@ -198,7 +202,8 @@ def collect(*, basic=False):
             cpu[key] = int(value) if value is not None and value.isdecimal() else value
             if error:
                 errors[key] = error
-        report["accelerators"]["metal"] = metal_probe()
+        if not cpu_only:
+            report["accelerators"]["metal"] = metal_probe()
         report["accelerators"]["cuda"] = {
             "status": "not_applicable",
             "reason": "CUDA probe supports Linux only",
@@ -219,9 +224,10 @@ def collect(*, basic=False):
                     cpu["memory_total_bytes"] = int(line.split()[1]) * 1024
         except (OSError, ValueError):
             errors["memory_total_bytes"] = "unavailable"
-        report["accelerators"]["cuda"] = cuda_probe()
+        if not cpu_only:
+            report["accelerators"]["cuda"] = cuda_probe()
         report["accelerators"]["metal"] = {"status": "not_applicable"}
-    for tool in ("clang", "nvcc", "ncu"):
+    for tool in ("clang",) if cpu_only else ("clang", "nvcc", "ncu"):
         if shutil.which(tool):
             value, error = command([tool, "--version"], timeout=3)
             # clang's later lines include its installation directory.
@@ -252,11 +258,14 @@ def load_report(path):
     return value
 
 
-def collect_bounded(timeout=5):
+def collect_bounded(timeout=5, *, cpu_only=False, python=None):
     """Try full device queries within one budget; keep missing facts explicit."""
     import signal
 
     basic = collect(basic=True)
+    basic["software"]["inventory_interpreter"] = (
+        "controller fallback; selected interpreter not queried"
+    )
     if timeout <= 0:
         basic["collection_error"] = "hardware query budget exhausted"
         return basic
@@ -265,7 +274,8 @@ def collect_bounded(timeout=5):
     with tempfile.TemporaryDirectory(prefix="lossless-hardware-query-") as folder:
         output = Path(folder) / "profile.json"
         process = subprocess.Popen(
-            [sys.executable, "-m", "lossless._native.hardware", "--output", str(output)],
+            [python or sys.executable, "-I", str(Path(__file__).resolve()), "--output", str(output)]
+            + (["--cpu-only"] if cpu_only else []),
             env=env,
             cwd=folder,
             stdout=subprocess.DEVNULL,
@@ -275,7 +285,9 @@ def collect_bounded(timeout=5):
         try:
             process.wait(timeout=timeout)
             if process.returncode == 0:
-                return load_report(output)
+                result = load_report(output)
+                result["software"]["inventory_interpreter"] = "selected interpreter"
+                return result
             basic["collection_error"] = f"query exited {process.returncode}"
         except subprocess.TimeoutExpired:
             basic["collection_error"] = "hardware query timeout; basic inventory only"
@@ -323,19 +335,22 @@ def load_notes(path):
     return value
 
 
-def emit_report(output=None, *, basic=False):
+def emit_report(output=None, *, basic=False, cpu_only=False):
     # Reserve output before probing, so an existing report is never overwritten.
     if output is not None:
         with Path(output).open("x") as stream:
-            json.dump(collect(basic=basic), stream, indent=2, allow_nan=False)
+            json.dump(collect(basic=basic, cpu_only=cpu_only), stream, indent=2, allow_nan=False)
             stream.write("\n")
     else:
-        print(json.dumps(collect(basic=basic), indent=2, allow_nan=False))
+        print(json.dumps(collect(basic=basic, cpu_only=cpu_only), indent=2, allow_nan=False))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--basic", action="store_true", help="skip OS commands and native probes")
+    parser.add_argument(
+        "--cpu-only", action="store_true", help="CPU facts only; no accelerator probes"
+    )
     args = parser.parse_args()
-    emit_report(args.output, basic=args.basic)
+    emit_report(args.output, basic=args.basic, cpu_only=args.cpu_only)

@@ -147,9 +147,7 @@ def complete(prompt: str) -> dict:
     )
     if response.stop_reason != "end_turn":
         raise ValueError("Provider did not return a complete response")
-    proposal = json.loads(
-        "".join(block.text for block in response.content if block.type == "text")
-    )
+    proposal = json.loads("".join(block.text for block in response.content if block.type == "text"))
     proposal["usage"] = {
         "input_tokens": response.usage.input_tokens,
         "output_tokens": response.usage.output_tokens,
@@ -218,6 +216,12 @@ The CPU workflow regression sends a deterministic provider the real discovery co
 Those automated checks use local fixtures. A separate live native-copy smoke now validates the source Codex connector through the public command boundary, separate evaluation and artifact export/load. Its eligible proposal did not beat NumPy and the reference was retained. [Tested CLI, receipt and setup](codex.md). No live Claude or MLX-provider quality claim follows. The measured MLX retention gain comes from the retained recipe. Earlier [campaign 043](qualification-041-043.md#043-independent-model-authoring) measured Codex authoring through a separate research harness. [Recorded validation](retention.md).
 
 ## Reports and deployment
+
+New source native jobs default to `objective.timing_scope: "call"`: selection,
+confirmation and search payback use ordinary exported calls including guards,
+allocation, binding and dispatch. Use `"bound"` only for an application that
+actually reuses bound buffers. Kernel-only measurements are separate diagnostics;
+old campaigns retain their original scope. [Full benchmark policy](benchmarking.md).
 
 A run directory contains the resolved job, expanded contract, hardware evidence, immutable source/harness hashes, discovery feedback, a frozen selection, evaluation measurements, model-call receipts, `report.json`, `report.html`, and logs. CPU workers have individual logs in `jobs/`; MLX writes its worker progress to `run.log`.
 

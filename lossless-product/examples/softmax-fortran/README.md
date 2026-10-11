@@ -34,9 +34,9 @@ import numpy as np
 
 operation = lossless.load("lossless-runs/softmax-fortran-artifact")
 x = np.asfortranarray(np.random.default_rng(1).normal(size=(66, 2039)).astype(np.float32))
-y = operation(x)                  # validates, allocates, and calls
-bound = operation.bind(x)         # allocate once for repeated calls
-y = bound()                      # output overwritten on the next bound call
+y = operation(x)  # validates, allocates, and calls
+bound = operation.bind(x)  # allocate once for repeated calls
+y = bound()  # output overwritten on the next bound call
 ```
 
 The supplied job lists **19 specific shapes, all Fortran layout**. Those exact

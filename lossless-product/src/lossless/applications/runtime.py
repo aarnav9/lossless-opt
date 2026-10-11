@@ -40,9 +40,20 @@ def stop(process):
     process.wait()
 
 
-def execute(argv, *, cwd, env, stdin, folder, timeout, max_output_bytes, progress):
+def execute(
+    argv, *, cwd, env, stdin, folder, timeout, max_output_bytes, progress, monitor_memory=False
+):
     started = clock()
     status = "completed"
+    peaks = {}
+    memory_available = False
+    if monitor_memory:
+        try:
+            import psutil
+
+            memory_available = True
+        except ImportError:
+            pass
     with (
         (folder / "stdin.txt").open("wb+") as source,
         (folder / "stdout.log").open("wb") as out,
@@ -56,6 +67,19 @@ def execute(argv, *, cwd, env, stdin, folder, timeout, max_output_bytes, progres
         heartbeat = started
         try:
             while process.poll() is None:
+                if memory_available:
+                    try:
+                        parent = psutil.Process(process.pid)
+                        for child in [parent, *parent.children(recursive=True)]:
+                            try:
+                                key = (child.pid, child.create_time())
+                                peaks[key] = max(peaks.get(key, 0), child.memory_info().rss)
+                            except psutil.NoSuchProcess:
+                                pass
+                    except psutil.NoSuchProcess:
+                        pass
+                    except (psutil.AccessDenied, OSError):
+                        memory_available = False
                 elapsed = clock() - started
                 if elapsed >= timeout:
                     status = "timeout"
@@ -80,8 +104,16 @@ def execute(argv, *, cwd, env, stdin, folder, timeout, max_output_bytes, progres
             status = "output_limit"
         if status == "completed" and process.returncode != 0:
             status = "failed"
-    return {
+    result = {
         "status": status,
         "returncode": process.returncode,
         "elapsed_seconds": clock() - started,
     }
+    if monitor_memory:
+        result["process_tree_memory"] = {
+            "available": memory_available,
+            "sum_sampled_peak_rss_bytes": sum(peaks.values()),
+            "processes": len(peaks),
+            "scope": "Separate memory run, 50ms process-tree RSS samples; sum of per-process sampled peaks double-counts shared pages and may miss short-lived allocation peaks.",
+        }
+    return result
