@@ -83,6 +83,21 @@ comparison. [Results, costs and model-free reproduction](lossless-product/docs/a
 · [Raw evidence](lossless-product/docs/evidence/application-continuation-pybaselines.json.gz)
 · [Frozen source proposal](lossless-product/experiments/application_intake/continuation-candidate.json).
 
+## 100 sequential CPU experiments
+
+Twenty experiments per family tested compiled application regions, persistent
+workers, native wrapper overhead, prepared metadata, and compiler feedback.
+On one Apple M2, the first four frozen finalists measured **1.051×, 1.400×,
+1.252× and 1.314×** their respective references on complete calls. All matched
+tested reference bits; each failed at least one regression or memory gate.
+The compiler-feedback finalist measured **0.974×** and also stayed exact.
+
+These are useful scoped research results, with no new default replacement or
+arbitrary-project speedup claim. Ratios from different families cannot be
+multiplied into a combined result. [Full report](lossless-product/docs/cpu-100-study.md)
+· [All 100 experiments](lossless-product/docs/cpu-100-experiments.md)
+· [Model-free reproduction](lossless-product/experiments/cpu_100/README.md).
+
 ## Search time is a performance tuning input
 
 **More optimization time can help when a short cap prevents useful work from completing.** A larger allowance does not guarantee a faster result or weaken the correctness contract. Our timer study found a completion threshold, with no consistent gain from doubling a one-shot author allowance from 30 to 60 minutes.

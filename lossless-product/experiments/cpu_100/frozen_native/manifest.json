@@ -1,0 +1,10 @@
+{
+  "scope": "CPU-100 frozen native reference; MIT original Lossless code; not a runtime import",
+  "files": {
+    "deployment.py": "75ff69a519829a713bd7cd4178943f50f35d81b3369e43f27ec2e3c389ff964b",
+    "copy.c": "9c27f7dd8d0a44360b83941b1c84af503f5181c1f88cdc850ca0c729c036c4bd",
+    "rmsnorm_residual.c": "5e12eb0c0319784a4a67f1c5972d55ac9e1eafed0d337593716368894cc4f8bc",
+    "softmax.c": "00544b2f5198a3a11342fb851d535d82a330b02058060e33cf2bd3fca37f59ed",
+    "operators.py": "ef8c8801ac8275f9252f0d0b34773bd8bf509f0c897515cde0bd1ddf16642735"
+  }
+}
