@@ -159,6 +159,10 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Supplemental studies
 
+- **CPU-ARRAY-PREPARATION — Experiment (exact/lossless CPU):** Evaluate direct indexed tensor assembly, bulk integer-array conversion, sorted interval pruning, direct dense stack/copy, and shared quantile work on synthetic numeric inputs.
+- **Result — accepted within recorded scope:** Six held-out paired CPU timings per case measured 2.21x indexed assembly, 1.69–1.71x integer planning, 10.31–18.21x interval matching, 1.90–2.07x stack/copy, and 1.43–1.80x column statistics. Recorded finite output/input and startup/memory checks passed. Earlier assembly timing was 1.66x; negative-zero quantile inputs retain the reference path with no consistent speedup. Isolated component results; summary only, without a standalone public reproducer. [Workloads, dimensions, method and limits](lossless-product/docs/cpu-array-preparation-study.md).
+
+
 - **APPLICATION-CONTINUATION — Experiment (exact/lossless, memory-aware continuation):** Resume the remaining 30m44s with Astra/medium after quota recovery, add per-proposal memory feedback, retire all 28 seen profiles into development and freeze eleven new final profiles.
 - **Result — same overall speed as the cache-heavy winner, better memory:** Five new revisions completed; the frozen scratch-buffer candidate measured 1.75698× stock public calls, 1.28152× stock reusable objects and 1.15188× the strongest reusable-plus-patch baseline. Both reusable baselines passed every final gate; traced allocation was equal/lower on every profile against the strongest. Overall reference retained because two public-call allocation gates still fail, largely reflecting existing fitter reuse. Diagnostic comparison with the old cache-heavy source was 1.00445× (no demonstrated gain). All final outputs exact across 1,320 timing processes; 308 upstream tests passed. Two sessions with intervening feedback, not a controlled timer comparison. [Full evidence and model-free reproduction](lossless-product/docs/application-continuation-study.md).
 
