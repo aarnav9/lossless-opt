@@ -35,7 +35,7 @@ lossless demo --budget 60s --output ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-From a standalone copy of this folder, use `python -m pip install .`. This source alpha is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
+From a standalone copy of this folder, use `python -m pip install .`. This installs current public source, including features added since the fixed `v0.1.0a1` release. The package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
 
 Use the exported operation without an LLM:
 
@@ -113,7 +113,7 @@ Merge those fields into the generated job while keeping its workload and contrac
 
 Dots show nine held-out case speedups per selected kernel; diamonds show geometric means. Five-minute kernel speed is unmeasured. [Figure data and interpretation](docs/qualification-041-043.md#readme-search-time-figure) · [SVG](docs/assets/search-time-043.svg).
 
-The unreleased source defaults to **30 minutes per LLM response** when `llm.timeout_seconds` is omitted. Set that JSON field or use `--llm-timeout 1h` to change it. `lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m` previews the frozen job; use the same options with `lossless optimize` to run it. Each response is capped by remaining total search time after reserving evaluation time, so a short job budget can cut it off earlier. Candidate/call caps still apply, and runs can finish early. [JSON/Python configuration](docs/alpha.md#search-time-and-performance-unreleased-cli-overrides) · [Expanded timer study and payback](docs/timers-044.md).
+The current `main` branch defaults to **30 minutes per LLM response** when `llm.timeout_seconds` is omitted. Set that JSON field or use `--llm-timeout 1h` to change it. `lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m` previews the frozen job; use the same options with `lossless optimize` to run it. Each response is capped by remaining total search time after reserving evaluation time, so a short job budget can cut it off earlier. Candidate/call caps still apply, and runs can finish early. [JSON/Python configuration](docs/alpha.md#search-time-and-performance-unreleased-cli-overrides) · [Expanded timer study and payback](docs/timers-044.md).
 
 Your `complete(prompt: str)` calls your preferred model and returns the JSON proposal string or object. The prompt contains the response schema, contract, permitted transformations, hardware context, and discovery feedback. A command alternative accepts one JSON request on stdin and emits one proposal batch on stdout. No model SDK or hosted Lossless service is required. Prefer a capable reasoning model for difficult searches; improved gains are a hypothesis to measure, not a guarantee. Native adapters accept C candidates; MLX currently lets the LLM choose among retained allocator policies rather than generating arbitrary GPU programs.
 
@@ -193,4 +193,4 @@ See [retention and release validation](docs/retention.md), [third-party notices]
 
 Use `lossless profile JOB --output DIRECTORY` to measure discovery inputs without searching or calling a provider. Add `--artifact PATH` to compare a guarded deployment. [Profiling guide](docs/profiling.md) · [Release installation and support matrix](docs/release-0.1.0a1.md) · [Expanded softmax qualification](docs/softmax-039.md).
 
-The unreleased source also supports frozen [MLX deployment limits](docs/alpha.md#mlx-deployment-limits-unreleased) for latency, active allocation, throughput and payback. [Broader workload qualification](docs/qualification-041-043.md) records where batching gains repeat and where they do not; these additions are not in the immutable `v0.1.0a1` release assets.
+The current `main` branch also supports frozen [MLX deployment limits](docs/alpha.md#mlx-deployment-limits-unreleased) for latency, active allocation, throughput and payback. [Broader workload qualification](docs/qualification-041-043.md) records where batching gains repeat and where they do not; these additions are not in the immutable `v0.1.0a1` release assets.

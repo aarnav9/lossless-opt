@@ -27,13 +27,13 @@ lossless report ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-The [first GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1) provides a wheel, source archive and checksums. For source development, clone this repository and install `./lossless-product`. The package has not been published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
+The commands above install the fixed [v0.1.0a1 release](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1). Newer features are already public on `main`: clone this repository and run `python -m pip install "./lossless-product[applications]"` from its root to include CPU application support. The package is not published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
 
 The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report.json` and `report.html` in the run directory. Completed runs export the accepted implementation or the reference; incomplete runs cannot be exported. A measured speedup is not guaranteed.
 
 ## Profile before searching
 
-Unreleased source now selects native candidates using complete public calls by
+The current `main` branch selects native candidates using complete public calls by
 default, including guards, allocations and dispatch. Application searches also
 gate regressions at each declared call position and can include startup costs.
 [Benchmark policy and public suite choices](lossless-product/docs/benchmarking.md).
@@ -64,7 +64,7 @@ lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-r
 
 The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a1.md).
 
-Unreleased source adds frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. The published `v0.1.0a1` assets are unchanged.
+The current `main` branch includes frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. The published `v0.1.0a1` assets are unchanged.
 
 ## CPU application experiment
 
@@ -104,21 +104,6 @@ and passing startup/memory gates. Setup plus three short calls was near parity;
 extra compiled/pool combinations did not improve the selected source edits.
 [Integration coverage, evidence and reproduction](lossless-product/docs/research-integration.md).
 These are source-package improvements; the existing prerelease assets are unchanged.
-
-## 100 sequential CPU experiments
-
-Twenty experiments per family tested compiled application regions, persistent
-workers, native wrapper overhead, prepared metadata, and compiler feedback.
-On one Apple M2, the first four frozen finalists measured **1.051×, 1.400×,
-1.252× and 1.314×** their respective references on complete calls. All matched
-tested reference bits; each failed at least one regression or memory gate.
-The compiler-feedback finalist measured **0.974×** and also stayed exact.
-
-These are useful scoped research results, with no new default replacement or
-arbitrary-project speedup claim. Ratios from different families cannot be
-multiplied into a combined result. [Full report](lossless-product/docs/cpu-100-study.md)
-· [All 100 experiments](lossless-product/docs/cpu-100-experiments.md)
-· [Model-free reproduction](lossless-product/experiments/cpu_100/README.md).
 
 ## How it works
 
