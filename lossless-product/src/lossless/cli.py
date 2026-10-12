@@ -265,6 +265,24 @@ def main(argv=None):
     )
     application_search.add_argument("--output", type=Path, required=True)
     application_search.add_argument("--budget", type=duration)
+    project_run = commands.add_parser(
+        "run-project",
+        help="Local exact CPU callable search and runnable project copy; no model calls",
+    )
+    project_run.add_argument("project", type=Path)
+    project_run.add_argument("--entry", help="file.py:function or package.module:function")
+    project_run.add_argument(
+        "--cases", type=Path, help="JSON representative discovery/evaluation calls"
+    )
+    project_run.add_argument("--python", type=Path)
+    project_run.add_argument("--factory", action="store_true")
+    project_run.add_argument("--observe", help="Observer for outputs and relevant callable state")
+    project_run.add_argument("--cleanup", help="Callable cleanup hook")
+    for option in ("include", "exclude", "inherit-env"):
+        project_run.add_argument("--" + option, action="append", default=[])
+    project_run.add_argument("--plan", type=Path, help="Optional saved local candidate plan")
+    project_run.add_argument("--budget", type=duration, default=180)
+    project_run.add_argument("--output", type=Path, required=True)
     profile = commands.add_parser(
         "profile", help="Profile discovery inputs; optional application assessment via --explain"
     )
@@ -405,6 +423,34 @@ def main(argv=None):
                 "report": str(outcome.directory / "report.html"),
             }
             if outcome.summary["status"] != "replayed":
+                print(json.dumps(result, indent=2))
+                raise SystemExit(2)
+        elif args.command == "run-project":
+            from .applications import optimize_project
+
+            outcome = optimize_project(
+                args.project,
+                output=args.output,
+                entry=args.entry,
+                cases=args.cases,
+                python=args.python,
+                factory=args.factory,
+                observe=args.observe,
+                cleanup=args.cleanup,
+                include=args.include,
+                exclude=args.exclude,
+                inherit_env=args.inherit_env,
+                budget=args.budget,
+                plan=args.plan,
+            )
+            result = {
+                "status": outcome.summary["status"],
+                "selected": outcome.summary["selected"],
+                "report": str(outcome.directory / "report.html"),
+                "application": outcome.summary.get("application"),
+                "reason": outcome.summary.get("reason"),
+            }
+            if outcome.summary["status"] not in {"accepted", "reference_retained"}:
                 print(json.dumps(result, indent=2))
                 raise SystemExit(2)
         elif args.command == "search-application":

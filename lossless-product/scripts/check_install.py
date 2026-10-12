@@ -145,6 +145,40 @@ def main(directory):
                 "import json; from pathlib import Path; r=json.loads(Path('application-search/report.json').read_text()); assert r['status']=='reference_retained' and r['selected']=='reference' and r['llm_calls']==0 and r['candidates'][0]['status']=='mismatch'; assert not Path('application-search/evaluation').exists(); print('Installed application source search passed')",
             ]
         )
+        run(
+            [
+                "-I",
+                "-m",
+                "lossless",
+                "run-project",
+                "application",
+                "--entry",
+                "app.py:run",
+                "--cases",
+                "application-job/cases.json",
+                "--budget",
+                "30s",
+                "--output",
+                "cpu-workflow",
+            ]
+        )
+        run(
+            [
+                "-I",
+                "cpu-workflow/application/run.py",
+                "--case",
+                "held_out",
+                "--output",
+                "cpu-values",
+            ]
+        )
+        run(
+            [
+                "-I",
+                "-c",
+                "from lossless.applications import read_outputs; assert read_outputs('cpu-values') == [{'value': 27}]; print('Installed CPU project delivery passed')",
+            ]
+        )
         run(["-I", "-m", "lossless", "demo", "--budget", "45s", "--output", "run"])
         run(["-I", "-m", "lossless", "export", "run", "--output", "artifact"])
         run(

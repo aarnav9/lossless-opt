@@ -56,6 +56,12 @@ New source native jobs default to `objective.timing_scope: "call"`: acceptance m
 
 ## Configure a job and your LLM
 
+For local CPU Python/NumPy callables, use
+`lossless run-project PATH --entry app.py:run --cases cases.json --output RUN`.
+It profiles, tries applicable local recipes, checks exact outputs, and creates a
+runnable project copy with reference fallback, without model calls.
+[CPU project guide and example](docs/cpu-projects.md).
+
 For an existing local application, current source also supports
 `lossless init --project PATH --output .lossless/app`, readable `lossless inspect`,
 and explicit `lossless replay` with a function/model factory or command and

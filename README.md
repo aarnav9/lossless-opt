@@ -38,17 +38,14 @@ default, including guards, allocations and dispatch. Application searches also
 gate regressions at each declared call position and can include startup costs.
 [Benchmark policy and public suite choices](lossless-product/docs/benchmarking.md).
 
-**Bring an existing application (current source):** `lossless init --project PATH --output .lossless/app`
-detects the selected environment and generates setup with entry-point suggestions.
-Supply representative cases and an invocation, inspect the readable preflight,
-then use `lossless replay` to check reference repeatability in fresh workspaces.
-This is the first stage of the [application workflow plan](lossless-product/docs/implementation.md#current-priority-bring-an-existing-application-5-october-2026);
-callable profiling and optional Codex assessment are also available with
-`lossless profile JOB --explain`. An opt-in
-[`search-application` experiment](lossless-product/docs/application-search.md) can
-now author scoped source changes and test complete callable speedups; guarded
-application deployment remains under development.
-[Intake guide](lossless-product/docs/applications.md) · [Profiling and model assessment](lossless-product/docs/application-profiling.md) · [Scoped ModPoly source experiment: 1.058× on repeated calls](lossless-product/docs/application-search-study.md).
+**Local CPU Python/NumPy projects (current source):**
+`lossless run-project PATH --entry app.py:run --cases cases.json --output RUN`
+profiles representative inputs, tests applicable local recipes under exact checks,
+and produces a runnable project copy with a reference fallback. No model calls.
+[Usage, supported scope and example](lossless-product/docs/cpu-projects.md).
+The separate [intake/replay](lossless-product/docs/applications.md),
+[optional Codex assessment](lossless-product/docs/application-profiling.md), and
+[`search-application`](lossless-product/docs/application-search.md) commands remain available.
 
 Application search includes a [sourced CPU investigation checklist](lossless-product/docs/cpu-investigation.md):
 detected hardware, discovery diagnostics, 22 areas with interactions and correctness

@@ -4,6 +4,17 @@ from .config import initialize, inspect
 from .replay import replay, ReplayResult
 from .search import search
 from .retained import retained_plan
+from .workflow import optimize_project
+from .bundle import read_outputs
 
 
-__all__ = ["initialize", "inspect", "replay", "ReplayResult", "search", "retained_plan"]
+__all__ = [
+    "initialize",
+    "inspect",
+    "replay",
+    "ReplayResult",
+    "search",
+    "retained_plan",
+    "optimize_project",
+    "read_outputs",
+]

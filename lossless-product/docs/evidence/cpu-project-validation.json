@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "validation_date_utc": "2026-10-12",
+  "unit_tests": {
+    "run": 213,
+    "passed": 205,
+    "skipped": 8,
+    "failed": 0
+  },
+  "lint": "ruff check . passed",
+  "archives": "wheel and source distribution content checks passed",
+  "installed_wheel": "fresh isolated environment: CLI run-project, reference launch, read_outputs, replay/profile/search, native export/load passed",
+  "logs": {
+    "full-tests": {
+      "sha256": "75df11e9f551bf6234481f8dcde560daf98e1b1a8a23063b76632f5baeec5c38",
+      "tail": "test_speed_is_paired_and_deterministic (test_vision_mechanisms.VisionProtocolTests.test_speed_is_paired_and_deterministic) ... ok\n\n----------------------------------------------------------------------\nRan 213 tests in 133.622s\n\nOK (skipped=8)"
+    },
+    "build": {
+      "sha256": "167de69498ce4ca25389ad9c03035e41576e0b15516481365974606ad7697f24",
+      "tail": "adding 'lossless_opt-0.1.0a1.dist-info/WHEEL'\nadding 'lossless_opt-0.1.0a1.dist-info/entry_points.txt'\nadding 'lossless_opt-0.1.0a1.dist-info/top_level.txt'\nadding 'lossless_opt-0.1.0a1.dist-info/RECORD'\nremoving build/bdist.macosx-10.9-universal2/wheel\nSuccessfully built lossless_opt-0.1.0a1.tar.gz and lossless_opt-0.1.0a1-py3-none-any.whl"
+    },
+    "install": {
+      "sha256": "3e5ff7a9a24d608beb748e61e6a2cb59db5888edea0b335e40b581030bc1864c",
+      "tail": "      \"name\": \"Matrix.blockDiag'_conjTranspose\",\n      \"statement\": \"\\u2200 {o : Type u_4} {m' : o \\u2192 Type u_7} {n' : o \\u2192 Type u_8} {\\u03b1 : Type u_14} [inst : Star \\u03b1]\\n  (M : Matrix ((i : o) \\u00d7 m' i) ((i : o) \\u00d7 n' i) \\u03b1) (k : o),\\n  M.conjTranspose.blockDiag' k = (M.blockDiag' k).conjTranspose\"\n    }\n  ]\n}\nInstalled exact export/load passed"
+    }
+  }
+}
