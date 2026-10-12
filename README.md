@@ -14,7 +14,7 @@ One recorded evaluation batch on the pinned Apple M2 setup, using the retained r
 
 ## Quickstart
 
-Requires **Python 3.10+ and clang** on macOS or Linux. On macOS, clang is provided by the Xcode Command Line Tools. Python dependencies install automatically; the CPU demo needs no model weights, GPU, LLM key, or proof toolchain.
+Requires **Python 3.10+ and clang** on macOS or Linux. Python dependencies install automatically; the CPU demo needs no model weights, GPU, LLM key, or proof toolchain.
 
 ```sh
 python3 -m venv .venv
