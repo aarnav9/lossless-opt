@@ -1,11 +1,37 @@
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+import subprocess
 import sys
 
 from lossless._native import engine, operators, providers
 from lossless._native.common import read, write
+
+
+class WorkerCleanupTests(unittest.TestCase):
+    def test_permission_error_during_worker_exit_is_reaped(self):
+        # Exercise a real child exit between the timeout and the group signal.
+        with subprocess.Popen([sys.executable, "-c", "pass"], start_new_session=True) as process:
+            with patch.object(engine.os, "killpg", side_effect=PermissionError("exit race")):
+                engine._stop_worker(process)
+            self.assertEqual(process.returncode, 0)
+
+    def test_permission_denial_for_live_worker_is_not_hidden(self):
+        process = Mock(pid=123)
+        process.wait.side_effect = subprocess.TimeoutExpired("worker", 1)
+        error = PermissionError("worker still alive")
+        with patch.object(engine.os, "killpg", side_effect=error):
+            with self.assertRaises(PermissionError) as raised:
+                engine._stop_worker(process)
+        self.assertIs(raised.exception, error)
+        process.wait.assert_called_once_with(timeout=1)
+
+    def test_disappeared_group_still_reaps_worker(self):
+        process = Mock(pid=123)
+        with patch.object(engine.os, "killpg", side_effect=ProcessLookupError):
+            engine._stop_worker(process)
+        process.wait.assert_called_once_with()
 
 
 class KernelLabTests(unittest.TestCase):

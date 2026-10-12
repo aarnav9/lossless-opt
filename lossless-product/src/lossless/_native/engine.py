@@ -314,6 +314,22 @@ def job_specs(run, state, stage):
         )
 
 
+def _stop_worker(process):
+    """Stop the isolated group and reap its worker despite an exit/signal race."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    except PermissionError as error:
+        # macOS can refuse a group signal as the worker exits (for example on
+        # its own SIGALRM). Only tolerate this if it actually finishes promptly.
+        try:
+            process.wait(timeout=1)
+        except subprocess.TimeoutExpired:
+            raise error
+    process.wait()
+
+
 def execute(run, stage, max_jobs=None, deadline=None):
     if stage not in ("discovery", "evaluation"):
         raise ValueError("invalid stage")
@@ -422,11 +438,7 @@ def execute(run, stage, max_jobs=None, deadline=None):
                 except (subprocess.TimeoutExpired, KeyboardInterrupt) as error:
                     timed_out = isinstance(error, subprocess.TimeoutExpired)
                     interrupted = not timed_out
-                    try:
-                        os.killpg(process.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
-                    process.wait()
+                    _stop_worker(process)
             elapsed = time.monotonic() - started
             state["spent_seconds"] += elapsed
             count += 1

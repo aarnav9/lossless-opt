@@ -65,7 +65,9 @@ def validate_scope(value):
 
 def names(name):
     stem = "_lossless_native_" + name
-    return [stem + ".c", stem + ".py", stem + (".dylib" if sys.platform == "darwin" else ".so")]
+    # Python prioritizes an identically named .so over the ctypes .py wrapper.
+    binary = stem + ".native" + (".dylib" if sys.platform == "darwin" else ".so")
+    return [stem + ".c", stem + ".py", binary]
 
 
 def schema(scope):

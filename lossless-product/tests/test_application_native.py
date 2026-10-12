@@ -1,6 +1,7 @@
 """Native helper admission, reproducible builds and real application evaluation."""
 
 import copy
+from importlib.machinery import PathFinder, SourceFileLoader
 import json
 from pathlib import Path
 import shutil
@@ -8,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from lossless.applications import initialize, native, patches, search
 
@@ -21,6 +23,18 @@ SOURCE = "#include <stddef.h>\nvoid increment(int *x,size_t n){for(size_t i=0;i<
 
 
 class ApplicationNativeTests(unittest.TestCase):
+    def test_helper_binary_cannot_shadow_python_wrapper(self):
+        for platform in ("linux", "darwin"):
+            with self.subTest(platform=platform), tempfile.TemporaryDirectory() as directory:
+                with patch.object(native.sys, "platform", platform):
+                    files = native.names("increment")
+                root = Path(directory)
+                for name in files:
+                    (root / name).touch()
+                spec = PathFinder.find_spec("_lossless_native_increment", [str(root)])
+                self.assertIsInstance(spec.loader, SourceFileLoader)
+                self.assertEqual(Path(spec.origin), root / "_lossless_native_increment.py")
+
     def test_scope_and_sources_fail_closed(self):
         native.validate_scope(SCOPE)
         for change in [
