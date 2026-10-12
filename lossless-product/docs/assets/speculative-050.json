@@ -1,0 +1,1361 @@
+{
+  "plan": {
+    "models": {
+      "360M": {
+        "id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "revision": "a10cc1512eabd3dde888204e902eca88bddb4951"
+      },
+      "135M": {
+        "id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+        "revision": "12fd25f77366fa6b3b4b768ec3050bf629380bac"
+      }
+    },
+    "platform": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+    "processor": "",
+    "versions": {
+      "torch": "2.14.1+cpu",
+      "transformers": "4.57.6",
+      "numpy": "2.4.6"
+    },
+    "threads": 4,
+    "dtype": "float32",
+    "device": "cpu",
+    "attention": "sdpa",
+    "tokens": 64,
+    "repeats": 7,
+    "cases": {
+      "discovery": {
+        "explain": "Explain why leaves change color in autumn in simple terms.",
+        "code": "Write a Python function that returns the first n Fibonacci numbers.",
+        "copy": "Repeat the following sentence ten times: The red fox runs past the tree."
+      },
+      "evaluation": {
+        "explain": "Explain how a refrigerator keeps food cold in simple terms.",
+        "code": "Write a Python function that checks whether a string is a palindrome.",
+        "copy": "Repeat the following sentence ten times: A blue bird sits beside the lake.",
+        "summarize": "Summarize this paragraph in three sentences: A community garden opened in a vacant lot last spring. Volunteers planted tomatoes, beans, and flowers. Local students installed rain barrels to conserve water. Neighbors share the harvest and meet on Saturdays to maintain the paths. Next year they plan to add fruit trees and a small greenhouse."
+      }
+    },
+    "source_sha256": "d0e1370abb22afd8d800d2e4066fcf0ddf0685f910f6bb220ac6ce5842aad11c",
+    "setup_seconds": 0.5098908540094271,
+    "contract": "Exact tokens, full logprob bits, active KV bits and forced continuation logits",
+    "timing_scope": "Fresh-cache generation plus full log_softmax; excludes loading, tokenization and validation"
+  },
+  "selection": {
+    "methods": [
+      "draft_8",
+      "lookup_8"
+    ],
+    "discovery": {
+      "draft_2": [
+        {
+          "key": "explain",
+          "speedup": 0.8383673217102444,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.62396240234375e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.52587890625e-05,
+            "kv_length": [
+              72,
+              72
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.7404556274414062e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "code",
+          "speedup": 1.0714439914776142,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.0517578125e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.71661376953125e-05,
+            "kv_length": [
+              74,
+              74
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.09808349609375e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "copy",
+          "speedup": 1.0879414084290226,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 0.000102996826171875
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 3.254413604736328e-05,
+            "kv_length": [
+              76,
+              76
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.0503997802734375e-05,
+            "exact": false
+          }
+        }
+      ],
+      "draft_4": [
+        {
+          "key": "explain",
+          "speedup": 0.7713924442960998,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.24249267578125e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 2.09808349609375e-05,
+            "kv_length": [
+              72,
+              72
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.5735626220703125e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "code",
+          "speedup": 1.1553586446675037,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.814697265625e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.9073486328125e-05,
+            "kv_length": [
+              74,
+              74
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.9073486328125e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "copy",
+          "speedup": 1.1234606542218613,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 0.00011444091796875
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 3.0040740966796875e-05,
+            "kv_length": [
+              76,
+              76
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.6226043701171875e-05,
+            "exact": false
+          }
+        }
+      ],
+      "draft_8": [
+        {
+          "key": "explain",
+          "speedup": 0.6703443617370709,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 4.38690185546875e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.9073486328125e-05,
+            "kv_length": [
+              72,
+              72
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.0503997802734375e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "code",
+          "speedup": 1.1890849419233083,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.62396240234375e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 2.09808349609375e-05,
+            "kv_length": [
+              74,
+              74
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.47955322265625e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "copy",
+          "speedup": 1.3338208946622734,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 0.00014495849609375
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 3.886222839355469e-05,
+            "kv_length": [
+              76,
+              76
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.384185791015625e-05,
+            "exact": false
+          }
+        }
+      ],
+      "lookup_4": [
+        {
+          "key": "explain",
+          "speedup": 0.9715044408205572,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.0517578125e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.1920928955078125e-05,
+            "kv_length": [
+              72,
+              72
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.6689300537109375e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "code",
+          "speedup": 1.069185745146814,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 4.1961669921875e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.9073486328125e-05,
+            "kv_length": [
+              74,
+              74
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.09808349609375e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "copy",
+          "speedup": 2.443984231611329,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 0.0001373291015625
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 3.4689903259277344e-05,
+            "kv_length": [
+              76,
+              76
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.4318695068359375e-05,
+            "exact": false
+          }
+        }
+      ],
+      "lookup_8": [
+        {
+          "key": "explain",
+          "speedup": 0.9426209016329169,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 4.38690185546875e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.52587890625e-05,
+            "kv_length": [
+              72,
+              72
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.7404556274414062e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "code",
+          "speedup": 0.9782027269921332,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 3.4332275390625e-05
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 1.9073486328125e-05,
+            "kv_length": [
+              74,
+              74
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 1.811981201171875e-05,
+            "exact": false
+          }
+        },
+        {
+          "key": "copy",
+          "speedup": 3.4187534457972903,
+          "checks": {
+            "tokens_equal": true,
+            "logprobs": {
+              "shape_dtype_equal": true,
+              "bitwise": false,
+              "max_abs": 0.000152587890625
+            },
+            "kv_bitwise": false,
+            "kv_max_abs": 4.374980926513672e-05,
+            "kv_length": [
+              76,
+              76
+            ],
+            "continuation_bitwise": false,
+            "continuation_max_abs": 2.574920654296875e-05,
+            "exact": false
+          }
+        }
+      ]
+    },
+    "selection_rule": "Fastest per drafting family, irrespective of exactness, for diagnosis only"
+  },
+  "records": [
+    {
+      "key": "explain",
+      "method": "draft_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 4.00543212890625e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 3.4332275390625e-05,
+        "kv_length": [
+          104,
+          104
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 1.621246337890625e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        49,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        8,
+        7,
+        2,
+        1
+      ],
+      "tokens_per_target_forward": 2.782608695652174,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          2.994549132999964,
+          5.964596481004264
+        ],
+        [
+          2.898383793013636,
+          5.205585294985212
+        ],
+        [
+          3.55002049804898,
+          8.854958632029593
+        ],
+        [
+          5.578455046052113,
+          7.031504145998042
+        ],
+        [
+          2.925975631980691,
+          5.674878284044098
+        ],
+        [
+          3.7647995840525255,
+          5.390284111956134
+        ],
+        [
+          3.530424333002884,
+          9.056214714015368
+        ]
+      ],
+      "orders": [
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A refrigerator keeps food cold by using a process called refrigeration. Refrigeration works by using a substance called a refrigerant to transfer heat away from the food. The refrigerant is a special liquid that changes state from liquid to gas when it absorbs heat from the food. This process is called a phase change.\n\nThe refrigerant is",
+      "speed": {
+        "paired_geomean": 0.5346120636693045,
+        "descriptive_bootstrap_95": [
+          0.4460961827052814,
+          0.6427600668801653
+        ],
+        "serial_median_seconds": 3.530424333002884,
+        "candidate_median_seconds": 5.964596481004264
+      }
+    },
+    {
+      "key": "explain",
+      "method": "lookup_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 4.00543212890625e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 1.621246337890625e-05,
+        "kv_length": [
+          104,
+          104
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 1.52587890625e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        49,
+        1,
+        9,
+        9,
+        1,
+        9,
+        1,
+        1,
+        1,
+        9,
+        1,
+        1,
+        1,
+        9,
+        9,
+        1,
+        9,
+        9,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        9,
+        9,
+        1,
+        9,
+        1,
+        9,
+        1,
+        1,
+        1,
+        1,
+        1,
+        9,
+        6,
+        9,
+        1,
+        1,
+        1,
+        1,
+        9,
+        9,
+        1,
+        9,
+        9,
+        9,
+        9,
+        1,
+        1,
+        9,
+        9,
+        9,
+        1,
+        1
+      ],
+      "tokens_per_target_forward": 1.1228070175438596,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          5.102237358049024,
+          5.744479897024576
+        ],
+        [
+          5.452247336972505,
+          4.568422378972173
+        ],
+        [
+          4.840151884010993,
+          5.261133141000755
+        ],
+        [
+          3.916328279010486,
+          3.975360443990212
+        ],
+        [
+          3.6494687720551156,
+          3.9118822399759665
+        ],
+        [
+          3.567929335986264,
+          3.4830839870264754
+        ],
+        [
+          3.5500707140308805,
+          3.6468916239682585
+        ]
+      ],
+      "orders": [
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A refrigerator keeps food cold by using a process called refrigeration. Refrigeration works by using a substance called a refrigerant to transfer heat away from the food. The refrigerant is a special liquid that changes state from liquid to gas when it absorbs heat from the food. This process is called a phase change.\n\nThe refrigerant is",
+      "speed": {
+        "paired_geomean": 0.9840796769979657,
+        "descriptive_bootstrap_95": [
+          0.9295532312174958,
+          1.0576530715326942
+        ],
+        "serial_median_seconds": 3.916328279010486,
+        "candidate_median_seconds": 3.975360443990212
+      }
+    },
+    {
+      "key": "code",
+      "method": "draft_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 5.340576171875e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 1.5735626220703125e-05,
+        "kv_length": [
+          108,
+          108
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 2.09808349609375e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        53,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        1
+      ],
+      "tokens_per_target_forward": 8.0,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          2.8783284329692833,
+          1.820280084037222
+        ],
+        [
+          2.8515149379963987,
+          1.80991178000113
+        ],
+        [
+          2.7665608589886688,
+          1.832145872991532
+        ],
+        [
+          2.7660577109782025,
+          1.7605001769843511
+        ],
+        [
+          2.851205106009729,
+          1.7587092709727585
+        ],
+        [
+          2.7581173969665542,
+          1.7477057150099427
+        ],
+        [
+          2.783449452952482,
+          1.730974149017129
+        ]
+      ],
+      "orders": [
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "Here's a Python function that checks whether a string is a palindrome:\n\n```python\ndef is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n```\n\nThis function",
+      "speed": {
+        "paired_geomean": 1.577557987647351,
+        "descriptive_bootstrap_95": [
+          1.5518145998577497,
+          1.599770100949257
+        ],
+        "serial_median_seconds": 2.783449452952482,
+        "candidate_median_seconds": 1.7605001769843511
+      }
+    },
+    {
+      "key": "code",
+      "method": "lookup_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 4.9591064453125e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 1.52587890625e-05,
+        "kv_length": [
+          108,
+          108
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 2.3365020751953125e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        53,
+        1,
+        1,
+        9,
+        9,
+        9,
+        1,
+        9,
+        9,
+        1,
+        1,
+        9,
+        1,
+        9,
+        1,
+        1,
+        9,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        9,
+        1,
+        1,
+        1,
+        1,
+        9,
+        1,
+        5,
+        9,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        9,
+        1,
+        9,
+        1,
+        9,
+        1,
+        1,
+        1,
+        9,
+        9,
+        9,
+        9,
+        1
+      ],
+      "tokens_per_target_forward": 1.2075471698113207,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          2.8212111960165203,
+          2.82596031203866
+        ],
+        [
+          2.8023032360360958,
+          2.848640911979601
+        ],
+        [
+          2.8119206649716944,
+          2.852697285998147
+        ],
+        [
+          2.7402476869756356,
+          2.8754631080082618
+        ],
+        [
+          2.8270779269514605,
+          2.8509473729645833
+        ],
+        [
+          2.850292260001879,
+          2.8450190480216406
+        ],
+        [
+          2.7602566659916192,
+          2.8745509349973872
+        ]
+      ],
+      "orders": [
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "Here's a Python function that checks whether a string is a palindrome:\n\n```python\ndef is_palindrome(s):\n    s = ''.join(c for c in s if c.isalnum()).lower()\n    return s == s[::-1]\n```\n\nThis function",
+      "speed": {
+        "paired_geomean": 0.9819122053355507,
+        "descriptive_bootstrap_95": [
+          0.9679341015340218,
+          0.9941786189787595
+        ],
+        "serial_median_seconds": 2.8119206649716944,
+        "candidate_median_seconds": 2.8509473729645833
+      }
+    },
+    {
+      "key": "copy",
+      "method": "draft_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 4.9591064453125e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 2.2590160369873047e-05,
+        "kv_length": [
+          108,
+          108
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 2.3365020751953125e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        53,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        7
+      ],
+      "tokens_per_target_forward": 8.0,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          2.80474204296479,
+          1.9000305869849399
+        ],
+        [
+          2.817381577042397,
+          1.889277413021773
+        ],
+        [
+          3.2856054739677347,
+          1.9389168379711919
+        ],
+        [
+          2.8062637980328873,
+          2.0381969969603233
+        ],
+        [
+          2.8597834359970875,
+          1.8932124890270643
+        ],
+        [
+          2.8072137430426665,
+          1.9520187500165775
+        ],
+        [
+          2.742944539000746,
+          1.945995686983224
+        ]
+      ],
+      "orders": [
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake.",
+      "speed": {
+        "paired_geomean": 1.4823334063883509,
+        "descriptive_bootstrap_95": [
+          1.4233847922144538,
+          1.560810339557317
+        ],
+        "serial_median_seconds": 2.8072137430426665,
+        "candidate_median_seconds": 1.9389168379711919
+      }
+    },
+    {
+      "key": "copy",
+      "method": "lookup_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 5.1021575927734375e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 2.193450927734375e-05,
+        "kv_length": [
+          108,
+          108
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 1.621246337890625e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        53,
+        1,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9
+      ],
+      "tokens_per_target_forward": 6.4,
+      "surplus_tokens": 1,
+      "samples": [
+        [
+          2.798923247028142,
+          0.7228338610148057
+        ],
+        [
+          2.8117109129671007,
+          0.7221498180297203
+        ],
+        [
+          2.785553961992264,
+          0.7021444439888
+        ],
+        [
+          2.7582779199583456,
+          0.7100306730135344
+        ],
+        [
+          2.7470755400136113,
+          0.7325639580376446
+        ],
+        [
+          2.7569227810017765,
+          0.7566066080471501
+        ],
+        [
+          2.755168324976694,
+          0.7234426499926485
+        ]
+      ],
+      "orders": [
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake. A blue bird sits beside the lake.",
+      "speed": {
+        "paired_geomean": 3.830093257818383,
+        "descriptive_bootstrap_95": [
+          3.7481835000078725,
+          3.897771187447026
+        ],
+        "serial_median_seconds": 2.7582779199583456,
+        "candidate_median_seconds": 0.7228338610148057
+      }
+    },
+    {
+      "key": "summarize",
+      "method": "draft_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 3.24249267578125e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 1.71661376953125e-05,
+        "kv_length": [
+          160,
+          160
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 2.0503997802734375e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        105,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9
+      ],
+      "tokens_per_target_forward": 4.923076923076923,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          2.9450850110151805,
+          3.3598093520267867
+        ],
+        [
+          3.0137198589509353,
+          3.3457269979990087
+        ],
+        [
+          2.918597651005257,
+          3.283310651022475
+        ],
+        [
+          2.9263763609924354,
+          3.8008355899946764
+        ],
+        [
+          3.035724859975744,
+          3.8650586489820853
+        ],
+        [
+          3.1555613660020754,
+          3.6682080380269326
+        ],
+        [
+          3.0891852119821124,
+          3.4931755239958875
+        ]
+      ],
+      "orders": [
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "draft_8"
+        ],
+        [
+          "draft_8",
+          "serial"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A community garden in a vacant lot in Springville was established last spring, with volunteers planting tomatoes, beans, and flowers. Local students installed rain barrels to conserve water, and neighbors share the harvest and meet on Saturdays to maintain the paths. Next year, they plan to add fruit trees and a small greenhouse.",
+      "speed": {
+        "paired_geomean": 0.8508753115466672,
+        "descriptive_bootstrap_95": [
+          0.807713619919313,
+          0.8850399027028799
+        ],
+        "serial_median_seconds": 3.0137198589509353,
+        "candidate_median_seconds": 3.4931755239958875
+      }
+    },
+    {
+      "key": "summarize",
+      "method": "lookup_8",
+      "checks": {
+        "tokens_equal": true,
+        "logprobs": {
+          "shape_dtype_equal": true,
+          "bitwise": false,
+          "max_abs": 3.62396240234375e-05
+        },
+        "kv_bitwise": false,
+        "kv_max_abs": 2.288818359375e-05,
+        "kv_length": [
+          160,
+          160
+        ],
+        "continuation_bitwise": false,
+        "continuation_max_abs": 2.3365020751953125e-05,
+        "exact": false
+      },
+      "target_forward_lengths": [
+        105,
+        1,
+        9,
+        9,
+        9,
+        9,
+        1,
+        1,
+        1,
+        1,
+        9,
+        9,
+        1,
+        1,
+        1,
+        9,
+        9,
+        9,
+        9,
+        1,
+        9,
+        9,
+        9,
+        9,
+        1
+      ],
+      "tokens_per_target_forward": 2.56,
+      "surplus_tokens": 0,
+      "samples": [
+        [
+          3.0311372759751976,
+          1.6485119249555282
+        ],
+        [
+          2.9083834040211514,
+          1.660124354006257
+        ],
+        [
+          3.2313102610060014,
+          1.6769822570495307
+        ],
+        [
+          3.2688700209837407,
+          1.7460171229904518
+        ],
+        [
+          5.3572146549704485,
+          1.9167918110033497
+        ],
+        [
+          3.5448453499702737,
+          1.9999324159580283
+        ],
+        [
+          3.4550445490167476,
+          1.6335725120152347
+        ]
+      ],
+      "orders": [
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ],
+        [
+          "lookup_8",
+          "serial"
+        ],
+        [
+          "serial",
+          "lookup_8"
+        ]
+      ],
+      "timed_tokens_equal": true,
+      "output_text": "A community garden in a vacant lot in Springville was established last spring, with volunteers planting tomatoes, beans, and flowers. Local students installed rain barrels to conserve water, and neighbors share the harvest and meet on Saturdays to maintain the paths. Next year, they plan to add fruit trees and a small greenhouse.",
+      "speed": {
+        "paired_geomean": 1.9857586270267793,
+        "descriptive_bootstrap_95": [
+          1.8163521199339314,
+          2.2406490615673
+        ],
+        "serial_median_seconds": 3.2688700209837407,
+        "candidate_median_seconds": 1.6769822570495307
+      }
+    }
+  ],
+  "summary": {
+    "draft_8": {
+      "geomean_speedup": 1.0155679258026644,
+      "tokens_equal": true,
+      "exact": false,
+      "passes_exact_speed_gate": false
+    },
+    "lookup_8": {
+      "geomean_speedup": 1.6464922164528466,
+      "tokens_equal": true,
+      "exact": false,
+      "passes_exact_speed_gate": false
+    }
+  },
+  "recorded_date": "2026-10-08",
+  "cpu": "Intel Core i7-12700H"
+}
