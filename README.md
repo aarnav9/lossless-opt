@@ -120,32 +120,6 @@ multiplied into a combined result. [Full report](lossless-product/docs/cpu-100-s
 · [All 100 experiments](lossless-product/docs/cpu-100-experiments.md)
 · [Model-free reproduction](lossless-product/experiments/cpu_100/README.md).
 
-## Search time is a performance tuning input
-
-**More optimization time can help when a short cap prevents useful work from completing.** A larger allowance does not guarantee a faster result or weaken the correctness contract. Our timer study found a completion threshold, with no consistent gain from doubling a one-shot author allowance from 30 to 60 minutes.
-
-![Announced five-minute authors all timed out. Announced 30- and 60-minute authors finished around 15–18 minutes, while the unannounced control finished around 10–12 minutes. Selected kernels had overlapping performance, 16.8–21.8% faster than retained.](lossless-product/docs/assets/timers-044.png)
-
-Three independent authors per condition received the same **native numerical softmax** task, with announced 5-, 30- or 60-minute limits or an unannounced 60-minute control. All 27 returned proposals passed numerical checks. Direct 60/30-minute winner comparisons were 1.0023×, 1.0283× and 0.9954×; only one pair was faster across every final case. These are one-shot kernel results, separate from exact MLX inference and sustained iterative search. [Full results and payback](lossless-product/docs/timers-044.md) · [Source evidence](lossless-product/docs/assets/timers-044.json.gz) · [SVG](lossless-product/docs/assets/timers-044.svg) · [Earlier 5/30-minute study](lossless-product/docs/qualification-041-043.md#043-independent-model-authoring).
-
-A [one-hour iterative follow-up](lossless-product/docs/iterate-045.md) added measured feedback between responses. Three rounds returned nine valid kernels; a fourth timed out. The final choice was only 1.00284× the first-round choice on fresh paired cases and failed the incremental improvement gate. Iterative search/evaluation took 59.20 minutes; enumeration took 97.92 seconds and delivered similar overall speed. This single trajectory does not establish that longer iterative search improves performance.
-
-A [three-model pilot](lossless-product/docs/models-047.md) then gave Sol, Astra and Luna the same 30-minute ceiling and six call slots. None passed the incremental gate against the shared seed or enumeration. Astra had the highest paired mean; Luna reached similar speed to Sol in about half the search/evaluation time. The enumeration control took 61.07 seconds. One trajectory per model does not establish a general ranking.
-
-A [broader MLX implementation experiment](lossless-product/docs/fullstack-048.md) allowed one author to revise scheduling, KV movement and graph execution. Six implementations passed discovery exactness; the selected source reached 1.098× the frozen strongest eligible references in two fresh held-out processes. It failed the full gate on long-single speed and one ragged first-token latency observation, so remains experimental. A sleep interruption also extended the nominal one-hour search beyond its wall-time allowance. This broader authoring interface is a research harness, not shipped product functionality.
-
-A [20-task KernelBench-derived MLX pilot](lossless-product/docs/kernelbench-049.md) extends that research to operators, fusions and vision/MLP graphs. All tasks passed final numerical checks; max pooling (2.044×) and a convolution/pooling pipeline (1.585×) passed their full task speed gates. The full-suite gate failed despite a 1.149× held-out mean. These are M2-sized numerical experiments, not official KernelBench CUDA scores or shipped recipes.
-
-Set both limits in the job: `budget.wall_time_seconds` controls the whole search; `llm.timeout_seconds` controls each LLM response (**default 30 minutes / 1,800 seconds in current source**). The source CLI also supports explicit overrides once a provider is configured:
-
-```sh
-lossless inspect ./my-job/lossless.json --budget 8h --llm-timeout 30m
-set -o pipefail
-python -u -m lossless optimize ./my-job/lossless.json --budget 8h --llm-timeout 30m --output ./lossless-runs/overnight 2>&1 | tee lossless-overnight.log
-```
-
-These are maximum allowances. Each response is also capped by remaining total search time after reserving evaluation time; a short job budget can cut it off before 30 minutes. Runs can finish early, and increasing total time alone does not increase candidate/call caps or the per-response limit. Leave time for compilation and final evaluation. The source CLI prints timestamped progress every 30 seconds during quiet waits. The resolved limits are frozen with the job before search. [JSON/Python configuration and current search limits](lossless-product/docs/alpha.md#search-time-and-performance-unreleased-cli-overrides).
-
 ## How it works
 
 ```mermaid
