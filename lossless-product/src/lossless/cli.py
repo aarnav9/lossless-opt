@@ -282,7 +282,20 @@ def main(argv=None):
         project_run.add_argument("--" + option, action="append", default=[])
     project_run.add_argument("--plan", type=Path, help="Optional saved local candidate plan")
     project_run.add_argument("--budget", type=duration, default=180)
+    project_run.add_argument(
+        "--prepared",
+        action="store_true",
+        help="Also qualify complete requests through reusable workers",
+    )
     project_run.add_argument("--output", type=Path, required=True)
+    diagnosis = commands.add_parser(
+        "diagnose-application",
+        help="Save fresh reference outputs and explain bit differences without accepting numerical drift",
+    )
+    diagnosis.add_argument("config", type=Path)
+    diagnosis.add_argument("--output", type=Path, required=True)
+    diagnosis.add_argument("--repeats", type=int, default=5)
+    diagnosis.add_argument("--budget", type=duration, default=60)
     profile = commands.add_parser(
         "profile", help="Profile discovery inputs; optional application assessment via --explain"
     )
@@ -425,6 +438,18 @@ def main(argv=None):
             if outcome.summary["status"] != "replayed":
                 print(json.dumps(result, indent=2))
                 raise SystemExit(2)
+        elif args.command == "diagnose-application":
+            from .applications.diagnostics import diagnose_reference
+
+            outcome = diagnose_reference(
+                args.config, output=args.output, repeats=args.repeats, budget=args.budget
+            )
+            result = dict(
+                status=outcome.summary["status"], report=str(outcome.directory / "report.json")
+            )
+            if outcome.summary["status"] == "failed":
+                print(json.dumps(result, indent=2))
+                raise SystemExit(2)
         elif args.command == "run-project":
             from .applications import optimize_project
 
@@ -442,12 +467,14 @@ def main(argv=None):
                 inherit_env=args.inherit_env,
                 budget=args.budget,
                 plan=args.plan,
+                prepared=args.prepared,
             )
             result = {
                 "status": outcome.summary["status"],
                 "selected": outcome.summary["selected"],
                 "report": str(outcome.directory / "report.html"),
                 "application": outcome.summary.get("application"),
+                "prepared_status": outcome.summary.get("prepared", {}).get("status"),
                 "reason": outcome.summary.get("reason"),
             }
             if outcome.summary["status"] not in {"accepted", "reference_retained"}:

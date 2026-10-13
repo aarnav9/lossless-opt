@@ -104,6 +104,12 @@ def make_bundle(
         "Read results: from lossless.applications import read_outputs; values = read_outputs('/path/to/new-result')\n"
         "Callable speed excludes launcher/interpreter, admission hashing, fixture I/O and result serialization. Delivery checks record separate complete-launch costs.\n"
         "Each launch starts a fresh callable/factory; a calls sequence reuses it. Outputs save values, not Python object aliases.\n"
+        "For repeated requests, qualify with run-project --prepared, then use:\n"
+        "from lossless.applications import PreparedApplication\n"
+        "with PreparedApplication('/path/to/application') as app:\n"
+        "    values = app.run_case('CASE_ID')['outputs']\n"
+        "New requests: app.run({'args': [{'$npy': 'new.npy'}]}, input_root='/path/to/fixtures').\n"
+        "Prepared workers reuse imports but reset the seeded factory per request. A separate prepared.json certificate enables optimized requests; unsupported metadata requires an explicit reference session.\n"
     )
     return destination
 
@@ -134,7 +140,7 @@ def check_delivery(bundle, value, cases, folder, deadline, progress):
             receipt = execute(
                 args,
                 cwd=bundle,
-                env=os.environ.copy(),
+                env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[2])},
                 stdin="",
                 folder=run,
                 timeout=min(left, value["replay"]["timeout_seconds"]),
@@ -173,6 +179,7 @@ def optimize_project(
     inherit_env=(),
     budget=180,
     plan=None,
+    prepared=False,
 ):
     """One local workflow; no implicit provider calls or numerical acceptance."""
     started = clock()
@@ -253,14 +260,22 @@ def optimize_project(
             architecture=False,
         )
         if profiled.summary["status"] != "profiled":
+            from .diagnostics import diagnose_reference
+
+            remaining = deadline - clock()
+            if remaining > 2:
+                report["diagnostic"] = diagnose_reference(
+                    config, output=out / "diagnostic", repeats=3, budget=min(30, remaining)
+                ).summary
             raise ValueError(
                 "reference profiling/repeatability failed; inspect profile/report.json"
             )
         available = deadline - clock()
         if available <= 0:
             raise TimeoutError("workflow budget exhausted after profiling")
+        search_budget = available * (0.65 if prepared else 0.8)
         if plan is None:
-            selected_plan, reason = plan_for(frozen, original, profiled.summary, available * 0.8)
+            selected_plan, reason = plan_for(frozen, original, profiled.summary, search_budget)
         else:
             selected_plan = copy.deepcopy(
                 read_json(plan) if isinstance(plan, (str, Path)) else plan
@@ -270,7 +285,7 @@ def optimize_project(
                     "run-project accepts local saved plans only; provider calls require search-application"
                 )
             selected_plan.update(
-                wall_time_seconds=available * 0.8, final_reserve_seconds=available * 0.35
+                wall_time_seconds=search_budget, final_reserve_seconds=search_budget * 0.45
             )
             reason = "explicit_local_plan"
         report["candidate_family"] = reason
@@ -305,8 +320,41 @@ def optimize_project(
         )
         if selected and any(c["auto"]["variant"] != "optimized" for c in report["delivery"]):
             raise ValueError(
-                "optimized deliverable failed admission in its qualification environment"
+                "optimized deliverable failed admission in its qualification environment: "
+                + "; ".join(
+                    str(c["auto"]["fallback_reason"])
+                    for c in report["delivery"]
+                    if c["auto"]["variant"] != "optimized"
+                )
             )
+        if prepared:
+            from .prepared_check import qualify_prepared
+            from .bundle import read_outputs
+            from .worker import Observer
+
+            remaining = deadline - clock()
+            if remaining <= 0:
+                report["prepared"] = dict(
+                    status="incomplete",
+                    reason="workflow budget exhausted before prepared qualification",
+                )
+            else:
+                expected_outputs = {}
+                for row in report["delivery"]:
+                    values = read_outputs(out / "delivery" / row["id"] / "reference/outputs")
+                    expected_outputs[row["id"]] = identity(
+                        Observer(value["replay"]["max_output_bytes"] * len(values)).encode(values)
+                    )
+                report["prepared"] = qualify_prepared(
+                    bundle,
+                    output=out / "prepared",
+                    expected={
+                        row["id"]: row["reference"]["fingerprint"] for row in report["delivery"]
+                    },
+                    expected_outputs=expected_outputs,
+                    python=value["environment"]["python"],
+                    budget=remaining,
+                )
         report["source_unchanged"] = (
             inventory(
                 root,

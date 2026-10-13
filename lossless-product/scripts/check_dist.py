@@ -57,6 +57,11 @@ def main(directory):
             "lossless/applications/automatic.py",
             "lossless/applications/bundle.py",
             "lossless/applications/workflow.py",
+            "lossless/applications/prepared.py",
+            "lossless/applications/prepared_worker.py",
+            "lossless/applications/prepared_check.py",
+            "lossless/applications/wire.py",
+            "lossless/applications/diagnostics.py",
             "lossless/execution.py",
             "lossless/_native/call_policy.py",
             "lossless/retained/catalog.json",
@@ -86,6 +91,7 @@ def main(directory):
             "lossless/adapters/mlx/MLX_LM_LICENSE",
             "/LICENSE",
             "NOTICE",
+            "NUMPY_FINANCIAL_LICENSE.txt",
         ]:
             if not any(n.endswith(suffix) for n in names):
                 raise ValueError(f"missing package resource: {suffix}")
@@ -120,6 +126,10 @@ def main(directory):
                 "scripts/check_cpu_project.py",
                 "docs/cpu-projects.md",
                 "docs/cpu-project-workflow-study.md",
+                "docs/cpu-prepared-study.md",
+                "docs/evidence/cpu-prepared-workflows.json.gz",
+                "docs/evidence/tmm-reference-diagnostic.json.gz",
+                "scripts/diagnose_tmm.py",
                 "docs/evidence/cpu-project-workflow.json.gz",
                 "scripts/summarize_cpu_projects.py",
                 "examples/cpu-project/project/signals.py",

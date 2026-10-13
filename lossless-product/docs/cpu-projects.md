@@ -69,8 +69,11 @@ The workflow profiles discovery cases and tries applicable local recipes:
   preparation/cache policies, and independent-spectrum pools in supported combinations.
 - Other projects: a small source candidate family replaces selected `np.sum(x)`,
   `np.mean(x)`, other simple reductions, and `np.copy(x)` calls in measured functions
-  with guarded ndarray methods. Arithmetic order is preserved; non-ndarray values
-  retain the original NumPy dispatch. Separate and combined edits compete.
+  with guarded ndarray methods, including expression arguments such as `np.all(diff < tol)`.
+  Another candidate shares repeated arithmetic expressions in straight-line functions
+  with single-assignment locals and numeric type guards. It preserves operator grouping;
+  custom numeric types and object arrays retain the original function body. Separate
+  and combined candidates compete. This does not enable algebraic reassociation.
 - An optional `--plan saved-plan.json` supplies local source/native candidates through
   the existing evaluator. Provider plans are rejected; hosted authoring remains a
   separate explicit `search-application` operation.
@@ -136,9 +139,75 @@ even when their compute becomes faster.
 
 Correctness evidence is finite and scoped to the supplied observers and cases; it
 is not a proof for every future value. General GPU work, arbitrary shell commands,
-transparent in-process installation, external side-effect equivalence and persistent
-services are outside this first workflow. A no-win reference bundle is a valid result.
+transparent in-process installation, external side-effect equivalence and general
+network services are outside this workflow. A no-win reference bundle is a valid result.
 
 Try the [small NumPy example](../examples/cpu-project/README.md). External validation
 uses `scripts/check_cpu_project.py`; see the [experiment record](cpu-project-workflow-study.md)
 for positive results, negative results and complete launch costs.
+
+## Reuse a prepared CPU worker
+
+On macOS/Linux, add `--prepared` to `run-project` to qualify a second execution mode:
+
+```sh
+lossless run-project ./my-project --entry pipeline.py:run --cases ./cases.json \
+  --prepared --budget 5m --output ./lossless-runs/prepared
+```
+
+The workflow still validates fresh launches. It additionally compares two equally
+persistent workers, reference and candidate, over six paired rounds. Each round
+repeats every evaluation case three times, rotating case and variant order. Every
+request must match the fresh reference's observations **and actual transported
+return values**. A separate `prepared.json` certificate requires complete request
+speed, per-case/per-position regression and process-tree memory gates. Source
+acceptance and prepared acceptance are separate report fields.
+
+```python
+from lossless.applications import PreparedApplication
+
+with PreparedApplication('./lossless-runs/prepared/application') as app:
+    print(app.info)  # selected variant, fallback reason and worker PID
+    first = app.run_case('held_out')['outputs']
+    second = app.run({'args': [{'$npy': 'new.npy'}]}, input_root='./new-inputs')['outputs']
+```
+
+The API owns one private process and immutable source snapshot. It reuses imports,
+but seeds and creates a **fresh factory for every request**; calls within a request
+share that factory. Cleanup runs after each request. JSON requests and `.npy` inputs
+are loaded afresh; outputs travel as copied values over a bounded JSON/NumPy channel
+without pickle. Responses are limited to 64 MiB. Only one request runs at a time.
+The context manager stops the process and removes its private files.
+
+An absent/failed certificate or changed environment selects a reference session.
+Once an optimized session starts, unsupported request metadata raises before the
+callable executes. Use `PreparedApplication(bundle, variant='reference')` explicitly
+for those inputs. Application errors and timeouts stop the worker with **no retry**.
+Modules remain loaded, so stateful modules may fail prepared qualification even
+when fresh launches qualify. This is finite observed lifecycle evidence, not a
+proof about hidden state or external side effects.
+
+Prepared timing includes fixture loading, guards, factory creation, observation,
+cleanup, serialization, transport and decoding. Startup is recorded separately;
+it must be amortized across enough requests. Memory qualification requires the
+`applications` dependencies and working process monitoring. This is a local value
+request API, not transparent in-process replacement or a network service.
+
+## Diagnose an unstable reference
+
+If reference profiling fails, the workflow attempts a short discovery-only
+diagnostic and still stops exact optimization. To collect additional snapshots:
+
+```sh
+lossless diagnose-application ./lossless-runs/project/job/lossless.json \
+  --repeats 8 --budget 1m --output ./lossless-runs/reference-diagnostic
+```
+
+The diagnostic saves actual returned values, exact fingerprints, differing element
+counts, sample values, absolute/relative component differences and finite float32/64
+ULP distances. It does not introduce tolerances or approve numerical candidates.
+Trace instrumentation can change repeatability; a repeatable diagnostic run does
+not overturn the original failure.
+
+The [prepared execution follow-up](cpu-prepared-study.md) records the broader
+financial candidates and reference diagnostics.

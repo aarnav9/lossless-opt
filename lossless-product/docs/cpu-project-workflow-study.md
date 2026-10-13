@@ -89,3 +89,8 @@ metadata fallback, modified sources, changed dependencies, relocation, saved
 returns, rejected wrong candidates, unstable references, explicit state observers,
 and no retry after partial execution. The deliberately delayed test callable is
 a deterministic routing test, not performance research evidence.
+
+The [13 October follow-up](cpu-prepared-study.md) adds applicable NumPy Financial
+candidates, separately measures prepared request latency, and records TMM's actual
+output differences. The no-recipe and unknown-magnitude findings above describe
+this original run, not the subsequent implementation.

@@ -6,6 +6,7 @@ from .search import search
 from .retained import retained_plan
 from .workflow import optimize_project
 from .bundle import read_outputs
+from .prepared import PreparedApplication
 
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "retained_plan",
     "optimize_project",
     "read_outputs",
+    "PreparedApplication",
 ]

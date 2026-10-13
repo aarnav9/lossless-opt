@@ -42,6 +42,7 @@ gate regressions at each declared call position and can include startup costs.
 `lossless run-project PATH --entry app.py:run --cases cases.json --output RUN`
 profiles representative inputs, tests applicable local recipes under exact checks,
 and produces a runnable project copy with a reference fallback. No model calls.
+Add `--prepared` to separately qualify reusable CPU workers and complete request latency.
 [Usage, supported scope and example](lossless-product/docs/cpu-projects.md).
 The separate [intake/replay](lossless-product/docs/applications.md),
 [optional Codex assessment](lossless-product/docs/application-profiling.md), and

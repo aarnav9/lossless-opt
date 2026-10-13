@@ -52,6 +52,10 @@ def main():
             "delivery/checks.json",
             "delivery/*/*/receipt.json",
             "application/manifest.json",
+            "application/prepared.json",
+            "prepared/report.json",
+            "diagnostic/report.json",
+            "diagnostic/attempts/*/receipt.json",
         ]
         for pattern in patterns:
             for path in sorted(root.glob(pattern)):
@@ -59,7 +63,7 @@ def main():
                     sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                     data=clean(json.loads(path.read_text())),
                 )
-        for relative in ("run.log", "search/selected.patch"):
+        for relative in ("run.log", "search/selected.patch", "prepared/run.log"):
             path = root / relative
             if path.is_file():
                 records[relative] = dict(
@@ -70,7 +74,7 @@ def main():
     result = dict(
         schema_version=1,
         runs=evidence,
-        scope="Local exact CPU project workflows. Include no-win and failed-reference results. SHA256 values describe original records before path redaction. Launcher timings are single descriptive pairs; only search evaluation gates qualify callable speedups. No model calls.",
+        scope="Local exact CPU project workflows. Include no-win and failed-reference results. SHA256 values describe original records before path redaction. Launcher timings are single descriptive pairs. Search evaluation qualifies callable speedups; a separate prepared report qualifies complete reusable-worker requests. No model calls.",
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(

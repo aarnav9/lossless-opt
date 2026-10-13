@@ -90,15 +90,23 @@ def verify_tree(root, files):
     )
 
 
-def select(bundle, manifest, calls, requested="auto"):
+def select(bundle, manifest, calls, requested="auto", *, check_inputs=True):
     bundle = Path(bundle).resolve()
     reference = bundle / "reference"
     if not verify_tree(reference, manifest["reference_files"]):
         raise ValueError("reference copy changed; rebuild the application bundle")
     if requested == "reference" or manifest["selected"] == "reference":
         return "reference", "reference requested or retained"
-    if identity(environment()) != identity(manifest["environment"]):
-        return "reference", "Python, packages, host or Lossless runtime changed"
+    current = environment()
+    if identity(current) != identity(manifest["environment"]):
+        changed = sorted(
+            k
+            for k in set(current) | set(manifest["environment"])
+            if current.get(k) != manifest["environment"].get(k)
+        )
+        return "reference", "Python, packages, host or Lossless runtime changed: " + ", ".join(
+            changed
+        )
     if (
         identity({name: os.environ.get(name) for name in manifest["inherit_env"]})
         != manifest["environment_values_hash"]
@@ -106,6 +114,8 @@ def select(bundle, manifest, calls, requested="auto"):
         return "reference", "declared environment settings changed"
     if not verify_tree(bundle / "optimized", manifest["optimized_files"]):
         return "reference", "optimized copy changed"
+    if not check_inputs:
+        return "optimized", None
     try:
         supported = identity(signature(calls)) in manifest["input_signatures"]
     except ValueError:
@@ -150,34 +160,38 @@ def save_value(value, output, counter, depth=0):
     raise ValueError("deliverable outputs must be Python scalars/containers or NumPy arrays")
 
 
+def restore_value(row, load_array):
+    kind = row["type"]
+    if kind in {"ndarray", "numpy_scalar"}:
+        array = load_array(row["file"])
+        return array[()] if kind == "numpy_scalar" else array
+    if kind in {"NoneType", "bool", "int", "str"}:
+        return row["value"]
+    if kind == "float":
+        return struct.unpack(">d", bytes.fromhex(row["bits"]))[0]
+    if kind == "bytes":
+        return bytes.fromhex(row["hex"])
+    if kind == "dict":
+        return {k: restore_value(v, load_array) for k, v in row["items"]}
+    if kind in {"list", "tuple"}:
+        result = [restore_value(v, load_array) for v in row["items"]]
+        return tuple(result) if kind == "tuple" else result
+    raise ValueError("unknown saved output type")
+
+
 def read_outputs(output):
     """Read saved return values; array loading never enables pickle."""
     import numpy as np
 
     output = Path(output).resolve()
 
-    def decode(row):
-        kind = row["type"]
-        if kind in {"ndarray", "numpy_scalar"}:
-            path = (output / row["file"]).resolve()
-            if not path.is_relative_to(output):
-                raise ValueError("array output escaped result directory")
-            array = np.load(path, allow_pickle=False)
-            return array[()] if kind == "numpy_scalar" else array
-        if kind in {"NoneType", "bool", "int", "str"}:
-            return row["value"]
-        if kind == "float":
-            return struct.unpack(">d", bytes.fromhex(row["bits"]))[0]
-        if kind == "bytes":
-            return bytes.fromhex(row["hex"])
-        if kind == "dict":
-            return {k: decode(v) for k, v in row["items"]}
-        if kind in {"list", "tuple"}:
-            result = [decode(v) for v in row["items"]]
-            return tuple(result) if kind == "tuple" else result
-        raise ValueError("unknown saved output type")
+    def load_array(name):
+        path = (output / name).resolve()
+        if not path.is_relative_to(output):
+            raise ValueError("array output escaped result directory")
+        return np.load(path, allow_pickle=False)
 
-    return [decode(row) for row in read_json(output / "result.json")["outputs"]]
+    return [restore_value(row, load_array) for row in read_json(output / "result.json")["outputs"]]
 
 
 def run(bundle, *, case=None, request=None, output, variant="auto"):

@@ -23,7 +23,7 @@ def copy(source, destination):
     )
 
 
-def prepare(kind, upstream, out):
+def prepare(kind, upstream, out, seed=12062026, matrix=False):
     project = out / "prepared/project"
     if kind == "pybaselines":
         from check_retained_application import prepare as prepare_spectra
@@ -59,14 +59,17 @@ def prepare(kind, upstream, out):
             "    return np.asarray(result)\n"
         )
     cases = []
-    for i, (name, split, size) in enumerate([("dev", "discovery", 80), ("new", "evaluation", 97)]):
+    shapes = [("dev", "discovery", 80, 8), ("new", "evaluation", 97, 8)]
+    if matrix and kind == "numpy-financial":
+        shapes += [("narrow", "evaluation", 121, 1), ("wide", "evaluation", 61, 32)]
+    for i, (name, split, size, width) in enumerate(shapes):
         calls = []
         for call in range(3):
-            rng = np.random.default_rng(12062026 + i * 100 + call)
+            rng = np.random.default_rng(seed + i * 100 + call)
             if kind == "numpy-financial":
-                n = rng.integers(12, 360, (size, 8)).astype(float)
-                v = rng.uniform(1000, 100000, (size, 8))
-                rate = rng.uniform(0.003, 0.03, (size, 8))
+                n = rng.integers(12, 360, (size, width)).astype(float)
+                v = rng.uniform(1000, 100000, (size, width))
+                rate = rng.uniform(0.003, 0.03, (size, width))
                 payment = -v * rate / (1 - (1 + rate) ** -n)
                 arrays = [n, payment, v]
             else:
@@ -89,6 +92,11 @@ def main():
     parser.add_argument("--project", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--budget", type=float, default=280)
+    parser.add_argument("--seed", type=int, default=12062026)
+    parser.add_argument("--prepared", action="store_true")
+    parser.add_argument(
+        "--matrix", action="store_true", help="Include held-out financial widths 1, 8 and 32"
+    )
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -102,9 +110,16 @@ def main():
     ).strip()
     write(
         out / "provenance.json",
-        dict(kind=args.kind, upstream_revision=revision, budget=args.budget),
+        dict(
+            kind=args.kind,
+            upstream_revision=revision,
+            budget=args.budget,
+            seed=args.seed if args.kind != "pybaselines" else "retained_fixture_seed",
+            prepared=args.prepared,
+            matrix=args.matrix,
+        ),
     )
-    project, cases, options = prepare(args.kind, upstream, out)
+    project, cases, options = prepare(args.kind, upstream, out, seed=args.seed, matrix=args.matrix)
     result = optimize_project(
         project,
         output=out / "workflow",
@@ -112,6 +127,7 @@ def main():
         python=sys.executable,
         inherit_env=inherited,
         budget=args.budget,
+        prepared=args.prepared,
         **options,
     )
     stamp(f"DONE status={result.summary['status']} result={out}/workflow/report.json log={out}.log")

@@ -45,3 +45,11 @@ src/lossless/adapters/mlx/MLX_LM_LICENSE. External model weights are not include
 NumPy, optional SciPy, MLX, MLX-LM, and externally installed Lean/Elan/mathlib
 retain their own licenses. Model weights are not bundled and remain subject
 to the model publisher's terms.
+
+The compressed CPU prepared-workflow evidence in
+docs/evidence/cpu-prepared-workflows.json.gz contains generated candidate bodies
+and patches derived from NumPy Financial 1.0.0 (revision
+247aa4e2ee4fa7db44915790d5a730b9776d10a7). These retain Copyright (c) 2005-2019,
+NumPy Developers, and the BSD-3-Clause terms in
+docs/evidence/NUMPY_FINANCIAL_LICENSE.txt. They are measured research candidates,
+not a bundled installation or an upstream endorsement.

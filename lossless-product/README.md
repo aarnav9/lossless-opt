@@ -60,6 +60,7 @@ For local CPU Python/NumPy callables, use
 `lossless run-project PATH --entry app.py:run --cases cases.json --output RUN`.
 It profiles, tries applicable local recipes, checks exact outputs, and creates a
 runnable project copy with reference fallback, without model calls.
+Add `--prepared` to separately qualify reusable CPU workers and complete request latency.
 [CPU project guide and example](docs/cpu-projects.md).
 
 For an existing local application, current source also supports

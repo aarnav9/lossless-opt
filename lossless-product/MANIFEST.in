@@ -8,6 +8,6 @@ recursive-include scripts *.py
 recursive-include experiments *.py *.c *.json *.md LICENSE
 include experiments/solver_pipeline/PlanCost.lean experiments/solver_pipeline/requirements.txt
 recursive-include examples *.py *.c *.json *.md
-recursive-include docs *.md *.mmd *.dot *.png *.svg *.json *.gz
+recursive-include docs *.md *.mmd *.dot *.png *.svg *.json *.gz *LICENSE.txt
 prune examples/*/.lossless
 global-exclude *.pyc

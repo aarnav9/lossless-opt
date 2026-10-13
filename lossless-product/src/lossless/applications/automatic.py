@@ -22,11 +22,29 @@ class Dispatch(ast.NodeTransformer):
             and node.func.value.id in self.aliases
             and node.func.attr in self.methods
             and len(node.args) == 1
-            and isinstance(node.args[0], ast.Name)
+            and not isinstance(node.args[0], ast.Starred)
             and not node.keywords
         ):
             return node
-        name, array, method = node.func.value.id, node.args[0].id, node.func.attr
+        name, method = node.func.value.id, node.func.attr
+        if not isinstance(node.args[0], ast.Name):
+            # Capture the original callable before evaluating its argument, once.
+            # A lambda gives the temporary its own scope (including comprehensions).
+            local = "_value"
+            function = "_function"
+            while local in self.aliases:
+                local += "_"
+            while function in self.aliases:
+                function += "_"
+            operation = f"{local}.copy(order='K')" if method == "copy" else f"{local}.{method}()"
+            result = ast.parse(
+                f"(lambda {function}, {local}: {operation} if type({local}) is {name}.ndarray else {function}({local}))(ORIGINAL_FUNCTION, ORIGINAL_VALUE)",
+                mode="eval",
+            ).body
+            result.args = [node.func, node.args[0]]
+            self.changed += 1
+            return ast.copy_location(result, node)
+        array = node.args[0].id
         # Exact ndarray only: subclasses, lists and duck arrays keep NumPy dispatch.
         expression = (
             f"({array}.copy(order='K') if type({array}) is {name}.ndarray else ORIGINAL)"
@@ -37,6 +55,107 @@ class Dispatch(ast.NodeTransformer):
         result.orelse = node
         self.changed += 1
         return ast.copy_location(result, node)
+
+
+def common_arithmetic(function, alias):
+    """Share repeated pure arithmetic in straight-line, single-assignment functions.
+
+    Keep each operator and grouping. Numeric guards exclude overloaded operators,
+    ndarray subclasses and object arrays. No loop/branch hoisting or reassociation.
+    """
+    body = copy.deepcopy(function.body)
+    if (
+        isinstance(body[0], ast.Expr)
+        and isinstance(body[0].value, ast.Constant)
+        and isinstance(body[0].value.value, str)
+    ):
+        body = body[1:]
+    args = function.args
+    if args.vararg or args.kwarg or args.kwonlyargs:
+        return None
+    parameters = {arg.arg for arg in [*args.posonlyargs, *args.args]}
+    assigned = set(parameters)
+    allowed = (
+        ast.Expression,
+        ast.Name,
+        ast.Constant,
+        ast.Load,
+        ast.BinOp,
+        ast.UnaryOp,
+        ast.Add,
+        ast.Sub,
+        ast.Mult,
+        ast.Div,
+        ast.Pow,
+        ast.UAdd,
+        ast.USub,
+    )
+    counts = {}
+    for statement in body:
+        if (
+            isinstance(statement, ast.Assign)
+            and len(statement.targets) == 1
+            and isinstance(statement.targets[0], ast.Name)
+        ):
+            target = statement.targets[0].id
+            if target in assigned:
+                return None
+        elif isinstance(statement, ast.Return):
+            target = None
+        else:
+            return None
+        if statement.value is None:
+            return None
+        for node in ast.walk(statement.value):
+            if not isinstance(node, allowed):
+                return None
+            if isinstance(node, ast.Name) and node.id not in assigned:
+                return None
+            if isinstance(node, ast.Constant) and type(node.value) not in {int, float}:
+                return None
+            if isinstance(node, ast.BinOp) and isinstance(
+                node.op, (ast.Add, ast.Sub, ast.Mult, ast.Div)
+            ):
+                key = ast.dump(node)
+                counts[key] = counts.get(key, 0) + 1
+        if target:
+            assigned.add(target)
+    repeated = {k for k, count in counts.items() if count > 1}
+    if not repeated or not body or not isinstance(body[-1], ast.Return):
+        return None
+    used = {n.id for n in ast.walk(function) if isinstance(n, ast.Name)}
+    cached = {}
+    prelude = []
+
+    class Share(ast.NodeTransformer):
+        def visit_BinOp(self, node):
+            key = ast.dump(node)
+            if key in cached:
+                return ast.Name(id=cached[key], ctx=ast.Load())
+            node = self.generic_visit(node)
+            if key in repeated:
+                name = f"_lossless_arithmetic_{len(cached)}"
+                while name in used:
+                    name += "_"
+                used.add(name)
+                cached[key] = name
+                prelude.append(ast.Assign(targets=[ast.Name(id=name, ctx=ast.Store())], value=node))
+                return ast.Name(id=name, ctx=ast.Load())
+            return node
+
+    replacement = []
+    for statement in body:
+        prelude.clear()
+        changed = Share().visit(copy.deepcopy(statement))
+        replacement.extend([*prelude, changed])
+    checks = [
+        f"(type({name}) in (int, float) or (type({name}) is {alias}.ndarray and {name}.dtype.kind in 'buifc'))"
+        for name in sorted(parameters)
+    ]
+    guard = ast.parse(" and ".join(checks) or "False", mode="eval").body
+    # The fallback retains the untouched body, including Decimal/custom behavior.
+    result = ast.If(test=guard, body=replacement, orelse=body)
+    return ast.unparse(ast.fix_missing_locations(result)) + "\n"
 
 
 def numpy_candidates(root, source, profile):
@@ -81,7 +200,7 @@ def numpy_candidates(root, source, profile):
             for n in node.names
             if not (node in tree.body and isinstance(node, ast.Import) and n.name == "numpy")
         }
-        if bindings & (aliases | {"type"}):
+        if bindings & (aliases | {"type", "int", "float"}):
             continue
         for node in tree.body:
             if not isinstance(node, ast.FunctionDef) or node.name != symbol or node.decorator_list:
@@ -133,6 +252,32 @@ def numpy_candidates(root, source, profile):
                     schema_version=1,
                     hypothesis=f"Guarded ndarray {label} dispatch; preserve arithmetic and subclass fallback.",
                     edits=edits,
+                )
+            )
+    arithmetic = []
+    for name, symbol, function, aliases in functions:
+        body = common_arithmetic(function, sorted(aliases)[0])
+        if body:
+            arithmetic.append(dict(path=name, symbol=symbol, body=body))
+            entry = dict(path=name, symbol=symbol)
+            if entry not in scope:
+                scope.append(entry)
+    if arithmetic:
+        proposals.append(
+            dict(
+                schema_version=1,
+                hypothesis="Reuse identical pure arithmetic intermediates; retain original operator grouping and numeric-type fallback.",
+                edits=arithmetic,
+            )
+        )
+        if len(proposals) > 1:
+            combined = {(e["path"], e["symbol"]): e for e in proposals[0]["edits"]}
+            combined.update({(e["path"], e["symbol"]): e for e in arithmetic})
+            proposals.append(
+                dict(
+                    schema_version=1,
+                    hypothesis="Compose guarded NumPy dispatch with shared arithmetic intermediates.",
+                    edits=list(combined.values()),
                 )
             )
     return scope, proposals

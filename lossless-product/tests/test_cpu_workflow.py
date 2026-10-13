@@ -15,7 +15,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from lossless.applications import optimize_project, read_outputs
+from lossless.applications import PreparedApplication, optimize_project, read_outputs
 from lossless.applications.automatic import numpy_candidates
 from lossless.applications.bundle import environment, select, signature, verify_tree
 from lossless.applications.discovery import inventory
@@ -129,7 +129,9 @@ class CPUWorkflowTests(unittest.TestCase):
         self.assertFalse((self.root / "workflow/application/optimized").exists())
 
     def test_accepted_delivery_new_values_and_changed_metadata_fallback(self):
-        source = "import time\ndef run(x):\n    time.sleep(.025)\n    return x * 3\n"
+        # Shared resident application data keeps this admission/routing test from
+        # depending on tiny-process import RSS ratios under platform load.
+        source = "import time\nimport numpy as np\nresident = np.ones(4_000_000)\ndef run(x):\n    time.sleep(.025)\n    return x * 3\n"
         (self.project / "app.py").write_text(source)
         for name, values in [("a", np.arange(16.0)), ("b", np.linspace(-1, 1, 16))]:
             np.save(self.project / (name + ".npy"), values)
@@ -137,7 +139,7 @@ class CPUWorkflowTests(unittest.TestCase):
             json.dumps([{"args": [{"$npy": "a.npy"}]}, {"args": [{"$npy": "b.npy"}]}])
         )
         result = self.optimize(
-            entry="app.py:run", cases=self.cases, plan=self.plan("return x * 3\n")
+            entry="app.py:run", cases=self.cases, plan=self.plan("return x * 3\n"), prepared=True
         )
         self.assertEqual(result["status"], "accepted", result.get("reason", result.get("search")))
         self.assertTrue(
@@ -146,6 +148,12 @@ class CPUWorkflowTests(unittest.TestCase):
             )
         )
         application = Path(result["application"])
+        self.assertEqual(result["prepared"]["status"], "accepted", result["prepared"])
+        with PreparedApplication(application) as prepared:
+            self.assertEqual(prepared.info["variant"], "optimized")
+            np.testing.assert_array_equal(
+                prepared.run_case("case_001")["outputs"][0], np.linspace(-1, 1, 16) * 3
+            )
         request = self.root / "request.json"
         request.write_text(json.dumps({"args": [{"$npy": "new.npy"}]}))
         for label, values, expected in [

@@ -179,6 +179,28 @@ def main(directory):
                 "from lossless.applications import read_outputs; assert read_outputs('cpu-values') == [{'value': 27}]; print('Installed CPU project delivery passed')",
             ]
         )
+        run(
+            [
+                "-I",
+                "-c",
+                "from lossless.applications import PreparedApplication\nwith PreparedApplication('cpu-workflow/application') as app:\n    assert app.run_case('held_out')['outputs'] == [{'value': 27}]\n    assert app.run_case('held_out')['outputs'] == [{'value': 27}]\nprint('Installed prepared requests passed')",
+            ]
+        )
+        run(
+            [
+                "-I",
+                "-m",
+                "lossless",
+                "diagnose-application",
+                "application-job/lossless.json",
+                "--repeats",
+                "2",
+                "--budget",
+                "15s",
+                "--output",
+                "reference-diagnostic",
+            ]
+        )
         run(["-I", "-m", "lossless", "demo", "--budget", "45s", "--output", "run"])
         run(["-I", "-m", "lossless", "export", "run", "--output", "artifact"])
         run(
