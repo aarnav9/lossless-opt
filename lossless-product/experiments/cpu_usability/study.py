@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import time
 
+from lossless import __version__
 from lossless._native.common import stamp, write
 from lossless.applications import CallableApplication, optimize_project
 from lossless.applications.worker import inputs, Observer
@@ -118,6 +119,7 @@ def main():
         out / "protocol.json",
         dict(
             kind=args.kind,
+            lossless_version=__version__,
             upstream=str(args.upstream),
             revision=revision,
             seed=202610145,

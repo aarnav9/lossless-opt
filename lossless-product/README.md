@@ -35,7 +35,7 @@ lossless demo --budget 60s --output ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-From a standalone copy of this folder, use `python -m pip install .`. This installs current public source, matching the features in the `v0.1.0a3` release. The package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
+From a standalone copy of this folder, use `python -m pip install .`. This installs current public source (`0.1.0a4.dev0`), including optional [expanded CPU recipes](docs/cpu-recipe-coverage-study.md) beyond the fixed `v0.1.0a3` wheel. The package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
 
 Use the exported operation without an LLM:
 
@@ -63,7 +63,7 @@ runnable project copy with reference fallback, without model calls.
 Use `--input-loader examples.py:cases --deployment auto --expected-requests 100`
 for Python examples and complete-call selection. Call the bundle with
 `CallableApplication` from a context manager.
-[CPU guide](docs/cpu-projects.md) · [Runnable example](examples/cpu-callable/README.md).
+[CPU guide](docs/cpu-projects.md) · [Runnable example](examples/cpu-callable/README.md) · [Developer trial](docs/developer-onboarding-trial.md).
 
 For an existing local application, current source also supports
 `lossless init --project PATH --output .lossless/app`, readable `lossless inspect`,

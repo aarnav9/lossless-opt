@@ -316,6 +316,12 @@ def main(argv=None):
         help="Expected requests per adapter lifetime for startup amortization",
     )
     project_run.add_argument("--output", type=Path, required=True)
+    project_run.add_argument(
+        "--recipe-coverage",
+        choices=["stable", "expanded"],
+        default="stable",
+        help="Expanded adds experimental NumPy dispatch and class-method recipes; exact gates remain required",
+    )
     diagnosis = commands.add_parser(
         "diagnose-application",
         help="Save fresh reference outputs and explain bit differences without accepting numerical drift",
@@ -500,6 +506,7 @@ def main(argv=None):
                 prepared_inputs=args.prepared_inputs,
                 deployment=args.deployment,
                 expected_requests=args.expected_requests,
+                recipe_coverage=args.recipe_coverage,
             )
             result = {
                 "status": outcome.summary["status"],

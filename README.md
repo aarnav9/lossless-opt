@@ -45,7 +45,7 @@ and produces a runnable project copy with a reference fallback. No model calls.
 Use `--input-loader examples.py:cases --deployment auto --expected-requests 100`
 to supply live examples and select using complete calls, including startup.
 Use the result through `CallableApplication(bundle)` as a context-managed callable.
-[CPU guide](lossless-product/docs/cpu-projects.md) · [Runnable example](lossless-product/examples/cpu-callable/README.md).
+[CPU guide](lossless-product/docs/cpu-projects.md) · [Runnable example](lossless-product/examples/cpu-callable/README.md) · [Developer trial](lossless-product/docs/developer-onboarding-trial.md). Current source is `0.1.0a4.dev0`; the linked wheel is the fixed `0.1.0a3` release.
 The separate [intake/replay](lossless-product/docs/applications.md),
 [optional Codex assessment](lossless-product/docs/application-profiling.md), and
 [`search-application`](lossless-product/docs/application-search.md) commands remain available.

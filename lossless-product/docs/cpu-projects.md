@@ -18,6 +18,14 @@ and your application's dependencies. Dependencies are inspected, not installed
 automatically. Omitting the callable or cases generates setup and entry suggestions
 with `needs_input`, without importing the application.
 
+Current source (`0.1.0a4.dev0`) defaults to `--recipe-coverage stable`. The optional
+`--recipe-coverage expanded` adds axis/keyword NumPy dispatch and profiled class
+methods, with the same exactness and deployment gates. The first expanded trial
+found no additional qualified application wins and sometimes lost worker reuse
+after final rejection, so it remains opt-in. The Python API accepts
+`recipe_coverage="expanded"`. Explicit saved plans are unchanged.
+[Results and limits](cpu-recipe-coverage-study.md).
+
 ## Supply examples directly from Python
 
 Instead of writing JSON and `.npy` files, provide a zero-argument loader in your

@@ -5,6 +5,7 @@ import copy
 from pathlib import Path
 
 from .retained import retained_plan
+from .numpy_dispatch import ExtendedDispatch, source_functions
 
 
 REDUCTIONS = {"sum", "prod", "mean", "min", "max", "all", "any"}
@@ -158,16 +159,17 @@ def common_arithmetic(function, alias):
     return ast.unparse(ast.fix_missing_locations(result)) + "\n"
 
 
-def numpy_candidates(root, source, profile):
+def numpy_candidates(root, source, profile, *, expanded=False):
     """Restrict edits to measured project functions, never evaluation input contents."""
     hotspots = {}
     for case in profile.get("profiles", []):
         for row in case.get("attribution", {}).get("top_cumulative", []):
             if row["origin"] == "project":
-                key = row["file"], row["function"]
+                key = row["file"], row["function"], row.get("line")
                 hotspots[key] = hotspots.get(key, 0) + row["cumulative_seconds"]
     functions = []
-    for (name, symbol), seconds in sorted(hotspots.items(), key=lambda p: -p[1]):
+    selected = set()
+    for (name, symbol, line), seconds in sorted(hotspots.items(), key=lambda p: -p[1]):
         if name not in source["files"] or source["files"][name]["bytes"] > 256000:
             continue
         try:
@@ -181,7 +183,7 @@ def numpy_candidates(root, source, profile):
             for alias in node.names
             if alias.name == "numpy"
         }
-        # Avoid rewriting shadowed builtins or aliases. Only module-level functions.
+        # Avoid rewriting shadowed builtins or aliases, including class bodies.
         bindings = {
             n.id
             for n in ast.walk(tree)
@@ -194,6 +196,12 @@ def numpy_candidates(root, source, profile):
         }
         bindings |= {n.arg for n in ast.walk(tree) if isinstance(n, ast.arg)}
         bindings |= {
+            n.name
+            for n in ast.walk(tree)
+            if isinstance(n, (ast.ExceptHandler, ast.MatchAs, ast.MatchStar)) and n.name
+        }
+        bindings |= {n.rest for n in ast.walk(tree) if isinstance(n, ast.MatchMapping) and n.rest}
+        bindings |= {
             n.asname or n.name.split(".")[0]
             for node in ast.walk(tree)
             if isinstance(node, (ast.Import, ast.ImportFrom))
@@ -202,8 +210,18 @@ def numpy_candidates(root, source, profile):
         }
         if bindings & (aliases | {"type", "int", "float"}):
             continue
-        for node in tree.body:
-            if not isinstance(node, ast.FunctionDef) or node.name != symbol or node.decorator_list:
+        matches = [
+            (qualified, node)
+            for qualified, node in source_functions(tree)
+            if node.name == symbol
+            and (line is None or node.lineno == line)
+            and (expanded or node in tree.body)
+        ]
+        # A profile without line numbers must still identify one unambiguous body.
+        if len(matches) != 1:
+            continue
+        for qualified, node in matches:
+            if (name, qualified) in selected:
                 continue
             shadowed = {
                 n.id
@@ -216,7 +234,8 @@ def numpy_candidates(root, source, profile):
             }
             if not aliases or (aliases | {"type"}) & shadowed:
                 continue
-            functions.append((name, symbol, node, aliases))
+            functions.append((name, qualified, node, aliases))
+            selected.add((name, qualified))
         if len(functions) >= 8:
             break
     proposals, scope, seen = [], [], set()
@@ -280,15 +299,59 @@ def numpy_candidates(root, source, profile):
                     edits=list(combined.values()),
                 )
             )
+    if not expanded:
+        return scope, proposals
+    # Append new recipes after every existing proposal, preserving the previous
+    # search choices and their order. Compose only disjoint function bodies.
+    for combined in (False, True):
+        edits, additions = [], 0
+        for name, symbol, function, aliases in functions:
+            body = copy.deepcopy(function.body)
+            if combined:
+                legacy = Dispatch(aliases, REDUCTIONS | {"copy"})
+                body = [legacy.visit(node) for node in body]
+            transform = ExtendedDispatch(aliases)
+            body = [transform.visit(node) for node in body]
+            additions += transform.changed
+            if transform.changed or (combined and legacy.changed):
+                edits.append(
+                    dict(
+                        path=name,
+                        symbol=symbol,
+                        body="\n".join(ast.unparse(ast.fix_missing_locations(n)) for n in body)
+                        + "\n",
+                    )
+                )
+        if combined:
+            merged = {(e["path"], e["symbol"]): e for e in edits}
+            merged.update({(e["path"], e["symbol"]): e for e in arithmetic})
+            edits = list(merged.values())
+        key = repr(edits)
+        if additions and key not in seen:
+            seen.add(key)
+            for edit in edits:
+                entry = {k: edit[k] for k in ("path", "symbol")}
+                if entry not in scope:
+                    scope.append(entry)
+            proposals.append(
+                dict(
+                    schema_version=1,
+                    hypothesis=("Compose existing recipes with " if combined else "")
+                    + "guarded ndarray axis/keyword reductions, indexed reductions and scans; capture arguments once and retain numeric ndarray arithmetic.",
+                    edits=edits,
+                )
+            )
     return scope, proposals
 
 
-def plan_for(root, source, profile, budget):
+def plan_for(root, source, profile, budget, *, coverage="stable"):
+    if coverage not in {"stable", "expanded"}:
+        raise ValueError("recipe coverage must be stable or expanded")
     try:
         plan = retained_plan(root, budget=budget)
         family = "retained_pybaselines"
     except ValueError:
-        scope, candidates = numpy_candidates(root, source, profile)
+        scope, candidates = numpy_candidates(root, source, profile, expanded=coverage == "expanded")
         if not candidates:
             return None, "No applicable local source recipe for the measured functions."
         family = "numpy_dispatch"

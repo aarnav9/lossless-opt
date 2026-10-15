@@ -91,6 +91,33 @@ class CPUWorkflowTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 prepare_cases(self.cases)
 
+    def test_recipe_coverage_cli_forwarding_and_validation(self):
+        (self.project / "app.py").write_text("def run(x):\n    return x\n")
+        for coverage in ("stable", "expanded"):
+            out = self.root / coverage
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "lossless",
+                    "run-project",
+                    str(self.project),
+                    "--recipe-coverage",
+                    coverage,
+                    "--output",
+                    str(out),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            self.assertEqual(completed.returncode, 2, completed.stderr)
+            report = json.loads((out / "report.json").read_text())
+            self.assertEqual(report["status"], "needs_input")
+            self.assertEqual(report["recipe_coverage"], coverage)
+        with self.assertRaisesRegex(ValueError, "recipe_coverage"):
+            self.optimize(recipe_coverage="unknown")
+
     def test_unstable_reference_cannot_produce_a_qualified_bundle(self):
         (self.project / "app.py").write_text("import os\ndef run(x):\n    return os.urandom(32)\n")
         result = self.optimize(entry="app.py:run", cases=self.cases)

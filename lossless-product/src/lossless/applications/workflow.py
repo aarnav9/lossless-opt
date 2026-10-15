@@ -199,10 +199,13 @@ def optimize_project(
     prepared_inputs="fixtures",
     deployment=None,
     expected_requests=100,
+    recipe_coverage="stable",
 ):
     """One local workflow; no implicit provider calls or numerical acceptance."""
     started = clock()
     positive(budget, "workflow budget")
+    if recipe_coverage not in {"stable", "expanded"}:
+        raise ValueError("recipe_coverage must be stable or expanded")
     if deployment not in {None, "auto", "oneshot", "prepared"}:
         raise ValueError("deployment must be auto, oneshot or prepared")
     if type(expected_requests) is not int or not 1 <= expected_requests <= 1000000:
@@ -230,6 +233,7 @@ def optimize_project(
         selected="reference",
         llm_calls=0,
         contract="exact",
+        recipe_coverage=recipe_coverage,
         budget_seconds=budget,
         source_project=str(root),
     )
@@ -329,7 +333,9 @@ def optimize_project(
             raise TimeoutError("workflow budget exhausted after profiling")
         search_budget = available * (0.45 if deployment else 0.65 if prepared else 0.8)
         if plan is None:
-            selected_plan, reason = plan_for(frozen, original, profiled.summary, search_budget)
+            selected_plan, reason = plan_for(
+                frozen, original, profiled.summary, search_budget, coverage=recipe_coverage
+            )
         else:
             selected_plan = copy.deepcopy(
                 read_json(plan) if isinstance(plan, (str, Path)) else plan

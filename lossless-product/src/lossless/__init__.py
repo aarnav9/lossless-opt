@@ -1,6 +1,6 @@
 """Lossless: explicit contracts, measured optimization, reusable implementations."""
 
-__version__ = "0.1.0a3"
+__version__ = "0.1.0a4.dev0"
 
 
 def optimize(workload, *, budget=None, llm=None, output=None, resume=False):
