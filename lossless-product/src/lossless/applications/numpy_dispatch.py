@@ -79,6 +79,26 @@ class ExtendedDispatch(ast.NodeTransformer):
             f"and {array.id}.dtype.kind in 'buifc'",
             mode="eval",
         ).body
+        # NumPy's __array_function__ dispatch can also inspect out/where. A
+        # plain input alone is insufficient when either operand is a subclass
+        # or duck array. Keep those calls on the original function.
+        provided = dict(zip(positional, args))
+        provided.update({k.arg: k.value for k in kwargs})
+        checks = [guard]
+        alias = node.func.value.id
+        for key in ("out", "where"):
+            if key not in provided:
+                continue
+            value = provided[key].id
+            plain_array = f"(type({value}) is {alias}.ndarray and {value}.dtype.kind in 'buifc')"
+            permitted = (
+                f"{value} is None or {plain_array}"
+                if key == "out"
+                else f"type({value}) is type(True) or type({value}) is {alias}.bool_ or {plain_array}"
+            )
+            checks.append(ast.parse(permitted, mode="eval").body)
+        if len(checks) > 1:
+            guard = ast.BoolOp(op=ast.And(), values=checks)
         direct = ast.Call(
             func=ast.Attribute(value=array, attr=method, ctx=ast.Load()),
             args=args[1:] if args else [],

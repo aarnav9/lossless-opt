@@ -166,6 +166,27 @@ def run():
             self.assertEqual(transform.changed, 0)
             self.assertEqual(ast.dump(actual), expected)
 
+    def test_out_and_where_overrides_keep_numpy_dispatch(self):
+        class Special(np.ndarray):
+            def __array_function__(self, func, types, args, kwargs):
+                return 12345
+
+        for expression, operand in (
+            ("np.sum(a, axis=0, out=other)", np.zeros(3).view(Special)),
+            ("np.sum(a, 0, None, other)", np.zeros(3).view(Special)),
+            ("np.cumsum(a, axis=0, out=other)", np.zeros((2, 3)).view(Special)),
+            ("np.mean(a, axis=0, where=other)", np.ones((2, 3), dtype=bool).view(Special)),
+            ("np.std(a, axis=0, where=other)", np.ones((2, 3), dtype=bool).view(Special)),
+        ):
+            source = f"import numpy as np\ndef run(a, other):\n    return {expression}\n"
+            candidate, changed = transformed(source)
+            reference = {}
+            exec(source, reference)
+            self.assertEqual(changed, 1)
+            a = np.arange(6.0).reshape(2, 3)
+            self.assertEqual(reference["run"](a, operand), 12345)
+            self.assertEqual(candidate["run"](a, operand), 12345)
+
     def test_invalid_axis_raises_original_exception_type(self):
         source = "import numpy as np\ndef run(a):\n    return np.sum(a, axis=7)\n"
         candidate, _ = transformed(source)

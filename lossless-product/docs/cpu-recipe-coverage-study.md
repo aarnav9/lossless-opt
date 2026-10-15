@@ -27,7 +27,8 @@ The new dispatch captures the callable and argument expressions once, in their
 original evaluation order. It forwards axis, dtype, output buffer and other
 supported arguments to the corresponding ndarray method. Only exact plain
 numeric ndarrays take this path; lists, subclasses and object arrays retain the
-original function. Unknown keyword extensions and argument unpacking are left
+original function. Subclass or duck-array `out`/`where` operands also retain
+NumPy dispatch. Unknown keyword extensions and argument unpacking are left
 untouched. There is no algebra reassociation, changed precision or numerical
 tolerance. This is measured finite qualification, not a proof for all inputs.
 
@@ -82,7 +83,10 @@ visible without changing the default search on these workloads.
 
 The local full suite passed 260 tests with eight optional skips before the final
 coverage option. Afterwards, all 11 recipe tests and the CLI coverage-routing
-test passed. Tests cover dtype/layout/axis combinations, nonfinites, output-buffer
+test passed. A final review then added a regression test and fallback guards for
+`out`/`where` subclass overrides; all 12 recipe tests passed. None of the measured
+workload candidates use those operands, and their generated bodies remain unchanged.
+Tests cover dtype/layout/axis combinations, nonfinites, output-buffer
 identity and mutation, subclass/object fallback, evaluation order, unknown
 extensions, ambiguous class names, decorated scopes and default opt-in behavior.
 CI runs the final suite and installed-wheel checks on Linux and macOS.
