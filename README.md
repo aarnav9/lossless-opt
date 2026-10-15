@@ -6,7 +6,7 @@
 
 Bring a supported workload, a JSON contract, and your own LLM. Lossless searches for faster implementations, checks them independently, and exports a guarded implementation with performance and correctness records. Built-in candidates let you try the workflow without an API key.
 
-**Status: GitHub prerelease (`0.1.0a1`), MIT-licensed original code, public source repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
+**Status: GitHub prerelease (`0.1.0a2`), MIT-licensed original code, public source repository.** The long-term scope includes GPU optimization for language models, vision, and linear algebra. The supported workloads below define what runs today; CUDA execution, arbitrary model import, and task-quality acceptance remain future work.
 
 ![Recorded installed-alpha MLX comparison: 1.945× throughput, with batch time falling from 574.8 to 295.4 ms and exact agreement on tested tokens, log probabilities and active KV state.](lossless-product/docs/assets/mlx-retention.png)
 
@@ -19,7 +19,7 @@ Requires **Python 3.10+ and clang** on macOS or Linux. Python dependencies insta
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install https://github.com/aarnav9/lossless-opt/releases/download/v0.1.0a1/lossless_opt-0.1.0a1-py3-none-any.whl
+python -m pip install https://github.com/aarnav9/lossless-opt/releases/download/v0.1.0a2/lossless_opt-0.1.0a2-py3-none-any.whl
 
 lossless doctor
 lossless demo --budget 60s --output ./lossless-runs/demo
@@ -27,7 +27,7 @@ lossless report ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-The commands above install the fixed [v0.1.0a1 release](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a1). Newer features are already public on `main`: clone this repository and run `python -m pip install "./lossless-product[applications]"` from its root to include CPU application support. The package is not published to PyPI or Homebrew. See the [product guide](lossless-product/README.md) for optional dependencies and Python usage.
+The commands above install the fixed [v0.1.0a2 release](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a2). For CPU application support, install the wheel with its `applications` extra; see the [CPU quickstart](lossless-product/docs/release-0.1.0a2.md). PyPI and Homebrew distribution remain future work. Source installation: `python -m pip install "./lossless-product[applications]"`.
 
 The demo returns `accepted`, `reference_retained`, or `incomplete`, with `report.json` and `report.html` in the run directory. Completed runs export the accepted implementation or the reference; incomplete runs cannot be exported. A measured speedup is not guaranteed.
 
@@ -38,13 +38,14 @@ default, including guards, allocations and dispatch. Application searches also
 gate regressions at each declared call position and can include startup costs.
 [Benchmark policy and public suite choices](lossless-product/docs/benchmarking.md).
 
-**Local CPU Python/NumPy projects (current source):**
+**Local CPU Python/NumPy projects:**
 `lossless run-project PATH --entry app.py:run --cases cases.json --output RUN`
 profiles representative inputs, tests applicable local recipes under exact checks,
 and produces a runnable project copy with a reference fallback. No model calls.
-Add `--prepared` to separately qualify reusable CPU workers and complete request latency.
-Use `--prepared-inputs values` with it to qualify copied live-array requests.
-[Usage, supported scope and example](lossless-product/docs/cpu-projects.md).
+Use `--input-loader examples.py:cases --deployment auto --expected-requests 100`
+to supply live examples and select using complete calls, including startup.
+Use the result through `CallableApplication(bundle)` as a context-managed callable.
+[CPU guide](lossless-product/docs/cpu-projects.md) · [Runnable example](lossless-product/examples/cpu-callable/README.md).
 The separate [intake/replay](lossless-product/docs/applications.md),
 [optional Codex assessment](lossless-product/docs/application-profiling.md), and
 [`search-application`](lossless-product/docs/application-search.md) commands remain available.
@@ -61,9 +62,9 @@ lossless init --template softmax --output ./softmax-demo
 lossless profile ./softmax-demo/lossless.json --budget 30s --output ./lossless-runs/profile
 ```
 
-The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a1.md).
+The HTML/JSON reports show first-call and warm timing, memory, separate host hotspots, and MLX latency/stages where applicable. Profiling uses discovery inputs and makes no LLM calls. Pass `--artifact PATH` to compare an exported implementation. [Profiling guide](lossless-product/docs/profiling.md) · [Release support matrix](lossless-product/docs/release-0.1.0a2.md).
 
-The current `main` branch includes frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. The published `v0.1.0a1` assets are unchanged.
+The current `main` branch includes frozen [MLX deployment limits](lossless-product/docs/alpha.md#mlx-deployment-limits-unreleased). [Broader qualification](lossless-product/docs/qualification-041-043.md) includes natural/code/multilingual workloads and a contract-checked stock batching control; the original roughly 2× gain is workload-specific. Historical results keep their recorded hardware and runtime scope.
 
 ## CPU application experiment
 
@@ -176,7 +177,7 @@ Your `complete(prompt: str)` callback returns a proposal JSON string or object. 
 | Codex CLI | Current source ships `python -m lossless.codex_provider`, using saved ChatGPT sign-in and structured proposals. [Ready-to-run job and subscription setup](lossless-product/docs/codex.md). |
 | Claude Code | A user-supplied command wrapper invokes `claude -p` with a proposal JSON Schema and extracts `structured_output` from its JSON response. [Official Claude Code documentation](https://code.claude.com/docs/en/headless). |
 
-The callback/command interface is implemented. **The Codex connector is available in current source, outside the published `v0.1.0a1` wheel.** Claude transports remain user-supplied. Codex uses your subscription allowance; API billing is separate. A live copy smoke verified the command path, evaluation and export/load, correctly retaining NumPy when the proposal did not win. [Setup, tested CLI version and costs](lossless-product/docs/codex.md) · [General connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex).
+The callback/command interface is implemented. **The Codex connector is available in current source, outside the published `v0.1.0a2` wheel.** Claude transports remain user-supplied. Codex uses your subscription allowance; API billing is separate. A live copy smoke verified the command path, evaluation and export/load, correctly retaining NumPy when the proposal did not win. [Setup, tested CLI version and costs](lossless-product/docs/codex.md) · [General connection guide](lossless-product/docs/alpha.md#connecting-claude-or-codex).
 
 ### What the LLM tests establish
 

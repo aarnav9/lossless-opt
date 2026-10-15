@@ -7,6 +7,8 @@ from .retained import retained_plan
 from .workflow import optimize_project
 from .bundle import read_outputs
 from .prepared import PreparedApplication
+from .callable import CallableApplication
+from .input_loader import CaseRecorder
 
 
 __all__ = [
@@ -19,4 +21,6 @@ __all__ = [
     "optimize_project",
     "read_outputs",
     "PreparedApplication",
+    "CallableApplication",
+    "CaseRecorder",
 ]

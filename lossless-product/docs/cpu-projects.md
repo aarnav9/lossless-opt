@@ -2,9 +2,8 @@
 
 `run-project` takes a local Python/NumPy callable and representative inputs through
 configuration, profiling, local candidate selection, exact evaluation, and a
-runnable project copy. It makes **zero model calls**. Install current source in
-the project's Python environment; the older GitHub release does not contain this
-command:
+runnable project copy. It makes **zero model calls**. Install the 0.1.0a2 alpha
+or current source in the project's Python environment:
 
 ```sh
 python -m pip install './lossless-product[applications]'
@@ -18,6 +17,114 @@ must be new and outside the input project. The active Python is the default;
 and your application's dependencies. Dependencies are inspected, not installed
 automatically. Omitting the callable or cases generates setup and entry suggestions
 with `needs_input`, without importing the application.
+
+## Supply examples directly from Python
+
+Instead of writing JSON and `.npy` files, provide a zero-argument loader in your
+project. It must return a list with explicit IDs and discovery/evaluation splits:
+
+```python
+# examples.py
+import numpy as np
+
+def cases():
+    rng = np.random.default_rng(17)
+    return [
+        dict(id="development", split="discovery", args=[rng.normal(size=(64, 32))]),
+        dict(id="held_out", split="evaluation", args=[rng.normal(size=(64, 32))]),
+    ]
+```
+
+```sh
+lossless run-project ./my-project --entry pipeline.py:run \
+  --input-loader examples.py:cases --deployment auto --expected-requests 100 \
+  --budget 5m --output ./lossless-runs/project
+```
+
+The loader runs once, with the selected Python and declared environment, in a
+copied project. Its examples are frozen before profiling or selection. The
+original project is unchanged. Both `args`/`kwargs` and `calls` sequences work.
+The loader supports plain contiguous numeric NumPy arrays and finite JSON
+values; it rejects tuples, custom objects, object arrays and reserved `$npy`
+dictionaries rather than silently changing their types. Limits: 1 MiB of JSON,
+128 MiB of array fixtures, 1,000 cases, and 60 seconds for loader execution.
+Direct requests retain the smaller 64 MiB transport limit. Use `--cases` for the
+existing fixture path; the two input options are mutually exclusive.
+
+For an existing test helper, import it from the loader and return its input data.
+`CaseRecorder` also provides explicit capture before input mutation:
+
+```python
+from lossless.applications import CaseRecorder
+
+def cases():
+    recorded = CaseRecorder()
+    recorded.call("development", "discovery", original_function, development_array)
+    recorded.call("held_out", "evaluation", original_function, independent_array)
+    return recorded.cases
+```
+
+Those calls execute the original function. There is no automatic pytest discovery
+or inferred split. Loaders and applications are trusted local code, not sandboxed
+code. Do not use loaders with external effects you do not want performed.
+
+## Call the delivered function from your application
+
+```python
+from lossless.applications import CallableApplication
+
+with CallableApplication('./lossless-runs/project/application') as run:
+    result = run(new_array)  # ordinary args/kwargs and the actual return value
+    print(run.info)         # variant, mode, and fallback reason
+```
+
+The bundle also contains `callable.py` with an `open_callable(**options)` helper.
+Use a context manager to manage worker lifetime. `run_calls([{...}, {...}])`
+returns one result per invocation and explicitly shares a factory within that
+sequence. Single calls reset the factory. Inputs/results are copied values;
+caller aliases and input mutations are not propagated. Supported array layouts
+and finite metadata admission are the same as the live-value API below.
+
+A missing/invalid callable certificate defaults to fresh reference execution.
+An optimized metadata miss raises **before execution**; open a separate
+`CallableApplication(bundle, variant='reference')` for unsupported inputs. There
+is no automatic retry after an application error or timeout. A changed source,
+package version, host or declared environment prevents optimized admission.
+Requalify with the same project command into a new output directory. The original
+project and earlier bundles remain available; remove the adapter to revert.
+
+## Select for the deployment you will use
+
+`--deployment` opts into complete adapter measurements:
+
+- `oneshot`: a fresh worker for every call, including startup and cleanup.
+- `prepared`: consider reusable imports as well as the fresh-reference fallback.
+- `auto`: compare both lifecycles on discovery inputs and freeze one choice.
+
+`auto`/`prepared` explicitly permit import reuse; neither promises preservation
+of undeclared module state or external side effects. `--expected-requests N`
+amortizes adapter/worker startup and cleanup over N calls. Choose 1 for a single
+request. Measured request positions include copying, input validation, observations,
+communication and output decoding. Reports retain startup, request and memory
+measurements separately; projected amortization is not a measured N-call session.
+
+All exact discovery-matched source candidates can compete, including combinations.
+Selection reads discovery timings only. The callable-search winner is an incumbent
+comparison, frozen before evaluation. A single source/lifecycle choice is then
+frozen and tested over six paired evaluation rounds against the same-mode
+reference, fresh reference where applicable, and the incumbent where different.
+Performance tests share a 5% error budget across the required comparisons; case,
+request-position and process-memory gates still apply. No failed evaluation
+starts another selection round. If a source change cannot beat an equally prepared
+reference, worker reuse is reported as a runtime change with original source.
+
+`report.json` contains `deployment.frozen_selection`, separate comparisons,
+rejected discovery options, and the final reason. `application/callable.json`
+binds the result to its manifest, input boundary, runtime features and lifecycle.
+It cannot authorize the legacy file/prepared APIs. The source-only and legacy
+`--prepared` paths remain available; choose one qualification path per run.
+
+Try the [complete callable example](../examples/cpu-callable/README.md).
 
 ## Supply the callable and inputs
 

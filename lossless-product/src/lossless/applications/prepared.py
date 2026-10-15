@@ -37,7 +37,12 @@ class PreparedApplication:
         input_mode="fixtures",
         _qualifying=False,
         _features=None,
+        _lifecycle="prepared",
     ):
+        if _lifecycle not in {"prepared", "callable-oneshot", "callable-prepared"}:
+            raise ValueError("unknown request lifecycle")
+        if _lifecycle != "prepared" and input_mode != "values":
+            raise ValueError("callable lifecycle requires values")
         if input_mode not in {"fixtures", "values"}:
             raise ValueError("input_mode must be fixtures or values")
         self.input_mode = input_mode
@@ -110,6 +115,7 @@ class PreparedApplication:
                     "qualify" if _qualifying else "run",
                     json.dumps(list(_features)),
                     input_mode,
+                    _lifecycle,
                 ],
                 pass_fds=(child.fileno(),),
                 env=env,

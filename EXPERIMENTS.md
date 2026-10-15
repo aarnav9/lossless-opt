@@ -216,3 +216,7 @@ Keep large runs and scratch work under ignored `research/`. Any evidence require
 
 - **Alpha 0.1.0a1 — Experiment:** Extract the frozen native optimizer and retained 017–023 MLX recipe into an independent package; test wheel installation, provider boundaries, contracts, proofs, export/load, fallback, and the original shrinking-batch fixtures.
 - **Result — scoped retention:** Local CPU/Metal checks and seven Lean modules passed; installed MLX reached 1.945× stock serial on the evaluation fixture with exact sampled tokens/probabilities/KV, close to the prior 1.96× result. Full campaign replay, broader model/device qualification, and fresh multi-GiB proof setup remain separate work; see `lossless-product/docs/retention.md`.
+
+## CPU callable usability and 0.1.0a2
+
+[Four external project trials](lossless-product/docs/cpu-usability-study.md) validate Python input loaders, ordinary callable delivery, complete-cost selection and reference retention. The Financial control preserves about 1.35× complete warm-request speed; negative transfer results remain recorded.

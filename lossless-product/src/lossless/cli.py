@@ -274,6 +274,9 @@ def main(argv=None):
     project_run.add_argument(
         "--cases", type=Path, help="JSON representative discovery/evaluation calls"
     )
+    project_run.add_argument(
+        "--input-loader", help="Python zero-argument loader returning explicitly split cases"
+    )
     project_run.add_argument("--python", type=Path)
     project_run.add_argument("--factory", action="store_true")
     project_run.add_argument("--observe", help="Observer for outputs and relevant callable state")
@@ -292,6 +295,17 @@ def main(argv=None):
         choices=["fixtures", "values"],
         default="fixtures",
         help="Request boundary to qualify with --prepared: saved fixtures or copied live arrays",
+    )
+    project_run.add_argument(
+        "--deployment",
+        choices=["auto", "oneshot", "prepared"],
+        help="Select using complete callable costs; auto permits import reuse",
+    )
+    project_run.add_argument(
+        "--expected-requests",
+        type=int,
+        default=100,
+        help="Expected requests per adapter lifetime for startup amortization",
     )
     project_run.add_argument("--output", type=Path, required=True)
     diagnosis = commands.add_parser(
@@ -464,6 +478,7 @@ def main(argv=None):
                 output=args.output,
                 entry=args.entry,
                 cases=args.cases,
+                input_loader=args.input_loader,
                 python=args.python,
                 factory=args.factory,
                 observe=args.observe,
@@ -475,6 +490,8 @@ def main(argv=None):
                 plan=args.plan,
                 prepared=args.prepared,
                 prepared_inputs=args.prepared_inputs,
+                deployment=args.deployment,
+                expected_requests=args.expected_requests,
             )
             result = {
                 "status": outcome.summary["status"],
@@ -482,6 +499,8 @@ def main(argv=None):
                 "report": str(outcome.directory / "report.html"),
                 "application": outcome.summary.get("application"),
                 "prepared_status": outcome.summary.get("prepared", {}).get("status"),
+                "deployment": outcome.summary.get("deployment", {}).get("mode"),
+                "deployment_status": outcome.summary.get("deployment", {}).get("status"),
                 "reason": outcome.summary.get("reason"),
             }
             if outcome.summary["status"] not in {"accepted", "reference_retained"}:

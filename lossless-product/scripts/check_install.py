@@ -1,5 +1,6 @@
 """Install only the built wheel into a new environment, outside the checkout."""
 
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
@@ -22,6 +23,10 @@ def main(directory):
         }
 
         def run(args):
+            print(
+                f"[{datetime.now(timezone.utc).isoformat()}] INSTALL CHECK {' '.join(args[:4])}",
+                flush=True,
+            )
             subprocess.run([str(python), *args], cwd=root, env=env, check=True, timeout=90)
 
         run(["-m", "pip", "install", str(wheel)])
@@ -184,6 +189,46 @@ def main(directory):
                 "-I",
                 "-c",
                 "from lossless.applications import PreparedApplication\nwith PreparedApplication('cpu-workflow/application') as app:\n    assert app.run_case('held_out')['outputs'] == [{'value': 27}]\n    assert app.run_case('held_out')['outputs'] == [{'value': 27}]\nprint('Installed prepared requests passed')",
+            ]
+        )
+        # Current CPU alpha: install the declared optional dependencies, then
+        # exercise loaders, complete-call qualification and the actual adapter.
+        run(["-m", "pip", "install", str(wheel) + "[applications]"])
+        (application / "examples.py").write_text(
+            "import numpy as np\ndef cases():\n    return ["
+            "dict(id='dev', split='discovery', args=[np.arange(8.)]),"
+            "dict(id='new', split='evaluation', args=[np.arange(8.) + 2])]\n"
+        )
+        run(
+            [
+                "-I",
+                "-m",
+                "lossless",
+                "run-project",
+                "application",
+                "--entry",
+                "app.py:run",
+                "--input-loader",
+                "examples.py:cases",
+                "--deployment",
+                "auto",
+                "--expected-requests",
+                "100",
+                "--budget",
+                "75s",
+                "--output",
+                "cpu-callable",
+            ]
+        )
+        run(
+            [
+                "-I",
+                "-c",
+                "import numpy as np; from lossless.applications import CallableApplication\n"
+                "with CallableApplication('cpu-callable/application') as run:\n"
+                "    np.testing.assert_array_equal(run(np.arange(8.))['value'], np.arange(8.) * 3)\n"
+                "    np.testing.assert_array_equal(run(np.arange(8.) + 4)['value'], (np.arange(8.) + 4) * 3)\n"
+                "print('Installed Python loader and callable delivery passed')",
             ]
         )
         run(

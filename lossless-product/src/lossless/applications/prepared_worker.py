@@ -19,7 +19,9 @@ from .wire import MAX_MESSAGE, pack, unpack
 from .worker import Observer, inputs, load_target
 
 
-def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures"):
+def serve(
+    fd, bundle, requested, qualifying, features=(), input_mode="fixtures", lifecycle="prepared"
+):
     import numpy as np
     from . import raw_wire
 
@@ -31,6 +33,8 @@ def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures")
     manifest = read_json(bundle / "manifest.json")
     selected, reason = select(bundle, manifest, None, requested, check_inputs=False)
     certificate = bundle / ("prepared-values.json" if input_mode == "values" else "prepared.json")
+    if lifecycle.startswith("callable-"):
+        certificate = bundle / "callable.json"
     if selected == "optimized" and not qualifying:
         policy = read_json(certificate) if certificate.exists() else {}
         if (
@@ -38,6 +42,13 @@ def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures")
             or policy.get("manifest_identity") != identity(manifest)
             or policy.get("runtime_features") != sorted(features)
             or policy.get("input_mode", "fixtures") != input_mode
+            or (
+                lifecycle.startswith("callable-")
+                and (
+                    policy.get("mode") != lifecycle.removeprefix("callable-")
+                    or policy.get("lifecycle_exact") is not True
+                )
+            )
         ):
             selected, reason = "reference", "prepared request lifecycle has not qualified"
     root = Path.cwd() / "project"
@@ -60,6 +71,7 @@ def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures")
     connection.send_bytes(
         encode(dict(status="ready", variant=selected, fallback_reason=reason, pid=os.getpid()))
     )
+    completed_requests = 0
     while True:
         frame = connection.recv_bytes(MAX_MESSAGE)
         if "raw" in features:
@@ -76,6 +88,8 @@ def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures")
         if command["action"] == "close":
             return
         try:
+            if lifecycle == "callable-oneshot" and completed_requests:
+                raise ValueError("oneshot worker already used")
             if command["action"] == "values":
                 if "values" not in features:
                     raise ValueError("direct values not enabled")
@@ -179,6 +193,7 @@ def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures")
                 raise ValueError("response too large")
             connection.send_bytes(response)
             del results, retained, observations, response, selected_call
+            completed_requests += 1
         except Exception as error:
             # State after an application failure is unknown. Report once and exit.
             connection.send_bytes(
@@ -195,4 +210,5 @@ if __name__ == "__main__":
         sys.argv[4] == "qualify",
         json.loads(sys.argv[5]),
         sys.argv[6],
+        sys.argv[7] if len(sys.argv) > 7 else "prepared",
     )

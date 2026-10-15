@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lossless-opt"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Contract-driven optimization for ML and numerical computation"
 readme = "README.md"
 # Original code is MIT; bundled mathlib resources and experimental pybaselines

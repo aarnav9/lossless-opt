@@ -96,6 +96,12 @@ def make_bundle(
         "from pathlib import Path\nfrom lossless.applications.bundle import main\n"
         'if __name__ == "__main__":\n    main(Path(__file__).resolve().parent)\n'
     )
+    (destination / "callable.py").write_text(
+        '"""Use open_callable() as a context manager; results are copied values."""\n'
+        "from pathlib import Path\nfrom lossless.applications import CallableApplication\n"
+        "def open_callable(**options):\n"
+        "    return CallableApplication(Path(__file__).resolve().parent, **options)\n"
+    )
     (destination / "USAGE.txt").write_text(
         "Run with the same Python environment used for qualification:\n"
         "python /path/to/application/run.py --case CASE_ID --output /path/to/new-result\n"
@@ -170,6 +176,7 @@ def optimize_project(
     output,
     entry=None,
     cases=None,
+    input_loader=None,
     python=None,
     factory=False,
     observe=None,
@@ -181,10 +188,22 @@ def optimize_project(
     plan=None,
     prepared=False,
     prepared_inputs="fixtures",
+    deployment=None,
+    expected_requests=100,
 ):
     """One local workflow; no implicit provider calls or numerical acceptance."""
     started = clock()
     positive(budget, "workflow budget")
+    if deployment not in {None, "auto", "oneshot", "prepared"}:
+        raise ValueError("deployment must be auto, oneshot or prepared")
+    if type(expected_requests) is not int or not 1 <= expected_requests <= 1000000:
+        raise ValueError("expected_requests must be an integer from 1 to 1000000")
+    if deployment and prepared:
+        raise ValueError("choose --deployment or the legacy --prepared qualification")
+    if cases is not None and input_loader is not None:
+        raise ValueError("choose --cases or --input-loader, not both")
+    if input_loader is not None and not entry:
+        raise ValueError("--input-loader requires an explicit --entry")
     if prepared_inputs not in {"fixtures", "values"} or (
         prepared_inputs == "values" and not prepared
     ):
@@ -216,11 +235,30 @@ def optimize_project(
     progress(
         f"START CPU project workflow budget={budget}s result={out / 'report.json'} log={out / 'run.log'} model_calls=0"
     )
+    original_input = None
+    work_root = root
     try:
+        if input_loader is not None:
+            from .input_loader import collect
+
+            work_root, cases, original_input, receipt = collect(
+                root,
+                out,
+                input_loader,
+                python=python,
+                include=include,
+                exclude=exclude,
+                inherit_env=inherit_env,
+                timeout=min(60, max(0.01, deadline - clock())),
+                progress=progress,
+            )
+            report["input_loader"] = dict(
+                target=input_loader, receipt=receipt, frozen_cases=str(cases)
+            )
         if cases is not None:
             write(out / "inputs.json", prepare_cases(Path(cases).resolve()))
         initialize(
-            root,
+            work_root,
             out / "job",
             entry=entry,
             factory=factory,
@@ -252,7 +290,7 @@ def optimize_project(
         env = bundle_environment(value["environment"]["python"], inherit_env)
         original = info["source"]
         frozen = out / "reference"
-        copy_project(root, frozen, original)
+        copy_project(work_root, frozen, original)
         value["project"]["root"] = str(frozen)
         write(config, value)
         available = deadline - clock()
@@ -280,7 +318,7 @@ def optimize_project(
         available = deadline - clock()
         if available <= 0:
             raise TimeoutError("workflow budget exhausted after profiling")
-        search_budget = available * (0.65 if prepared else 0.8)
+        search_budget = available * (0.45 if deployment else 0.65 if prepared else 0.8)
         if plan is None:
             selected_plan, reason = plan_for(frozen, original, profiled.summary, search_budget)
         else:
@@ -306,6 +344,23 @@ def optimize_project(
             if outcome.summary["status"] == "accepted_experiment":
                 selected = Path(outcome.summary["candidate_project"])
                 selected_source = snapshot(selected, value)
+        if deployment:
+            from .deployment import select_deployment
+
+            report["callable_search_selected"] = "optimized" if selected else "reference"
+            selected, selected_source, report["deployment"] = select_deployment(
+                output=out / "deployment",
+                reference=frozen,
+                reference_source=original,
+                value=value,
+                cases=resolved_cases,
+                env=env,
+                search_folder=out / "search" if selected_plan is not None else None,
+                mode=deployment,
+                expected_requests=expected_requests,
+                deadline=deadline - min(15, max(0, (deadline - clock()) * 0.1)),
+                progress=progress,
+            )
         report.update(
             status="accepted" if selected else "reference_retained",
             selected="optimized" if selected else "reference",
@@ -322,6 +377,10 @@ def optimize_project(
             report["status"],
         )
         report["application"] = str(bundle)
+        if deployment:
+            from .deployment import certify
+
+            certify(bundle, report["deployment"])
         report["delivery"] = check_delivery(
             bundle, value, resolved_cases, out / "delivery", deadline, progress
         )
@@ -364,7 +423,9 @@ def optimize_project(
                     input_mode=prepared_inputs,
                 )
         report["source_unchanged"] = (
-            inventory(
+            inventory(root, exclude, include=include)["files"] == original_input["files"]
+            if original_input is not None
+            else inventory(
                 root,
                 value["project"]["exclude"],
                 value["project"]["limits"],
@@ -372,6 +433,8 @@ def optimize_project(
             )["files"]
             == original["files"]
         )
+        if deployment and report["deployment"]["status"] == "failed":
+            report.update(status="failed", reason=report["deployment"].get("reason"))
         if not report["source_unchanged"]:
             raise ValueError("input project changed during workflow; rerun from a stable source")
     except (ValueError, OSError, TimeoutError, subprocess.SubprocessError) as error:
@@ -386,6 +449,10 @@ def optimize_project(
         report["scope"] = (
             "Exact finite callable checks. Fresh-launch delivery timings are single descriptive pairs including interpreter, admission, input/output I/O and serialization; they are not qualified launch speedups. No automatic in-place installation or universal equivalence proof."
         )
+        if deployment:
+            report["scope"] += (
+                " Deployment comparisons separately qualify complete copied-value adapter calls with declared startup amortization."
+            )
         write(out / "report.json", report)
         (out / "report.html").write_text(
             "<!doctype html><meta charset='utf-8'><title>CPU application</title><h1>CPU application workflow</h1><pre style='white-space:pre-wrap'>"

@@ -1,6 +1,6 @@
 # Using the source alpha
 
-This describes the source interface. The `v0.1.0a1` tag preserves the first published alpha; additions explicitly marked unreleased require installation from the current source. Files labeled `draft-1` and the broader design documents remain proposals.
+This describes the interface packaged in `v0.1.0a2` and current source. The `v0.1.0a1` tag preserves the first published alpha. Files labeled `draft-1` and the broader design documents remain proposals.
 
 ## A job is deterministic setup
 
@@ -35,7 +35,9 @@ To split the files, replace the contract object with `{"file": "contract.json"}`
 
 The harness resolves and freezes these inputs first. It then builds a discovery-only prompt for the user-connected LLM. There is no internal proprietary LLM. Evaluation cases stay out of that prompt and cannot be revised after observing discovery results within the same run.
 
-## Search time and performance (unreleased CLI overrides)
+<a id="search-time-and-performance-unreleased-cli-overrides"></a>
+
+## Search time and performance
 
 **Treat optimization time as a performance tuning input: more time can help when useful proposals or evaluations are being cut short.** It increases opportunity, not guaranteed speed. Campaign 044's five-minute authors timed out, while all 30- and 60-minute authors completed. One hour did not consistently beat 30 minutes in that one-shot study. [Measured results and cost](timers-044.md).
 
@@ -280,7 +282,9 @@ Graph promotion additionally requires a fresh paired interval more than 1% above
 
 `lossless profile JOB --repeats 7 --budget 30s --output DIRECTORY` profiles discovery inputs without invoking providers or proof setup. Pass `--artifact PATH` to compare an exported implementation. Native ordinary and bound calls are separate; MLX records complete requests with probabilities, state, TTFT, memory and coarse phase accounting. See the [profiling guide](profiling.md) for setup costs, p95 interpretation, host attribution and fallback scope.
 
-## MLX deployment limits (unreleased)
+<a id="mlx-deployment-limits-unreleased"></a>
+
+## MLX deployment limits
 
 Optional `objective.constraints` are frozen before search and checked in discovery, evaluation, and the final decision. They supplement all existing correctness, comparator and graph-incremental gates. For example, merge this objective into an MLX job and set `workload.parameters.repeats` to at least 20:
 

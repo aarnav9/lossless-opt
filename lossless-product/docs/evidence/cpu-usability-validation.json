@@ -1,0 +1,31 @@
+{
+  "study": "cpu-callable-usability",
+  "version": "0.1.0a2",
+  "completed_trials": 8,
+  "final_trials": 4,
+  "new_external_projects": 3,
+  "known_control": "numpy-financial",
+  "llm_calls": 0,
+  "public_adapter_new_values_exact": 4,
+  "full_local_tests": {
+    "ran": 241,
+    "skipped": 8,
+    "seconds": 183.505,
+    "status": "passed",
+    "scope": "Before final two controls and guard refinement"
+  },
+  "final_focused_tests": {
+    "ran": 12,
+    "seconds": 37.362,
+    "status": "passed",
+    "scope": "Final release runtime"
+  },
+  "static_checks": "ruff check and format passed; 256 Python files",
+  "distribution_checks": "Release process runs check_dist.py and check_install.py on the built alpha; see release assets/CI for receipts.",
+  "initial_trials": "Preserved; final trials include mandatory incumbent comparison and adapter serialization.",
+  "evidence_sha256": "6a3c33dc18fe4abdc6ef568c7fe9a8581dd66a9698d9d92eed7f333b144428a0",
+  "logs": {
+    "lossless-alpha2-tests.log": "b296d5bae3384c0a34e940c2bfc048c7f052bc3c92a02924f4c303204646ff73",
+    "lossless-onboarding-release-tests.log": "551ff12806b223c507dfc81d0560bcfa0f53b2f14570aff67bc8911e729ace2c"
+  }
+}
