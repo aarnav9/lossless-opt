@@ -193,6 +193,44 @@ it must be amortized across enough requests. Memory qualification requires the
 `applications` dependencies and working process monitoring. This is a local value
 request API, not transparent in-process replacement or a network service.
 
+### Pass live arrays without staging files
+
+For a caller that already holds NumPy arrays, qualify the copied-value boundary:
+
+```sh
+lossless run-project ./my-project --entry pipeline.py:run --cases ./cases.json \
+  --prepared --prepared-inputs values --budget 5m --output ./lossless-runs/live-arrays
+```
+
+```python
+with PreparedApplication('./lossless-runs/live-arrays/application', input_mode='values') as app:
+    result = app.run_values({'calls': [{'args': [new_signal], 'kwargs': {}}]})
+    outputs = result['outputs']
+```
+
+`prepared-values.json` qualifies this boundary independently from `prepared.json`.
+Both the original and optimized source receive the same runtime improvements.
+The timer includes checking, copying and transporting live inputs, all application
+work, and transporting outputs; caller input creation and worker startup are separate.
+A file-request certificate cannot enable optimized value requests, or vice versa.
+
+Inputs must be plain, aligned, writeable, C/F-contiguous numeric arrays, or supported
+Python scalars and containers. `calls` contains 1–100 `args`/`kwargs` entries.
+Every array occurrence becomes an independent owned copy. Input mutation stays in
+the worker; aliases between caller objects are not preserved. Do not mutate inputs
+while a request runs. Dictionaries are literal values, including a `$npy` key.
+Unsupported layouts are rejected before execution. Optimized calls still scan
+every changing floating-point array for nonfinite values and enforce measured
+metadata and fixed scalar controls.
+
+The default transport uses bounded raw array frames with copied, owned outputs.
+It preserves dtype, shape, array order and raw bits; structured arrays use the
+existing NumPy format. Observation reuse removes one duplicate encoding when the
+declared observation is the actual result. Input and retained-output snapshots
+remain in place. These changes do not change arithmetic or enable tolerances.
+The [request-runtime experiment record](cpu-request-runtime-study.md) includes
+negative experiments and separate file/live-input measurements.
+
 ## Diagnose an unstable reference
 
 If reference profiling fails, the workflow attempts a short discovery-only

@@ -1,0 +1,39 @@
+{
+  "study": "cpu-request-runtime",
+  "baseline_commit": "d13261f57f9f706c61da464f5fe6efd09aaf1d9b",
+  "llm_calls": 0,
+  "completed_studies": 8,
+  "preserved_setup_failures": 1,
+  "paired_measured_requests": 3960,
+  "static_checks": "ruff check and format passed; 250 files",
+  "unit_tests": {
+    "ran": 231,
+    "skipped": 8,
+    "status": "passed",
+    "seconds": 154.685
+  },
+  "distribution_checks": "wheel and sdist checked; clean install outside checkout passed exact export/load",
+  "reconstruction": "all frozen runtime Python hashes and every fixture/source file hash matched",
+  "shared_runtime": "all Python source hashes match frozen engine-final",
+  "financial_demo": "public optimized live-array session, new seed 202610144, three (97,8) outputs exactly matched explicit reference",
+  "evidence_sha256": "fb6bc3004961fac003a6897ddb37b5d447d5f3afd0d1411a5e0c0be447830671",
+  "logs": {
+    "product-tests.log": "55d549f884929a6033cc14762f1617751aa9f6595ffe3240766080b7c4cc3bc6",
+    "build.log": "cbe459b40e6e99a6aa95118b3ec63cd93629cf15075000d38bd272ce338f40ca",
+    "install.log": "52fe50f180ecfe3cdf2e62adabd6403e5494a1ffda08529d9b8aee5c2c2fa3e0"
+  },
+  "products": {
+    "product-financial": {
+      "status": "accepted",
+      "source_speedup": 1.3676930976788348,
+      "prepared_status": "accepted",
+      "prepared_speedup": 1.3451775682065508
+    },
+    "product-pybaselines": {
+      "status": "accepted",
+      "source_speedup": 1.3028931714628968,
+      "prepared_status": "reference_retained",
+      "prepared_speedup": 1.030097385218691
+    }
+  }
+}

@@ -9,15 +9,25 @@ import time
 from .._native.common import stamp, write
 from ..jobs import identity, read_json
 from .comparison import eligible, statistics_for
-from .prepared import PreparedApplication
-from .worker import Observer
+from .prepared import PreparedApplication, DEFAULT_FEATURES
+from .worker import Observer, inputs
 
 
 def qualify_prepared(
-    bundle, *, output, expected, expected_outputs, python=None, budget=120, rounds=6, requests=3
+    bundle,
+    *,
+    output,
+    expected,
+    expected_outputs,
+    python=None,
+    budget=120,
+    rounds=6,
+    requests=3,
+    input_mode="fixtures",
 ):
     if (
-        type(rounds) is not int
+        input_mode not in {"fixtures", "values"}
+        or type(rounds) is not int
         or type(requests) is not int
         or rounds < 6
         or requests < 2
@@ -32,8 +42,9 @@ def qualify_prepared(
     started = time.perf_counter()
     deadline = started + budget
     manifest = read_json(bundle / "manifest.json")
+    certificate = bundle / ("prepared-values.json" if input_mode == "values" else "prepared.json")
     # Requalification invalidates any previous certificate before attempting work.
-    write(bundle / "prepared.json", dict(status="incomplete", manifest_identity=identity(manifest)))
+    write(certificate, dict(status="incomplete", manifest_identity=identity(manifest)))
     cases = [c for c in read_json(bundle / "cases.json") if c["split"] == "evaluation"]
     if (
         not cases
@@ -47,8 +58,17 @@ def qualify_prepared(
         minimum_speedup=1.02, max_case_regression=0.03, max_call_regression=0.03, significance=0.05
     )
     rows = [dict(id=c["id"], pairs=[]) for c in cases]
+    value_cases = (
+        {c["id"]: {"calls": inputs(c["calls"], bundle / "reference")} for c in cases}
+        if input_mode == "values"
+        else {}
+    )
     report = dict(
         status="incomplete",
+        input_mode=input_mode,
+        runtime_features=sorted(
+            (*DEFAULT_FEATURES, *(["values"] if input_mode == "values" else []))
+        ),
         manifest_identity=identity(manifest),
         policy=policy,
         rows=rows,
@@ -58,6 +78,10 @@ def qualify_prepared(
         requests_per_case=requests,
         llm_calls=0,
     )
+    if input_mode == "values":
+        report["timing_scope"] = (
+            "Complete parent live-value request: validation, copied input serialization/transport/decoding, metadata checks, factory, calls, observations, cleanup, output serialization/transport/deserialization. Caller already owns inputs; startup recorded separately."
+        )
 
     def progress(message):
         stamp(message)
@@ -101,6 +125,7 @@ def qualify_prepared(
                                 variant="reference" if name == "reference" else "auto",
                                 timeout=remaining(),
                                 _qualifying=True,
+                                input_mode=input_mode,
                             )
                         )
                         if name == "candidate" and session.info["variant"] != "optimized":
@@ -121,7 +146,11 @@ def qualify_prepared(
                             for name in order if request_index % 2 == 0 else order[::-1]:
                                 session = sessions[name]
                                 session.timeout = remaining()
-                                result = session.run_case(case["id"])
+                                result = (
+                                    session.run_values(value_cases[case["id"]])
+                                    if input_mode == "values"
+                                    else session.run_case(case["id"])
+                                )
                                 timings[name].append(result["request_seconds"])
                                 fingerprints[name].append(result["fingerprint"])
                                 peaks[name] = max(
@@ -187,9 +216,11 @@ def qualify_prepared(
         write(output / "report.json", report)
         # Missing or failed evidence can never enable an optimized session.
         write(
-            bundle / "prepared.json",
+            certificate,
             dict(
                 status=report["status"],
+                input_mode=input_mode,
+                runtime_features=report["runtime_features"],
                 manifest_identity=report["manifest_identity"],
                 statistics=report.get("statistics"),
                 lifecycle=report["lifecycle"],

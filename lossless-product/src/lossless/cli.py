@@ -287,6 +287,12 @@ def main(argv=None):
         action="store_true",
         help="Also qualify complete requests through reusable workers",
     )
+    project_run.add_argument(
+        "--prepared-inputs",
+        choices=["fixtures", "values"],
+        default="fixtures",
+        help="Request boundary to qualify with --prepared: saved fixtures or copied live arrays",
+    )
     project_run.add_argument("--output", type=Path, required=True)
     diagnosis = commands.add_parser(
         "diagnose-application",
@@ -468,6 +474,7 @@ def main(argv=None):
                 budget=args.budget,
                 plan=args.plan,
                 prepared=args.prepared,
+                prepared_inputs=args.prepared_inputs,
             )
             result = {
                 "status": outcome.summary["status"],

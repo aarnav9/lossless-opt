@@ -180,10 +180,17 @@ def optimize_project(
     budget=180,
     plan=None,
     prepared=False,
+    prepared_inputs="fixtures",
 ):
     """One local workflow; no implicit provider calls or numerical acceptance."""
     started = clock()
     positive(budget, "workflow budget")
+    if prepared_inputs not in {"fixtures", "values"} or (
+        prepared_inputs == "values" and not prepared
+    ):
+        raise ValueError(
+            "prepared_inputs requires fixtures or values; values also requires prepared=True"
+        )
     root, out = Path(project).resolve(), Path(output).resolve()
     if out == root or out.is_relative_to(root) or root.is_relative_to(out):
         raise ValueError("workflow output must be separate from the source project")
@@ -354,6 +361,7 @@ def optimize_project(
                     expected_outputs=expected_outputs,
                     python=value["environment"]["python"],
                     budget=remaining,
+                    input_mode=prepared_inputs,
                 )
         report["source_unchanged"] = (
             inventory(

@@ -94,6 +94,7 @@ def main():
     parser.add_argument("--budget", type=float, default=280)
     parser.add_argument("--seed", type=int, default=12062026)
     parser.add_argument("--prepared", action="store_true")
+    parser.add_argument("--prepared-inputs", choices=["fixtures", "values"], default="fixtures")
     parser.add_argument(
         "--matrix", action="store_true", help="Include held-out financial widths 1, 8 and 32"
     )
@@ -128,6 +129,7 @@ def main():
         inherit_env=inherited,
         budget=args.budget,
         prepared=args.prepared,
+        prepared_inputs=args.prepared_inputs,
         **options,
     )
     stamp(f"DONE status={result.summary['status']} result={out}/workflow/report.json log={out}.log")

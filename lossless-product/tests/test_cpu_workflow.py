@@ -154,6 +154,35 @@ class CPUWorkflowTests(unittest.TestCase):
             np.testing.assert_array_equal(
                 prepared.run_case("case_001")["outputs"][0], np.linspace(-1, 1, 16) * 3
             )
+        from lossless.applications.prepared_check import qualify_prepared
+        from lossless.applications.worker import Observer
+
+        original_certificate = (application / "prepared.json").read_bytes()
+        with contextlib.redirect_stdout(io.StringIO()):
+            values_report = qualify_prepared(
+                application,
+                output=self.root / "value-qualification",
+                input_mode="values",
+                expected={row["id"]: row["reference"]["fingerprint"] for row in result["delivery"]},
+                expected_outputs={
+                    row["id"]: identity(
+                        Observer(2**20).encode(
+                            read_outputs(
+                                self.root / "workflow/delivery" / row["id"] / "reference/outputs"
+                            )
+                        )
+                    )
+                    for row in result["delivery"]
+                },
+            )
+        self.assertEqual(values_report["status"], "accepted", values_report)
+        self.assertEqual((application / "prepared.json").read_bytes(), original_certificate)
+        with PreparedApplication(application, input_mode="values") as prepared:
+            self.assertEqual(prepared.info["variant"], "optimized")
+            values = np.linspace(7, 9, 16)
+            np.testing.assert_array_equal(
+                prepared.run_values({"calls": [{"args": [values]}]})["outputs"][0], values * 3
+            )
         request = self.root / "request.json"
         request.write_text(json.dumps({"args": [{"$npy": "new.npy"}]}))
         for label, values, expected in [

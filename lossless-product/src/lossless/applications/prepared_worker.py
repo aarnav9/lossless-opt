@@ -13,27 +13,41 @@ from ..jobs import identity, read_json
 from .bundle import select, signature
 from .config import validate_cases
 from .replay import copy_project
-from .wire import MAX_MESSAGE, pack
+from .request_guard import RequestGuard
+from .value_request import normalize
+from .wire import MAX_MESSAGE, pack, unpack
 from .worker import Observer, inputs, load_target
 
 
-def serve(fd, bundle, requested, qualifying):
+def serve(fd, bundle, requested, qualifying, features=(), input_mode="fixtures"):
     import numpy as np
+    from . import raw_wire
+
+    staging = bytearray() if "buffers" in features else None
+    encode = (lambda value: raw_wire.pack(value, staging)) if "raw" in features else pack
 
     connection = Connection(fd)
     bundle = Path(bundle).resolve()
     manifest = read_json(bundle / "manifest.json")
     selected, reason = select(bundle, manifest, None, requested, check_inputs=False)
-    certificate = bundle / "prepared.json"
+    certificate = bundle / ("prepared-values.json" if input_mode == "values" else "prepared.json")
     if selected == "optimized" and not qualifying:
         policy = read_json(certificate) if certificate.exists() else {}
-        if policy.get("status") != "accepted" or policy.get("manifest_identity") != identity(
-            manifest
+        if (
+            policy.get("status") != "accepted"
+            or policy.get("manifest_identity") != identity(manifest)
+            or policy.get("runtime_features") != sorted(features)
+            or policy.get("input_mode", "fixtures") != input_mode
         ):
             selected, reason = "reference", "prepared request lifecycle has not qualified"
     root = Path.cwd() / "project"
     copy_project(bundle / selected, root, {"files": manifest[selected + "_files"]})
     cases = read_json(bundle / "cases.json")
+    guard = (
+        RequestGuard(cases, root, manifest["input_signatures"])
+        if selected == "optimized" and "guards" in features
+        else None
+    )
     sys.dont_write_bytecode = True
     sys.path[:0] = [str(root), str(root / "src")]
     os.chdir(root)
@@ -44,14 +58,29 @@ def serve(fd, bundle, requested, qualifying):
     observe = load_target(entry["observe"], root, loaded) if entry.get("observe") else None
     cleanup = load_target(entry["cleanup"], root, loaded) if entry.get("cleanup") else None
     connection.send_bytes(
-        pack(dict(status="ready", variant=selected, fallback_reason=reason, pid=os.getpid()))
+        encode(dict(status="ready", variant=selected, fallback_reason=reason, pid=os.getpid()))
     )
     while True:
-        command = json.loads(connection.recv_bytes(2**20))
+        frame = connection.recv_bytes(MAX_MESSAGE)
+        if "raw" in features:
+            command = raw_wire.unpack(frame)
+        elif frame.startswith(b"LLV1"):
+            if "values" not in features:
+                raise ValueError("direct values not enabled")
+            command = unpack(frame[4:])
+        else:
+            if len(frame) > 2**20:
+                raise ValueError("request JSON exceeds 1 MiB")
+            command = json.loads(frame)
+        del frame
         if command["action"] == "close":
             return
         try:
-            if "case" in command:
+            if command["action"] == "values":
+                if "values" not in features:
+                    raise ValueError("direct values not enabled")
+                calls = normalize(command["request"])["calls"]
+            elif "case" in command:
                 found = [case for case in cases if case["id"] == command["case"]]
                 if len(found) != 1:
                     raise ValueError("unknown saved case")
@@ -61,15 +90,20 @@ def serve(fd, bundle, requested, qualifying):
                     [{"id": "request", "split": "evaluation", **command["request"]}], entry
                 )[0]
                 fixture_root = Path(command["input_root"]).resolve()
-            calls = inputs(row["calls"], fixture_root)
+            if command["action"] != "values":
+                calls = inputs(row["calls"], fixture_root)
             if selected == "optimized":
                 try:
-                    admitted = identity(signature(calls)) in manifest["input_signatures"]
+                    admitted = (
+                        guard.admits(calls)
+                        if guard is not None
+                        else identity(signature(calls)) in manifest["input_signatures"]
+                    )
                 except ValueError:
                     admitted = False
                 if not admitted:
                     connection.send_bytes(
-                        pack(
+                        encode(
                             dict(
                                 status="outside_scope",
                                 reason="request metadata outside qualification; use an explicit reference session",
@@ -102,12 +136,16 @@ def serve(fd, bundle, requested, qualifying):
                         else result
                     )
                     # Actual returns and declared observations must both be bounded values.
-                    Observer(limit).encode(result)
+                    encoded_result = Observer(limit).encode(result)
                     results.append(result)
                     retained.append(observed)
                     observations.append(
                         dict(
-                            output=Observer(limit).encode(observed),
+                            output=(
+                                encoded_result
+                                if "observations" in features and observed is result
+                                else Observer(limit).encode(observed)
+                            ),
                             inputs_before=before,
                             inputs_after=Observer(limit).encode(call),
                         )
@@ -127,7 +165,7 @@ def serve(fd, bundle, requested, qualifying):
                 ):
                     selected_call.close()
             rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-            response = pack(
+            response = encode(
                 dict(
                     status="completed",
                     variant=selected,
@@ -144,10 +182,17 @@ def serve(fd, bundle, requested, qualifying):
         except Exception as error:
             # State after an application failure is unknown. Report once and exit.
             connection.send_bytes(
-                pack(dict(status="failed", error=type(error).__name__, reason=str(error)))
+                encode(dict(status="failed", error=type(error).__name__, reason=str(error)))
             )
             return
 
 
 if __name__ == "__main__":
-    serve(int(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4] == "qualify")
+    serve(
+        int(sys.argv[1]),
+        sys.argv[2],
+        sys.argv[3],
+        sys.argv[4] == "qualify",
+        json.loads(sys.argv[5]),
+        sys.argv[6],
+    )

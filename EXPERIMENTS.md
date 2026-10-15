@@ -162,6 +162,9 @@ Detailed local evidence lives in the ignored `research/` workspace. Numbered rep
 
 ## Supplemental studies
 
+- **CPU request runtime — Experiment (exact/lossless):** Sequentially test observation reuse, persistent dispatch, prepared guards, direct arrays and raw/reusable transport, then freeze the combination for held-out four-arm comparisons against both the previous runtime and equally equipped reference source.
+- **Result — scoped runtime gain, mixed live arrays:** All completed variants matched exact observations and returned bits. Combined file requests improved pybaselines 1.1835× over the previous optimized runtime while Financial retained a 1.3544× source edge. Live pybaselines averaged 1.5934× against file staging but failed position gates; array controls regressed. Dispatch, prepared guards and reusable buffers were rejected. Public Financial live requests qualified at 1.3452×; public pybaselines retained the reference for that mode. [Full results and reproducible evidence](lossless-product/docs/cpu-request-runtime-study.md).
+
 - **RESEARCH-INTEGRATION — Experiment (exact/lossless application; separate numerical APIs):** Package positive mechanisms as scoped callable APIs/search candidates and compare eight local source/compiled/cache/pool compositions on pinned pybaselines with fresh changing-input fixtures, closed final cases and no model calls.
 - **Result — scoped CPU application win:** Combined source edits passed exact output/input/retained-output, startup and memory gates at 1.31695× complete-call speed (three final profiles, six paired rounds); setup plus three short calls was near parity. Extra compiled/pool combinations did not improve the selected result. Thirty catalog entries now expose retained, superseded and experimental mechanisms with explicit contracts; backend conformance is not fresh speed qualification. [Integration coverage, limits and local reproduction](lossless-product/docs/research-integration.md).
 

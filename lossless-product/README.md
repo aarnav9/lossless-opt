@@ -61,6 +61,7 @@ For local CPU Python/NumPy callables, use
 It profiles, tries applicable local recipes, checks exact outputs, and creates a
 runnable project copy with reference fallback, without model calls.
 Add `--prepared` to separately qualify reusable CPU workers and complete request latency.
+Use `--prepared-inputs values` with it to qualify copied live-array requests.
 [CPU project guide and example](docs/cpu-projects.md).
 
 For an existing local application, current source also supports

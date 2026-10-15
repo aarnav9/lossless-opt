@@ -5,6 +5,7 @@ import math
 from multiprocessing.connection import Connection
 import os
 from pathlib import Path
+import queue
 import signal
 import socket
 import subprocess
@@ -14,7 +15,9 @@ import threading
 import time
 
 from ..jobs import read_json
-from .wire import MAX_MESSAGE, unpack
+from .wire import MAX_MESSAGE, pack, unpack
+
+DEFAULT_FEATURES = ("observations", "raw")
 
 
 class PreparedApplication:
@@ -24,7 +27,39 @@ class PreparedApplication:
     A context manager is required to release the worker and its private snapshot.
     """
 
-    def __init__(self, bundle, *, python=None, variant="auto", timeout=30, _qualifying=False):
+    def __init__(
+        self,
+        bundle,
+        *,
+        python=None,
+        variant="auto",
+        timeout=30,
+        input_mode="fixtures",
+        _qualifying=False,
+        _features=None,
+    ):
+        if input_mode not in {"fixtures", "values"}:
+            raise ValueError("input_mode must be fixtures or values")
+        self.input_mode = input_mode
+        if _features is None:
+            _features = (*DEFAULT_FEATURES, *(["values"] if input_mode == "values" else []))
+        elif not _qualifying:
+            raise ValueError("experimental runtime features require explicit qualification")
+        if set(_features) - {
+            "observations",
+            "dispatcher",
+            "guards",
+            "values",
+            "raw",
+            "buffers",
+        }:
+            raise ValueError("experimental runtime features require explicit qualification")
+        self._features = frozenset(_features)
+        if "buffers" in self._features and "raw" not in self._features:
+            raise ValueError("reusable transport buffers require raw frames")
+        self._staging = bytearray() if "buffers" in self._features else None
+        self._dispatch_queue = None
+        self._dispatch_thread = None
         if (
             sys.platform not in {"darwin", "linux"}
             or variant not in {"auto", "reference"}
@@ -73,6 +108,8 @@ class PreparedApplication:
                     str(self.bundle),
                     variant,
                     "qualify" if _qualifying else "run",
+                    json.dumps(list(_features)),
+                    input_mode,
                 ],
                 pass_fds=(child.fileno(),),
                 env=env,
@@ -91,24 +128,52 @@ class PreparedApplication:
             self.close()
             raise
 
-    def _exchange(self, command):
-        finished, result = threading.Event(), {}
+    def _perform_exchange(self, command, finished, result):
+        try:
+            from . import raw_wire
 
-        def exchange():
-            try:
-                if command is not None:
+            raw = "raw" in self._features
+            if command is not None:
+                if raw:
+                    data = raw_wire.pack(command, self._staging)
+                elif command.get("action") == "values":
+                    data = b"LLV1" + pack(command)
+                    if len(data) > MAX_MESSAGE:
+                        raise ValueError("value request exceeds 64 MiB transport limit")
+                else:
                     data = json.dumps(command, allow_nan=False).encode()
                     if len(data) > 2**20:
                         raise ValueError("request JSON exceeds 1 MiB; use $npy fixtures")
-                    self._connection.send_bytes(data)
-                result["value"] = unpack(self._connection.recv_bytes(MAX_MESSAGE))
-            except BaseException as error:
-                result["error"] = error
-            finally:
-                finished.set()
+                self._connection.send_bytes(data)
+            decode = raw_wire.unpack if raw else unpack
+            result["value"] = decode(self._connection.recv_bytes(MAX_MESSAGE))
+        except BaseException as error:
+            result["error"] = error
+        finally:
+            finished.set()
 
-        thread = threading.Thread(target=exchange, daemon=True)
-        thread.start()
+    def _dispatch_loop(self):
+        while True:
+            task = self._dispatch_queue.get()
+            if task is None:
+                return
+            self._perform_exchange(*task)
+            del task
+
+    def _exchange(self, command):
+        finished, result = threading.Event(), {}
+        if "dispatcher" in self._features:
+            if self._dispatch_queue is None:
+                self._dispatch_queue = queue.Queue(maxsize=1)
+                self._dispatch_thread = threading.Thread(target=self._dispatch_loop, daemon=True)
+                self._dispatch_thread.start()
+            thread = self._dispatch_thread
+            self._dispatch_queue.put_nowait((command, finished, result))
+        else:
+            thread = threading.Thread(
+                target=self._perform_exchange, args=(command, finished, result), daemon=True
+            )
+            thread.start()
         deadline = time.monotonic() + self.timeout
         self._sample_memory()
         while not finished.wait(min(0.02, max(0, deadline - time.monotonic()))):
@@ -171,12 +236,33 @@ class PreparedApplication:
             self._lock.release()
 
     def run_case(self, case):
+        if self.input_mode != "fixtures":
+            raise ValueError("this session requires run_values")
         return self._run(dict(action="run", case=case))
 
     def run(self, request, *, input_root):
+        if self.input_mode != "fixtures":
+            raise ValueError("this session requires run_values")
         return self._run(
             dict(action="run", request=request, input_root=str(Path(input_root).resolve()))
         )
+
+    def run_values(self, request):
+        """Copy live values into the worker; do not mutate them until this returns.
+
+        Each array occurrence is an independent owned copy. Aliasing and input
+        mutations are not reflected back to the caller. Only aligned, writeable
+        C/F-contiguous numeric arrays are supported. Dicts are literal values.
+        """
+        from .value_request import normalize
+
+        if "values" not in self._features:
+            raise ValueError("direct values require separate runtime qualification")
+        tick = time.perf_counter()
+        request = normalize(request)
+        result = self._run(dict(action="values", request=request))
+        result["request_seconds"] = time.perf_counter() - tick
+        return result
 
     def close(self):
         if self._closed:
@@ -193,6 +279,14 @@ class PreparedApplication:
                 process.wait(timeout=1)
             process.wait(timeout=2)
         self._connection.close()
+        if self._dispatch_queue is not None:
+            try:
+                self._dispatch_queue.put_nowait(None)
+            except queue.Full:
+                # A timeout can happen before the dispatcher consumes its task.
+                self._dispatch_queue.get_nowait()
+                self._dispatch_queue.put_nowait(None)
+            self._dispatch_thread.join(timeout=1)
         self._log.close()
         self._temporary.cleanup()
 
