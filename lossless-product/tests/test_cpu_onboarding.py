@@ -14,7 +14,7 @@ import numpy as np
 
 from lossless.applications import CallableApplication, CaseRecorder, optimize_project
 from lossless.applications.input_loader import freeze
-from lossless.applications.deployment import paired, passes
+from lossless.applications.deployment import certify, paired, passes
 from lossless.applications.discovery import inventory
 from lossless.applications.workflow import make_bundle, bundle_environment
 from lossless.applications.config import initialize, inspect, resolve
@@ -89,6 +89,7 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(outcome.summary["status"], "reference_retained", outcome.summary)
         self.assertEqual(before, inventory(self.project))
         self.assertTrue((Path(outcome.summary["application"]) / "callable.py").exists())
+        self.assertNotIn("RuntimeWarning", (self.root / "run/input-loader/stderr.log").read_text())
         with CallableApplication(outcome.summary["application"]) as run:
             first = run(np.arange(8.0), factor=2)["out"]
             pid = run.info["pid"]
@@ -168,10 +169,104 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(result["deployment"]["mode"], "prepared", result["deployment"])
         with CallableApplication(result["application"]) as run:
             self.assertEqual(run.mode, "prepared")
+            self.assertIn("reference retained", run.info["fallback_reason"])
             pid = run.info["pid"]
             np.testing.assert_array_equal(run(np.arange(8.0)), np.arange(8.0) * 2)
             np.testing.assert_array_equal(run(np.arange(8.0) + 2), (np.arange(8.0) + 2) * 2)
             self.assertEqual(run.info["pid"], pid)
+
+    def certify(self, bundle, status="reference_retained"):
+        certify(
+            bundle,
+            dict(
+                status=status,
+                mode="prepared",
+                lifecycle_exact=True,
+                expected_requests=100,
+                timing_scope="regression fixture",
+            ),
+        )
+
+    def check_changed_environment(self, *, candidate):
+        code = (
+            "import os\ncount = 0\ndef run(x):\n    global count\n    count += 1\n"
+            "    return x + (count if os.environ['REVIEW_STATE'] == 'changed' else 1)\n"
+        )
+        with patch.dict(os.environ, REVIEW_STATE="stable"):
+            bundle = self.bundle(code, code if candidate else None, inherit=["REVIEW_STATE"])
+            self.certify(bundle, "accepted" if candidate else "reference_retained")
+            with CallableApplication(bundle) as run:
+                self.assertEqual(run.mode, "prepared")
+                np.testing.assert_array_equal(run(np.arange(8.0)), np.arange(8.0) + 1)
+                np.testing.assert_array_equal(run(np.arange(8.0)), np.arange(8.0) + 1)
+        with patch.dict(os.environ, REVIEW_STATE="changed"):
+            with CallableApplication(bundle) as run:
+                self.assertEqual(run.mode, "oneshot")
+                self.assertEqual(run.info["variant"], "reference")
+                self.assertIn("environment settings changed", run.info["fallback_reason"])
+                self.assertEqual(run(5), 6)
+                pid = run.info["pid"]
+                self.assertEqual(run(5), 6)
+                self.assertNotEqual(run.info["pid"], pid)
+                self.assertIn("environment settings changed", run.info["fallback_reason"])
+
+    def test_reference_reuse_requires_unchanged_environment(self):
+        self.check_changed_environment(candidate=False)
+
+    def test_optimized_fallback_uses_fresh_reference_after_environment_change(self):
+        self.check_changed_environment(candidate=True)
+
+    def test_reference_reuse_requires_unchanged_packages(self):
+        bundle = self.bundle(
+            "count = 0\ndef run(x):\n    global count\n    count += 1\n    return x + count\n"
+        )
+        path = bundle / "manifest.json"
+        manifest = json.loads(path.read_text())
+        manifest["environment"]["packages"].append(["removed-test-dependency", "1.0"])
+        path.write_text(json.dumps(manifest))
+        self.certify(bundle)
+        with CallableApplication(bundle) as run:
+            self.assertEqual(run.mode, "oneshot")
+            self.assertIn("packages", run.info["fallback_reason"])
+            self.assertEqual(run(5), 6)
+            self.assertEqual(run(5), 6)
+
+    def test_invalid_certificate_and_explicit_mode_cannot_enable_import_reuse(self):
+        bundle = self.bundle(
+            "count = 0\ndef run(x):\n    global count\n    count += 1\n    return x + count\n"
+        )
+        self.certify(bundle)
+        valid = json.loads((bundle / "callable.json").read_text())
+        invalid = ["{broken", "[]", "null"] + [
+            json.dumps({**valid, **change})
+            for change in (
+                {"mode": []},
+                {"status": []},
+                {"runtime_features": []},
+                {"input_mode": "fixtures"},
+                {"manifest_identity": "wrong"},
+            )
+        ]
+        for content in invalid:
+            with self.subTest(certificate=content):
+                (bundle / "callable.json").write_text(content)
+                with CallableApplication(bundle, mode="prepared") as run:
+                    self.assertEqual(run.mode, "oneshot")
+                    self.assertEqual(run(5), 6)
+                    self.assertEqual(run(5), 6)
+                    self.assertIn("fresh reference", run.info["fallback_reason"])
+        (bundle / "callable.json").unlink()
+        with CallableApplication(bundle, mode="prepared") as run:
+            self.assertEqual(run.mode, "oneshot")
+            self.assertEqual(run(5), 6)
+            self.assertEqual(run(5), 6)
+
+    def test_qualification_cannot_skip_reference_reuse_environment_admission(self):
+        with patch.dict(os.environ, REVIEW_STATE="stable"):
+            bundle = self.bundle("def run(x): return x\n", inherit=["REVIEW_STATE"])
+        with patch.dict(os.environ, REVIEW_STATE="changed"):
+            with self.assertRaisesRegex(ValueError, "qualification environment changed"):
+                CallableApplication(bundle, mode="prepared", _qualifying=True)
 
     def test_timeout_and_application_failure_are_never_retried(self):
         marker = self.root / "marker"

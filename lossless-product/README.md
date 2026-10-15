@@ -2,7 +2,7 @@
 
 > An optimizer that combines formal reasoning, hardware information, and measured experiments to accelerate computations while preserving an explicit correctness contract.
 
-**GitHub prerelease, `0.1.0a2`.** Lossless searches offline, checks candidates against a frozen contract, measures them on separate discovery and evaluation cases, and exports a guarded implementation. If no candidate qualifies, it retains the reference. Connect your own reasoning LLM through a Python callback or JSON command; retained candidates also work without an API key.
+**GitHub prerelease, `0.1.0a3`.** Lossless searches offline, checks candidates against a frozen contract, measures them on separate discovery and evaluation cases, and exports a guarded implementation. If no candidate qualifies, it retains the reference. Connect your own reasoning LLM through a Python callback or JSON command; retained candidates also work without an API key.
 
 The product direction covers ML, vision, and linear algebra. This alpha implements the adapters below. It does not yet optimize arbitrary model graphs or CUDA workloads.
 
@@ -35,7 +35,7 @@ lossless demo --budget 60s --output ./lossless-runs/demo
 lossless export ./lossless-runs/demo --output ./lossless-runs/copy-artifact
 ```
 
-From a standalone copy of this folder, use `python -m pip install .`. This installs current public source, matching the features in the `v0.1.0a2` release. The package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
+From a standalone copy of this folder, use `python -m pip install .`. This installs current public source, matching the features in the `v0.1.0a3` release. The package is not published to PyPI or Homebrew. NumPy is the only required Python dependency. Optional extras install SciPy baselines (`.[numerical]`) or the pinned Apple Silicon runtime (`.[mlx]`). Model weights and proof toolchains are separate.
 
 Use the exported operation without an LLM:
 
@@ -126,7 +126,7 @@ The current `main` branch defaults to **30 minutes per LLM response** when `llm.
 
 Your `complete(prompt: str)` calls your preferred model and returns the JSON proposal string or object. The prompt contains the response schema, contract, permitted transformations, hardware context, and discovery feedback. A command alternative accepts one JSON request on stdin and emits one proposal batch on stdout. No model SDK or hosted Lossless service is required. Prefer a capable reasoning model for difficult searches; improved gains are a hypothesis to measure, not a guarantee. Native adapters accept C candidates; MLX currently lets the LLM choose among retained allocator policies rather than generating arbitrary GPU programs.
 
-The [Codex subscription guide](docs/codex.md) provides a ready-to-run JSON job and the bundled source command `python -m lossless.codex_provider`, which uses saved ChatGPT sign-in. The [general connection guide](docs/alpha.md#connecting-claude-or-codex) includes a minimal Claude API callback and the Claude Code command boundary. Provider/model labels alone do not select a service; the callback or command performs the call. The Codex connector is not in the published `v0.1.0a2` wheel.
+The [Codex subscription guide](docs/codex.md) provides a ready-to-run JSON job and the bundled source command `python -m lossless.codex_provider`, which uses saved ChatGPT sign-in. The [general connection guide](docs/alpha.md#connecting-claude-or-codex) includes a minimal Claude API callback and the Claude Code command boundary. Provider/model labels alone do not select a service; the callback or command performs the call. The Codex connector is included in the `v0.1.0a3` wheel.
 
 **Automated provider tests use deterministic local providers.** The CPU control submits reference C code; the installed MLX test proposes a retained allocator policy. Current source also passed a live ChatGPT-signed-in Codex native-copy smoke through the shipped command connector, including evaluation and export/load; NumPy was retained when the candidate did not win. [Connector validation](docs/codex.md#what-was-actually-checked) · [Earlier independent authoring study](docs/qualification-041-043.md#043-independent-model-authoring) · [Validation record](docs/retention.md).
 
@@ -198,8 +198,8 @@ python -m build
 
 Candidate execution and provider callbacks use trusted local processes with timeouts, not an OS security sandbox. Run with representative inputs you are allowed to send to your configured provider. Evaluation data is withheld from proposal prompts; candidates do not decide acceptance.
 
-See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. The [GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a2) includes wheels, source and checksums; package-registry distribution remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
+See [retention and release validation](docs/retention.md), [third-party notices](NOTICE), and the repository's experiment ledger. Original code is [MIT licensed](LICENSE); third-party components retain their own licenses. The [GitHub prerelease](https://github.com/aarnav9/lossless-opt/releases/tag/v0.1.0a3) includes wheels, source and checksums; package-registry distribution remains pending. Design documents describe the broader target architecture; this README and the alpha guide define implemented behavior.
 
-Use `lossless profile JOB --output DIRECTORY` to measure discovery inputs without searching or calling a provider. Add `--artifact PATH` to compare a guarded deployment. [Profiling guide](docs/profiling.md) · [Release installation and support matrix](docs/release-0.1.0a2.md) · [Expanded softmax qualification](docs/softmax-039.md).
+Use `lossless profile JOB --output DIRECTORY` to measure discovery inputs without searching or calling a provider. Add `--artifact PATH` to compare a guarded deployment. [Profiling guide](docs/profiling.md) · [Release installation and support matrix](docs/release-0.1.0a3.md) · [Expanded softmax qualification](docs/softmax-039.md).
 
-The current `main` branch also supports frozen [MLX deployment limits](docs/alpha.md#mlx-deployment-limits-unreleased) for latency, active allocation, throughput and payback. [Broader workload qualification](docs/qualification-041-043.md) records where batching gains repeat and where they do not; these source features are included in the `v0.1.0a2` release.
+The current `main` branch also supports frozen [MLX deployment limits](docs/alpha.md#mlx-deployment-limits-unreleased) for latency, active allocation, throughput and payback. [Broader workload qualification](docs/qualification-041-043.md) records where batching gains repeat and where they do not; these source features are included in the `v0.1.0a3` release.

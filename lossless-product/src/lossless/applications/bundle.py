@@ -90,13 +90,8 @@ def verify_tree(root, files):
     )
 
 
-def select(bundle, manifest, calls, requested="auto", *, check_inputs=True):
-    bundle = Path(bundle).resolve()
-    reference = bundle / "reference"
-    if not verify_tree(reference, manifest["reference_files"]):
-        raise ValueError("reference copy changed; rebuild the application bundle")
-    if requested == "reference" or manifest["selected"] == "reference":
-        return "reference", "reference requested or retained"
+def environment_failure(manifest):
+    """Return the reason a source or lifecycle certificate is no longer current."""
     current = environment()
     if identity(current) != identity(manifest["environment"]):
         changed = sorted(
@@ -104,14 +99,44 @@ def select(bundle, manifest, calls, requested="auto", *, check_inputs=True):
             for k in set(current) | set(manifest["environment"])
             if current.get(k) != manifest["environment"].get(k)
         )
-        return "reference", "Python, packages, host or Lossless runtime changed: " + ", ".join(
-            changed
-        )
+        return "Python, packages, host or Lossless runtime changed: " + ", ".join(changed)
     if (
         identity({name: os.environ.get(name) for name in manifest["inherit_env"]})
         != manifest["environment_values_hash"]
     ):
-        return "reference", "declared environment settings changed"
+        return "declared environment settings changed"
+    return None
+
+
+def callable_policy(bundle, manifest, features):
+    """Malformed or stale certificates cannot authorize source or import reuse."""
+    try:
+        policy = read_json(Path(bundle) / "callable.json")
+    except (OSError, ValueError):
+        return None
+    if (
+        type(policy) is not dict
+        or policy.get("status") not in ("accepted", "reference_retained")
+        or policy.get("manifest_identity") != identity(manifest)
+        or policy.get("lifecycle_exact") is not True
+        or policy.get("mode") not in ("oneshot", "prepared")
+        or policy.get("input_mode") != "values"
+        or policy.get("runtime_features") != sorted(features)
+    ):
+        return None
+    return policy
+
+
+def select(bundle, manifest, calls, requested="auto", *, check_inputs=True):
+    bundle = Path(bundle).resolve()
+    reference = bundle / "reference"
+    if not verify_tree(reference, manifest["reference_files"]):
+        raise ValueError("reference copy changed; rebuild the application bundle")
+    if requested == "reference" or manifest["selected"] == "reference":
+        return "reference", "reference requested or retained"
+    reason = environment_failure(manifest)
+    if reason:
+        return "reference", reason
     if not verify_tree(bundle / "optimized", manifest["optimized_files"]):
         return "reference", "optimized copy changed"
     if not check_inputs:

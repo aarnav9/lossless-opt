@@ -93,9 +93,9 @@ class Observer:
             return {"type": type(value).__name__, "value": value}
         if type(value) is float:
             return {"type": "float64", "bits": struct.pack(">d", value).hex()}
-        if isinstance(value, str):
+        if type(value) is str:
             return {"type": "str", **self.bytes(value.encode())}
-        if isinstance(value, bytes):
+        if type(value) is bytes:
             return {"type": "bytes", **self.bytes(value)}
         if isinstance(value, (list, tuple)):
             return {
@@ -137,7 +137,8 @@ class Observer:
                 if array.dtype.hasobject:
                     raise ValueError("object arrays require entry.observe")
                 shape, dtype, data = list(array.shape), str(array.dtype), array.tobytes(order="C")
-            return {"type": module + ".array", "shape": shape, "dtype": dtype, **self.bytes(data)}
+            kind = ".scalar" if module == "numpy" and isinstance(value, np.generic) else ".array"
+            return {"type": module + kind, "shape": shape, "dtype": dtype, **self.bytes(data)}
         raise ValueError(f"unsupported observed type {type(value).__name__}; provide entry.observe")
 
 

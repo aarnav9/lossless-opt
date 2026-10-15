@@ -131,6 +131,8 @@ def main(directory):
                 "scripts/check_cpu_project.py",
                 "docs/cpu-projects.md",
                 "docs/release-0.1.0a2.md",
+                "docs/release-0.1.0a3.md",
+                "docs/evidence/cpu-alpha3-review.json.gz",
                 "docs/cpu-usability-study.md",
                 "experiments/cpu_usability/study.py",
                 "examples/cpu-callable/project/examples.py",

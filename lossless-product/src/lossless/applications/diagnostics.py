@@ -23,6 +23,16 @@ def differences(left, right, *, limit=20):
         if len(rows) >= limit:
             return
         if isinstance(a, (np.ndarray, np.generic)) and isinstance(b, (np.ndarray, np.generic)):
+            if isinstance(a, np.generic) != isinstance(b, np.generic):
+                rows.append(
+                    dict(
+                        path=path,
+                        kind="value_type",
+                        left_type=type(a).__name__,
+                        right_type=type(b).__name__,
+                    )
+                )
+                return
             a, b = np.asarray(a), np.asarray(b)
             if a.shape != b.shape or a.dtype != b.dtype:
                 rows.append(

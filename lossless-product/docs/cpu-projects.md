@@ -2,7 +2,7 @@
 
 `run-project` takes a local Python/NumPy callable and representative inputs through
 configuration, profiling, local candidate selection, exact evaluation, and a
-runnable project copy. It makes **zero model calls**. Install the 0.1.0a2 alpha
+runnable project copy. It makes **zero model calls**. Install the 0.1.0a3 alpha
 or current source in the project's Python environment:
 
 ```sh
@@ -85,11 +85,15 @@ sequence. Single calls reset the factory. Inputs/results are copied values;
 caller aliases and input mutations are not propagated. Supported array layouts
 and finite metadata admission are the same as the live-value API below.
 
-A missing/invalid callable certificate defaults to fresh reference execution.
+A missing/invalid callable certificate uses fresh reference execution, including
+when `mode='prepared'` is requested. Import reuse requires a matching certificate.
 An optimized metadata miss raises **before execution**; open a separate
 `CallableApplication(bundle, variant='reference')` for unsupported inputs. There
 is no automatic retry after an application error or timeout. A changed source,
 package version, host or declared environment prevents optimized admission.
+Environment changes also disable qualified import reuse for reference-only bundles;
+`run.info` reports the actual mode and reason. Reference execution in an unchanged,
+qualified environment can retain prepared mode without a source optimization.
 Requalify with the same project command into a new output directory. The original
 project and earlier bundles remain available; remove the adapter to revert.
 

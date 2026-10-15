@@ -275,6 +275,18 @@ class ApplicationTests(unittest.TestCase):
         b = np.array([0x7FC00002], dtype=np.uint32).view(np.float32)
         self.assertNotEqual(Observer(100).encode(a), Observer(100).encode(b))
 
+    def test_exact_observer_distinguishes_numpy_scalars_arrays_and_python_scalars(self):
+        from lossless.applications.diagnostics import differences
+
+        for scalar in (np.float64(3), np.int32(3), np.str_("same"), np.bytes_(b"same")):
+            with self.subTest(dtype=scalar.dtype):
+                array = np.asarray(scalar)
+                self.assertNotEqual(Observer(100).encode(scalar), Observer(100).encode(array))
+                self.assertNotEqual(
+                    Observer(100).encode(scalar), Observer(100).encode(scalar.item())
+                )
+                self.assertEqual(differences(scalar, array)[0]["kind"], "value_type")
+
     def test_src_package_relative_imports_and_factory_arguments(self):
         package = self.project / "src/pkg"
         package.mkdir(parents=True)

@@ -220,3 +220,6 @@ Keep large runs and scratch work under ignored `research/`. Any evidence require
 ## CPU callable usability and 0.1.0a2
 
 [Four external project trials](lossless-product/docs/cpu-usability-study.md) validate Python input loaders, ordinary callable delivery, complete-cost selection and reference retention. The Financial control preserves about 1.35× complete warm-request speed; negative transfer results remain recorded.
+
+- **CPU-ALPHA3-REVIEW — Experiment:** Regress changed-environment reuse, invalid certificates and NumPy return-type changes; rerun the existing Financial workload under the stricter exact runtime.
+- **Result — fixes retain the measured gain:** Required gates passed with 1.3535× warm complete-request speed and 1.3300× startup-amortized speed versus equally prepared original source; fresh public-adapter inputs matched exactly. [Patch alpha, scope and evidence](lossless-product/docs/release-0.1.0a3.md).

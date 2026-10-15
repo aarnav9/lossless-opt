@@ -128,6 +128,17 @@ class CPUWorkflowTests(unittest.TestCase):
         self.assertTrue(all(row["exact"] for row in result["delivery"]))
         self.assertFalse((self.root / "workflow/application/optimized").exists())
 
+    def test_equal_bits_with_changed_numpy_return_type_are_rejected(self):
+        (self.project / "app.py").write_text(
+            "import numpy as np\ndef run(x):\n    return np.float64(x)\n"
+        )
+        result = self.optimize(
+            entry="app.py:run", cases=self.cases, plan=self.plan("return np.array(float(x))\n")
+        )
+        self.assertEqual(result["status"], "reference_retained", result)
+        self.assertEqual(result["search"]["candidates"][0]["status"], "mismatch")
+        self.assertTrue(all(row["exact"] for row in result["delivery"]))
+
     def test_accepted_delivery_new_values_and_changed_metadata_fallback(self):
         # Shared resident application data keeps this admission/routing test from
         # depending on tiny-process import RSS ratios under platform load.

@@ -54,7 +54,7 @@ def doctor():
     import platform
 
     versions = {}
-    for name in ["numpy", "scipy", "mlx", "mlx-lm"]:
+    for name in ["numpy", "scipy", "psutil", "threadpoolctl", "mlx", "mlx-lm"]:
         try:
             versions[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
@@ -73,6 +73,9 @@ def doctor():
         sys.platform in {"darwin", "linux"}
         and shutil.which("clang") is not None
         and versions["numpy"] is not None
+    )
+    cpu_application = sys.platform in {"darwin", "linux"} and all(
+        versions[name] is not None for name in ("numpy", "psutil")
     )
     mlx = (
         platform.system() == "Darwin"
@@ -115,11 +118,16 @@ def doctor():
                 "profile",
                 "profile --explain",
                 "search-application --plan",
+                "run-project --entry --input-loader --deployment auto",
             ],
-            "optimization_available": False,
+            "optimization_available": cpu_application,
             "experimental_source_search_available": True,
+            "callable_deployment_available": cpu_application,
+            "next_step": "lossless run-project --help"
+            if cpu_application
+            else "Install the applications extra in the project's Python environment",
         },
-        "scope": "macOS/Linux alpha. Existing-application intake, replay, callable profiling/assessment and scoped experimental source search are available. Guarded application deployment, general vision/CUDA execution and end-to-end proved contracts are not implemented. Execution is trusted-local.",
+        "scope": "macOS/Linux alpha. Local Python/NumPy callable intake, profiling, scoped source search and copied-value callable deployment are available. Exactness is finite validation on supplied examples. General vision/CUDA execution and end-to-end proved contracts are not implemented. Execution is trusted-local.",
     }
 
 

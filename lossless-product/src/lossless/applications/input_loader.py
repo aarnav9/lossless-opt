@@ -118,7 +118,13 @@ def collect(project, output, loader, *, python, include, exclude, inherit_env, t
     )
     progress(f"INPUT LOADER {loader}; executing once in copied project")
     receipt = execute(
-        [str(python or sys.executable), "-s", "-m", __name__, str(payload)],
+        [
+            str(python or sys.executable),
+            "-s",
+            "-c",
+            "import sys; from lossless.applications.input_loader import main; main(sys.argv[1])",
+            str(payload),
+        ],
         cwd=staged,
         env=env,
         stdin="",

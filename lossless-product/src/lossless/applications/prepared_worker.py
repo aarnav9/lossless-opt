@@ -10,7 +10,7 @@ import sys
 import time
 
 from ..jobs import identity, read_json
-from .bundle import select, signature
+from .bundle import callable_policy, environment_failure, select, signature
 from .config import validate_cases
 from .replay import copy_project
 from .request_guard import RequestGuard
@@ -32,25 +32,37 @@ def serve(
     bundle = Path(bundle).resolve()
     manifest = read_json(bundle / "manifest.json")
     selected, reason = select(bundle, manifest, None, requested, check_inputs=False)
-    certificate = bundle / ("prepared-values.json" if input_mode == "values" else "prepared.json")
-    if lifecycle.startswith("callable-"):
-        certificate = bundle / "callable.json"
-    if selected == "optimized" and not qualifying:
+    callable_mode = lifecycle.startswith("callable-")
+    if callable_mode and not qualifying:
+        policy = callable_policy(bundle, manifest, features)
+        if policy is None or policy["mode"] != lifecycle.removeprefix("callable-"):
+            selected, lifecycle = "reference", "callable-oneshot"
+            reason = "callable deployment has not qualified for this mode; using fresh reference"
+        else:
+            if policy["status"] == "reference_retained":
+                selected = "reference"
+    elif selected == "optimized" and not qualifying:
+        certificate = bundle / (
+            "prepared-values.json" if input_mode == "values" else "prepared.json"
+        )
         policy = read_json(certificate) if certificate.exists() else {}
         if (
             policy.get("status") != "accepted"
             or policy.get("manifest_identity") != identity(manifest)
             or policy.get("runtime_features") != sorted(features)
             or policy.get("input_mode", "fixtures") != input_mode
-            or (
-                lifecycle.startswith("callable-")
-                and (
-                    policy.get("mode") != lifecycle.removeprefix("callable-")
-                    or policy.get("lifecycle_exact") is not True
-                )
-            )
         ):
             selected, reason = "reference", "prepared request lifecycle has not qualified"
+    if lifecycle == "callable-prepared" and selected == "reference":
+        # select() permits an explicit reference in any environment. Import reuse
+        # needs unchanged metadata even without an edit. Include this startup cost
+        # during qualification too; it must measure the deployed path.
+        failure = environment_failure(manifest)
+        if failure:
+            if qualifying:
+                raise ValueError("deployment qualification environment changed: " + failure)
+            selected, lifecycle = "reference", "callable-oneshot"
+            reason = failure + "; using fresh reference"
     root = Path.cwd() / "project"
     copy_project(bundle / selected, root, {"files": manifest[selected + "_files"]})
     cases = read_json(bundle / "cases.json")
@@ -69,7 +81,15 @@ def serve(
     observe = load_target(entry["observe"], root, loaded) if entry.get("observe") else None
     cleanup = load_target(entry["cleanup"], root, loaded) if entry.get("cleanup") else None
     connection.send_bytes(
-        encode(dict(status="ready", variant=selected, fallback_reason=reason, pid=os.getpid()))
+        encode(
+            dict(
+                status="ready",
+                variant=selected,
+                fallback_reason=reason,
+                pid=os.getpid(),
+                mode=lifecycle.removeprefix("callable-"),
+            )
+        )
     )
     completed_requests = 0
     while True:

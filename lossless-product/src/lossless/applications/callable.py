@@ -4,8 +4,9 @@ from pathlib import Path
 import time
 import threading
 
-from ..jobs import identity, read_json
-from .prepared import PreparedApplication
+from ..jobs import read_json
+from .bundle import callable_policy
+from .prepared import DEFAULT_FEATURES, PreparedApplication
 
 
 class CallableApplication:
@@ -26,24 +27,22 @@ class CallableApplication:
         self.bundle = Path(bundle).resolve()
         self.python, self.timeout = python, timeout
         manifest = read_json(self.bundle / "manifest.json")
-        path = self.bundle / "callable.json"
-        policy = read_json(path) if path.exists() else {}
-        valid = (
-            policy.get("status") in {"accepted", "reference_retained"}
-            and policy.get("manifest_identity") == identity(manifest)
-            and policy.get("lifecycle_exact") is True
-        )
-        self.mode = mode or (policy.get("mode", "oneshot") if valid else "oneshot")
-        if self.mode not in {"oneshot", "prepared"}:
-            raise ValueError("invalid callable certificate mode")
+        policy = callable_policy(self.bundle, manifest, (*DEFAULT_FEATURES, "values"))
+        self.mode = mode or (policy["mode"] if policy else "oneshot")
         self.variant = variant
         self._qualifying = _qualifying
         reason = None
-        if not _qualifying and not (
-            valid and policy.get("mode") == self.mode and policy.get("status") == "accepted"
-        ):
-            self.variant = "reference"
-            reason = "callable deployment has not qualified; re-run run-project with --deployment"
+        if not _qualifying:
+            if policy is None or policy["mode"] != self.mode:
+                self.variant, self.mode = "reference", "oneshot"
+                reason = (
+                    "callable deployment certificate missing, invalid or for another mode; "
+                    "using fresh reference; re-run run-project with --deployment"
+                )
+            elif policy["status"] == "reference_retained":
+                self.variant = "reference"
+                reason = "reference retained by deployment qualification"
+        self._fallback_reason = reason
         self.info = dict(variant=self.variant, mode=self.mode, fallback_reason=reason)
         self._session = None
         self._closed = False
@@ -54,9 +53,21 @@ class CallableApplication:
             tick = time.perf_counter()
             self._session = self._open()
             self.startup_seconds = time.perf_counter() - tick
-            self.info.update(self._session.info)
-            if reason and not self.info.get("fallback_reason"):
-                self.info["fallback_reason"] = reason
+            self._update_info(self._session)
+
+    def _update_info(self, session):
+        self.info.update(session.info)
+        # The worker rechecks the certificate and environment before imports.
+        # A stale prepared qualification uses this worker for one request only.
+        if self.mode != self.info["mode"] and self.info.get("fallback_reason"):
+            self._fallback_reason = self.info["fallback_reason"]
+        self.mode = self.info["mode"]
+        if self._fallback_reason and self.info.get("fallback_reason") in {
+            None,
+            "reference requested or retained",
+            "callable deployment has not qualified for this mode; using fresh reference",
+        }:
+            self.info["fallback_reason"] = self._fallback_reason
 
     def _open(self):
         return PreparedApplication(
@@ -79,17 +90,18 @@ class CallableApplication:
         try:
             if session is None:
                 session = self._open()
+            self._update_info(session)
             session.timeout = self.timeout
             receipt = session.run_values({"calls": calls})
             receipt["peak_tree_rss_bytes"] = session.peak_tree_rss_bytes
             receipt["memory_available"] = session.memory_available
-            self.info.update(session.info)
             self.last_receipt = receipt
             return receipt["outputs"]
         finally:
             try:
                 if self.mode == "oneshot" and session is not None:
                     session.close()
+                    self._session = None
             finally:
                 self._lock.release()
 
