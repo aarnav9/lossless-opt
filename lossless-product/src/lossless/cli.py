@@ -607,7 +607,9 @@ def main(argv=None):
                 "report": str(outcome.directory / "report.html"),
             }
         elif args.command == "report":
-            result = read_json(args.run / "report.json")
+            from .reports import read_report
+
+            result = read_report(args.run / "report.json")
         elif args.command == "export":
             from .artifacts import export
 

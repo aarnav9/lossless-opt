@@ -312,3 +312,13 @@ Memory is the largest MLX-tracked active allocation during warm calls, including
 Payback uses the entire measured search cost plus relative first-call excess over warm, divided by measured per-batch savings. Shared model loading is excluded from deployment setup but included when it occurred during the search. The final check accounts for the completed search rather than only the cost seen at discovery. No positive saving means no finite payback. Unmeasured human/provider billing cost is not invented.
 
 `deployment_metrics`, raw samples and per-limit pass/fail records appear in the report. If no candidate satisfies all gates, Lossless retains the reference; that outcome does **not** certify that the reference meets the requested limits. These are offline acceptance checks for the declared workload, not an online latency/memory enforcement mechanism for arbitrary later requests.
+
+
+## Display generated reports
+
+In current source (unreleased), `lossless report RUN_DIRECTORY` displays
+`report.json` with a separate 64 MiB
+file-size limit, so nested validation evidence can exceed the 4 MB configuration
+input limit. Configuration and artifact admission retain their existing limits.
+Duplicate JSON keys, nonfinite values, invalid UTF-8 and malformed JSON remain
+errors. The display limit bounds file bytes, not decoded-object memory.
