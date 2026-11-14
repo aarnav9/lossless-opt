@@ -298,6 +298,13 @@ are loaded afresh; outputs travel as copied values over a bounded JSON/NumPy cha
 without pickle. Responses are limited to 64 MiB. Only one request runs at a time.
 The context manager stops the process and removes its private files.
 
+Request-local inputs, results and observations stay alive through all calls,
+cleanup and response transmission. The worker releases its references before
+receiving the next request, so a previous result table does not remain live merely
+because it was the last returned value. Copied outputs already delivered to the
+caller remain independent. Module caches, application-held references and reusable
+transport capacity remain; releasing references does not guarantee lower OS RSS.
+
 An absent/failed certificate or changed environment selects a reference session.
 Once an optimized session starts, unsupported request metadata raises before the
 callable executes. Use `PreparedApplication(bundle, variant='reference')` explicitly
