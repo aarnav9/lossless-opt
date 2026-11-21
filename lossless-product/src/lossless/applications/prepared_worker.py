@@ -92,7 +92,11 @@ def serve(
         )
     )
     completed_requests = 0
-    while True:
+
+    def respond():
+        # Own every decoded input and result until the response has been sent.
+        # A fresh frame releases request-local arrays before the next receive,
+        # while module globals and intentional application caches remain alive.
         frame = connection.recv_bytes(MAX_MESSAGE)
         if "raw" in features:
             command = raw_wire.unpack(frame)
@@ -144,7 +148,7 @@ def serve(
                             )
                         )
                     )
-                    continue
+                    return 0
             # Each request keeps the established fresh-factory, seeded lifecycle.
             # Imports survive; calls within this request share the same object.
             random.seed(manifest["seed"])
@@ -212,14 +216,19 @@ def serve(
             if len(response) > MAX_MESSAGE:
                 raise ValueError("response too large")
             connection.send_bytes(response)
-            del results, retained, observations, response, selected_call
-            completed_requests += 1
+            return 1
         except Exception as error:
             # State after an application failure is unknown. Report once and exit.
             connection.send_bytes(
                 encode(dict(status="failed", error=type(error).__name__, reason=str(error)))
             )
             return
+
+    while True:
+        completed = respond()
+        if completed is None:
+            return
+        completed_requests += completed
 
 
 if __name__ == "__main__":

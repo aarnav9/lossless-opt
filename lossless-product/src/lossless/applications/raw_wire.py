@@ -61,7 +61,12 @@ def pack(value, staging=None):
             return dict(type="dict", items=[[k, encode(x, depth + 1)] for k, x in v.items()])
         raise ValueError("unsupported transported value")
 
-    row = encode(value)
+    try:
+        row = encode(value)
+    finally:
+        # Recursive closures retain their cells, including array-backed segments.
+        # Break that cycle on success and failure instead of waiting for cyclic GC.
+        encode = None
     header = json.dumps(dict(value=row, arrays=arrays)).encode()
     size = 4 + len(header) + total
     if size > MAX_MESSAGE:
